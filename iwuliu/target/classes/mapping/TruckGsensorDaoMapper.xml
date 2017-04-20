@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckGsensorDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Truck_Gsensor" type="com.cn.gazelle.logistics.pojo.T_Data_Truck_Gsensor">
+
+        <id column="GSENSOR_NUMBER" property="gsensor_number"/>
+        <result column="OBD_ID" property="obd_id"/>
+        <result column="CLIENT_ACQUISITION_TIME" property="client_acquisition_time"/>
+        <result column="X_GSENSOR" property="x_gsensor"/>
+        <result column="Y_GSENSOR" property="y_gsensor"/>
+        <result column="Z_GSENSOR" property="z_gsensor"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--保存卡车故障信息-->
+    <insert id="saveTruckGsensor" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Gsensor">
+        INSERT INTO
+        T_Data_Truck_Gsensor(GSENSOR_NUMBER,
+        OBD_ID,
+        CLIENT_ACQUISITION_TIME,
+        X_GSENSOR,
+        Y_GSENSOR,
+        Z_GSENSOR,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID)
+        VALUES (
+        #{gsensor_number},
+        #{obd_id},
+        #{client_acquisition_time},
+        #{x_gsensor},
+        #{y_gsensor},
+        #{z_gsensor},
+        0,
+        #{last_update},
+        #{last_update_user_id})
+    </insert>
+
+    <!--更新卡车故障信息-->
+    <update id="updateTruckGsensor" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Gsensor">
+        UPDATE
+        T_Data_Truck_Gsensor
+        SET
+        OBD_ID = #{obd_id},
+        CLIENT_ACQUISITION_TIME = #{client_acquisition_time},
+        X_GSENSOR = #{x_gsensor},
+        Y_GSENSOR = #{y_gsensor},
+        Z_GSENSOR = #{z_gsensor},
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+        GSENSOR_NUMBER = #{gsensor_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据重力加速度No删除卡车重力加速信息-->
+    <delete id="delTruckGsensor" parameterType="String">
+        UPDATE
+            T_Data_Truck_Gsensor
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            GSENSOR_NUMBER = #{gsensor_number} AND DELETE_FLAG = 0
+    </delete>
+</mapper>

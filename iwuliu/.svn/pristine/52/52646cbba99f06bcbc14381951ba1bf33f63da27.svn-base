@@ -1,0 +1,8 @@
+/*表格显示*/
+.fixed-table-body{
+    height:auto;
+}
+#myModal label{
+    min-width: 104px;
+    text-align: right;
+}

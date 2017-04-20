@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.UserDaoMapper">
+
+    <resultMap id="T_Sys_User" type="com.cn.gazelle.logistics.pojo.T_Sys_User">
+        <id column="USER_ID" property="user_id" />
+        <result column="LOGIN_NAME" property="login_name" />
+        <result column="LOGIN_PASSWORD" property="login_password" />
+        <result column="USER_NAME" property="user_name" />
+        <result column="USER_SEX" property="user_sex" />
+        <result column="USER_PHONE" property="user_phone" />
+        <result column="USER_TEL" property="user_tel" />
+        <result column="USER_MAIL" property="user_mail" />
+        <result column="PROVINCE_ID" property="province_id"/>
+        <result column="CITY_ID" property="city_id"/>
+        <result column="AREA_ID" property="area_id"/>
+        <result column="TOWN_STREET" property="town_street"/>
+        <result column="GROUP_ID" property="group_id" />
+        <result column="GROUP_NAME" property="group_name" />
+        <result column="FUN_ROLE_ID" property="funRole_id" />
+        <result column="FUN_ROLE_NAME" property="funRole_name" />
+        <result column="DATA_ROLE_ID" property="dataRole_id" />
+        <result column="DATA_ROLE_NAME" property="dataRole_name" />
+        <result column="USER_DATE" property="user_date" />
+        <result column="DELETE_STATES" property="delete_states" />
+        <result column="USER_REMARK" property="user_remark" />
+    </resultMap>
+
+    <!--根据ID查找用户信息 -->
+    <select id="findUserByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Sys_User">
+        SELECT
+            *
+        FROM
+            T_Sys_User
+        WHERE
+            USER_ID=#{user_id} AND DELETE_STATES = '0'
+    </select>
+
+    <!--根据登录名查找用户信息-->
+    <select id="findUserByLoginName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Sys_User">
+        SELECT
+            *
+        FROM
+            T_Sys_User
+        WHERE
+            LOGIN_NAME =#{login_name} AND DELETE_STATES = '0'
+    </select>
+
+    <!--根据用户名和密码查询用户信息-->
+    <select id="findUserByNamePassword" resultType="com.cn.gazelle.logistics.pojo.T_Sys_User">
+        SELECT
+            *
+        FROM
+            T_Sys_User
+        WHERE
+            LOGIN_NAME=#{login_name} AND LOGIN_PASSWORD = #{login_password} AND DELETE_STATES = '0'
+    </select>
+
+    <!--根据用户登录名查找用户角色信息-->
+    <select id="findFunRoleByLoginName" resultMap="T_Sys_User">
+        SELECT
+            *
+        FROM
+            T_Sys_User u
+        WHERE
+            u.LOGIN_NAME LIKE  '%${login_name}%' AND u.DELETE_STATES = '0'
+    </select>
+
+    <!--查找所有用户信息-->
+    <select id="findAllUser" resultMap="T_Sys_User">
+        SELECT
+            *
+        FROM
+            T_Sys_User
+        WHERE
+            DELETE_STATES = '0'
+        <if test="search_type != ''">
+        AND
+            ${search_type} LIKE '%${name}%'
+        </if>
+            limit #{page},#{rows}
+
+    </select>
+
+    <!--查询用户总记录数-->
+    <select id="findAllUserRowsCount" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_User
+        WHERE
+            DELETE_STATES = '0'
+    </select>
+
+    <!--查询符合条件的总用户记录数-->
+    <select id="findAllUserSearchCount" parameterType="String" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_User
+        WHERE
+            DELETE_STATES = '0'
+        <if test="search_type != ''">
+        AND
+            ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--保存用户信息-->
+    <insert id="saveUser" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_User">
+        INSERT INTO
+                T_Sys_User (USER_ID,
+                LOGIN_NAME,
+                LOGIN_PASSWORD,
+                USER_NAME,
+                USER_SEX,
+                USER_PHONE,
+                USER_TEL,
+                USER_MAIL,
+                PROVINCE_ID,
+                CITY_ID,
+                AREA_ID,
+                TOWN_STREET,
+                GROUP_ID,
+                GROUP_NAME,
+                FUN_ROLE_ID,
+                FUN_ROLE_NAME,
+                DATA_ROLE_ID,
+                DATA_ROLE_NAME,
+                USER_DATE,
+                DELETE_STATES,
+                USER_REMARK)
+        VALUES (
+                #{user_id},
+                #{login_name},
+                #{login_password},
+                #{user_name},
+                #{user_sex},
+                #{user_phone},
+                #{user_tel},
+                #{user_mail},
+                #{province_id},
+                #{city_id},
+                #{area_id},
+                #{town_street},
+                #{group_id},
+                #{group_name},
+                #{funRole_id},
+                #{funRole_name},
+                #{dataRole_id},
+                #{dataRole_name},
+                #{user_date},
+                '0',
+                #{user_remark});
+    </insert>
+
+    <!--更新用户信息-->
+    <update id="updateUser" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_User">
+        UPDATE
+            T_Sys_User
+        SET
+            LOGIN_NAME = #{login_name},
+            LOGIN_PASSWORD = #{login_password},
+            USER_NAME = #{user_name},
+            USER_SEX = #{user_sex},
+            USER_PHONE = #{user_phone},
+            USER_TEL = #{user_tel},
+            USER_MAIL = #{user_mail},
+            PROVINCE_ID = #{province_id},
+            CITY_ID = #{city_id},
+            AREA_ID = #{area_id},
+            TOWN_STREET = #{town_street},
+            USER_REMARK = #{user_remark}
+        WHERE
+            USER_ID = #{user_id} AND DELETE_STATES = '0'
+    </update>
+
+    <!--更新用户数据角色-->
+    <update id="updateUserDataRole" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_User">
+        UPDATE
+            T_Sys_User
+        SET
+            DATA_ROLE_ID = #{dataRole_id},
+            DATA_ROLE_NAME = #{dataRole_name}
+        WHERE
+            USER_ID = #{user_id} AND DELETE_STATES = '0'
+    </update>
+
+    <!--更新用户功能角色-->
+    <update id="updateUserFunRole" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_User">
+        UPDATE
+            T_Sys_User
+        SET
+            FUN_ROLE_ID = #{funRole_id},
+            FUN_ROLE_NAME = #{funRole_name}
+        WHERE
+            USER_ID = #{user_id} AND DELETE_STATES = '0'
+    </update>
+
+    <!--更新用户分组-->
+    <update id="updateUserUserGroup" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_User">
+        UPDATE
+            T_Sys_User
+        SET
+            GROUP_ID = #{group_id},
+            GROUP_NAME = #{group_name}
+        WHERE
+            USER_ID = #{user_id} AND DELETE_STATES = '0'
+    </update>
+
+    <!--根据用户ID删除用户信息-->
+    <delete id="delUser" parameterType="String">
+        UPDATE
+            T_Sys_User
+        SET
+            DELETE_STATES = '1'
+        WHERE
+            USER_ID = #{user_id} AND DELETE_STATES = '0'
+    </delete>
+</mapper>

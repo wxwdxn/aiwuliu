@@ -1,0 +1,322 @@
+//不能不包含特殊符号
+var specialWord=/^([\u4E00-\u9FA5]|\w)*$/;
+$(function() {
+	//验证账户
+	checkMob($("#userName")[0], regExpMob)
+	checkMob($("#changeUserName")[0], regExpMob);
+	//验证密码
+	checkPaw($("#passWord")[0], regExpPsd1);
+	checkPaw($("#newPwd")[0], regExpPsd1);
+	//验证两次输入密码是否一致
+	checkAgainPSW($("#againNewPwd")[0])
+	// 登录页面cookie记住密码
+	var username = $.cookie('username');
+	var loginPaw = $.cookie('loginPaw');
+	if (typeof(username) != "undefined"
+			&& typeof(loginPaw) != "undefined") {
+		$("#userName").val(username);
+		$("#passWord").val(loginPaw);
+		$(".isRem").attr("isRem", "true");
+		$(".isRem").addClass("glyphicon-check");
+		$(".isRem").removeClass("glyphicon-unchecked")
+	}
+	// 发送验证码
+	$(".code").click(function () {
+		var prompt = document.getElementById("prompt");
+		var changeUserName = document.getElementById("changeUserName").value;
+		if(changeUserName != ""){
+			$.ajax({
+				type: "POST",
+				url: '/iwuliu/login/sendSMS',
+				data: {mobilePhone: changeUserName},
+				dataType: 'json',
+				cache: false,
+				async: false,
+				success: function (data, stats) {
+					if (data == 0) {
+						//prompt.innerHTML = "系统错误，请再试一次";
+						//alert("系统错误，请再试一次");
+						prompt.innerHTML = "系统错误，请再试一次";
+						$("#prompt").css("color", "red")
+					}
+					if (data == 7) {
+						prompt.innerHTML = "手机号码未注册，请重新输入";
+						$("#prompt").css("color", "red")
+					}
+					if (data == 8) {
+						prompt.innerHTML = "短信发送成功";
+						$("#prompt").css("color", "#fff")
+						//alert("短信发送成功");
+					}
+				}
+			})
+		}else{
+			$("#changeUserName").parents(".form-group").find("p").text("请输入账户名");
+			$("#changeUserName").parents(".form-group").find("p").css("color","#fff")
+		}
+
+	})
+})
+//时间表示
+var timeEnd;
+var selfClick;
+//正则验证
+var regExpMob = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/; //手机号码正则验证准确版
+var regExpPsd1 = /^.{6,20}$/;
+//点击忘记密码
+function forgetPwd(){
+	$(".login").addClass("hidden");
+	$(".register").removeClass("hidden");
+	$(".registerSuccess").addClass("hidden")
+};
+
+//点击记住密码切换图片
+function changeStatics(ele){
+	var _isRem = $(ele).attr("isRem");
+	if(_isRem == "false"){
+		$(ele).attr("isRem","true");
+		$(ele).addClass("glyphicon-check");
+		$(ele).removeClass("glyphicon-unchecked")
+	}else{
+		$(ele).attr("isRem","false");
+		$(ele).removeClass("glyphicon-check");
+		$(ele).addClass("glyphicon-unchecked")
+	}
+}
+//获取验证码倒计时
+function getCode(ele){
+	if (document.getElementById('changeUserName').value!=""){
+		if($(ele).attr("isClick") == "true"){
+			$(ele).attr("isClick","false");
+			var i = 60
+			$(ele).html("<i>"+ i +"</i>s后重新获取");
+			timeEnd = setInterval(function(){
+				i--;
+				$(ele).html("<i>"+ i +"</i>s后重新获取");
+				if(i == 0){
+					clearInterval(timeEnd);
+					$(ele).html("获取验证码")
+					$(ele).attr("isClick","true");
+				}
+			},1000);
+		}
+	}else{
+		$("#changeUserName").parents(".form-group").find("p").text("请输入账户名");
+		$("#changeUserName").parents(".form-group").find("p").css("color","#fff")
+	}
+
+}
+//确认修改密码成功
+function registerBtn(){
+	$(".login").addClass("hidden");
+	$(".register").addClass("hidden");
+	$(".registerSuccess").removeClass("hidden");
+	$(".code").text("获取验证码")
+	var i = 10;
+	clearInterval(timeEnd);
+	$(".code").attr("isClick","true");
+	selfClick = setInterval(function(){
+		i--;
+		$(".selfChick").html(i);
+		if(i == 0){
+			clearInterval(selfClick);
+			$(".back_login").click()
+		}
+	},1000)
+}
+//返回登录页面
+function back_login(){
+	clearInterval(selfClick);
+	$(".selfChick").html("10")
+	$(".login").removeClass("hidden");
+	$(".register").addClass("hidden");
+	$(".registerSuccess").addClass("hidden")
+}
+
+
+//验证账户
+function checkMob(inp, regEx) {
+	inp.onkeyup = function () {
+		if (this.value == '') {
+			$(this).parents(".form-group").find("p").text("请输入账户名");
+			$(this).parents(".form-group").find("p").css("color","#fff")
+			//this.nextElementSibling.className = "";
+			console.log(this.value)
+		}
+		else if (regEx.test(this.value)) {
+			//this.nextElementSibling.innerHTML = "输入正确";
+			$(this).parents(".form-group").find("p").text("输入正确")
+			$(this).parents(".form-group").find("p").css("color","#fff")
+			//this.nextElementSibling.className = "";
+			console.log(this.value)
+		} else {
+			//this.nextElementSibling.innerHTML = "账户格式不正确 请重新输入";
+			$(this).parents(".form-group").find("p").text("账户格式不正确")
+			$(this).parents(".form-group").find("p").css("color","red")
+			//this.nextElementSibling.className = "wrong";
+		}
+	}
+}
+
+
+function checkPaw(inp, regEx) {
+	inp.onkeyup = function () {
+		if (this.value == '') {
+			$(this).parents(".form-group").find("p").text("请输入密码");
+			$(this).parents(".form-group").find("p").css("color","#fff");
+		} else if (!specialWord.test(this.value)){
+			$(this).parents(".form-group").find("p").text("不能输入特殊字符");
+			$(this).parents(".form-group").find("p").css("color","red");
+		} else if (regEx.test(this.value)) {
+			$(this).parents(".form-group").find("p").text("密码格式正确");
+			$(this).parents(".form-group").find("p").css("color","#fff");
+		}  else {
+			$(this).parents(".form-group").find("p").text("密码必须为6-20位");
+			$(this).parents(".form-group").find("p").css("color","red");
+		}
+	}
+}
+
+// 登录
+function login() {
+	var username = $("#userName").val();
+	var loginPaw = $("#passWord").val();
+	var showMsg = document.getElementById("showMsg");
+	$.ajax({
+		type: "POST",
+		url: '/iwuliu/login/selectMember',
+		data: {username: username, loginPaw: loginPaw},
+		dataType: 'json',
+		cache: false,
+		error: function (request) {      // 设置表单提交出错
+			showMsg.innerHTML = "系统错误";
+		},
+		success: function (data, stats) {
+			if (data == 3) {
+				showMsg.innerHTML = "用户名或密码为空，请重新输入";
+			}
+			if (data == 4) {
+				showMsg.innerHTML = "用户名或密码错误，请重新输入";
+			}
+			if (data == 5) {
+				saveCookie();
+				showMsg.innerHTML = "正在登录 , 请稍后 ...";
+				window.top.location.href = "/iwuliu/operationWelcome/home";
+			}
+		}
+	});
+}
+// 保存cookies信息
+function saveCookie() {
+	if ($(".isRem").attr("isRem") == "true") {
+		$.cookie('username', $("#userName").val(), {
+			expires: 7
+		});
+		$.cookie('loginPaw', $("#passWord").val(), {
+			expires: 7
+		});
+	} else {
+		$.cookie('username', '', {
+			expires: -1
+		});
+		$.cookie('loginPaw', '', {
+			expires: -1
+		});
+		$("#userName").val('');
+		$("#passWord").val('');
+	}
+}
+
+// 判断两次输入的密码是否一致
+function checkAgainPSW(inp) {
+	inp.onkeyup = function () {
+		if($("#newPwd")[0].value == ""){
+			$("#newPwd").parents(".form-group").find("p").text = "请输入密码";
+			$("#newPwd").parents(".form-group").find("p").css("color","#fff");
+		}else if(this.value == $("#newPwd")[0].value) {
+			$(this).parents(".form-group").find("p").text("输入正确");
+			$(this).parents(".form-group").find("p").css("color","#fff");
+		} else {
+			$(this).parents(".form-group").find("p").text("两次密码不一致 请重新输入");
+			$(this).parents(".form-group").find("p").css("color","red");
+			return;
+		}
+	}
+}
+
+// 提交修改密码
+function editPsw() {
+	var prompt = document.getElementById("prompt");
+	var success = document.getElementById("success");
+	var mobilePhone = document.getElementById('changeUserName').value;
+	var code = document.getElementById('number').value;
+	var newPSW = document.getElementById('newPwd').value;
+	var againPSW = document.getElementById("againNewPwd").value;
+
+	// 判断验证码是否输入
+	if (code == '') {
+		prompt.innerHTML = "请输入验证码";
+		$("#prompt").css("color","red")
+		return;
+	}
+	if (newPSW == againPSW) {
+		prompt.innerHTML = "输入正确";
+		$("#prompt").css("color","#fff")
+	} else {
+		prompt.innerHTML = "两次密码不一致 请重新输入";
+		$("#prompt").css("color","red")
+		return;
+	}
+	$.ajax({
+		type: "POST",
+		url: '/iwuliu/login/editPsw',
+		data: {mobilePhone: mobilePhone, code: code, newPSW: newPSW, againPSW: againPSW},
+		dataType: 'json',
+		cache: false,
+		success: function (data, stats) {
+			if (data == 2) {
+				prompt.innerHTML = "手机号或验证码错误，请重新输入";
+				//alert("手机号或验证码错误，请重新输入！");
+				$("#prompt").css("color","red")
+			}
+			if (data == 6) {
+				prompt.innerHTML = "修改密码成功";
+				$(".login").addClass("hidden");
+				$(".register").addClass("hidden");
+				$(".registerSuccess").removeClass("hidden");
+				$(".code").text("获取验证码")
+				var i = 10;
+				clearInterval(timeEnd);
+				$(".code").attr("isClick","true");
+				selfClick = setInterval(function(){
+					i--;
+					$(".selfChick").html(i);
+					if(i == 0){
+						clearInterval(selfClick);
+						$(".back_login").click()
+					}
+				},1000)
+			}
+			if (data == 9) {
+				prompt.innerHTML = "未获取验证码";
+				//alert("未获取验证码！");
+				$("#prompt").css("color","red")
+			}
+			if (data == 10) {
+				prompt.innerHTML = "系统错误 修改密码失败";
+				//alert("系统错误 修改密码失败！");
+				$("#prompt").css("color","red")
+			}
+			if (data == 11) {
+				prompt.innerHTML = "重置密码与原密码重合";
+				//alert("重置密码与原密码重合！");
+				$("#prompt").css("color","red")
+			}
+			if (data == 12) {
+				prompt.innerHTML = "验证码超时";
+				//alert("验证码1分钟过时，请重新获取验证码！");
+				$("#prompt").css("color","red")
+			}
+		}
+	});
+}

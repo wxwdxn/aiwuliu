@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.WorkConditionDetailDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Work_Condition_Detail" type="com.cn.gazelle.logistics.pojo.T_Data_Work_Condition_Detail">
+
+        <id column="WORK_CONDITION_NUMBER" property="work_condition_number"/>
+        <result column="OBD_ID" property="obd_id"/>
+        <result column="CLIENT_ACQUISITION_TIME" property="client_acquisition_time"/>
+        <result column="WORK_CONDITION_TYPE" property="work_condition_type"/>
+        <result column="WORK_CONDITION_VALUE" property="work_condition_value"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--保存卡车工况明细信息-->
+    <insert id="saveWorkConditionDetail" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Work_Condition_Detail">
+        INSERT INTO
+                T_Data_Work_Condition_Detail(WORK_CONDITION_NUMBER,
+                OBD_ID,
+                CLIENT_ACQUISITION_TIME,
+                WORK_CONDITION_TYPE,
+                WORK_CONDITION_VALUE,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{work_condition_number},
+                #{obd_id},
+                #{client_acquisition_time},
+                #{work_condition_type},
+                #{work_condition_value},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新卡车工况明细信息-->
+    <update id="updateWorkConditionDetail" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Work_Condition_Detail">
+        UPDATE
+            T_Data_Work_Condition_Detail
+        SET
+            OBD_ID = #{obd_id},
+            CLIENT_ACQUISITION_TIME = #{client_acquisition_time},
+            WORK_CONDITION_TYPE = #{work_condition_type},
+            WORK_CONDITION_VALUE = #{work_condition_value},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            WORK_CONDITION_NUMBER= #{work_condition_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据工况No删除卡车工况明细信息-->
+    <update id="delWorkConditionDetail" parameterType="String">
+        UPDATE
+            T_Data_Work_Condition_Detail
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            WORK_CONDITION_NUMBER = #{work_condition_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--查询卡车工况详细信息（驾驶行为分析使用）-->
+    <select id="queryWorkConditionDetailOfDriving" resultType="java.util.HashMap">
+        SELECT
+            (
+            SELECT COUNT(*)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '0313'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  over_speed_count,
+            (
+            SELECT COUNT(*)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '6001'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  rapid_acceleration_count,
+            (
+            SELECT COUNT(*)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '6002'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  rapid_deceleration_count,
+            (
+            SELECT COUNT(*)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '010F'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  high_engine_speed_count,
+            (
+            SELECT SUM(c.WORK_CONDITION_VALUE)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '0313'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  over_speed_duration,
+            (
+            SELECT COUNT(*)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '010E'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  fatigue_driving_count,
+            (
+            SELECT COUNT(*)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '0315'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  idling_count,
+            (
+            SELECT SUM(c.WORK_CONDITION_VALUE)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '0315'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  idling_duration,
+            (
+            SELECT COUNT(*)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '6003'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  turns_count,
+            (SELECT COUNT(*)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '0318'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  trip_count,
+            (SELECT SUM(c.WORK_CONDITION_VALUE)
+            FROM
+                t_data_work_condition_detail AS c
+            <where>
+                c.DELETE_FLAG = '0'
+                AND
+                c.WORK_CONDITION_TYPE = '0318'
+                <if test="obd_id != null and obd_id!= ''">
+                    AND c.OBD_ID LIKE '%${obd_id}%'
+                </if>
+                <if test="start_time != null and start_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+                </if>
+                <if test="end_time != null and end_time!= ''">
+                    AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+                </if>
+            </where>
+            ) AS  trip_duration
+        FROM
+        t_data_work_condition_detail GROUP BY over_speed_count
+    </select>
+
+    <!--查询卡车工况次数-->
+    <select id="queryWorkConditionDetailCount" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        t_data_work_condition_detail AS c
+        <where>
+            c.DELETE_FLAG = '0'
+            AND c.OBD_ID = #{obd_id}
+            AND  c.WORK_CONDITION_TYPE =#{work_condition_type}
+            <if test="start_time != null and start_time!= ''">
+                AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+            </if>
+            <if test="end_time != null and end_time!= ''">
+                AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+            </if>
+        </where>
+    </select>
+
+    <!--查询卡车工况时长-->
+    <select id="queryWorkConditionDetailSum" resultType="int">
+        SELECT  IFNULL(SUM(CAST(c.WORK_CONDITION_VALUE AS SIGNED )),0)
+        FROM
+        t_data_work_condition_detail AS c
+        <where>
+            c.DELETE_FLAG = '0'
+            AND c.OBD_ID = #{obd_id}
+            AND  c.WORK_CONDITION_TYPE =#{work_condition_type}
+            <if test="start_time != null and start_time!= ''">
+                AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+            </if>
+            <if test="end_time != null and end_time!= ''">
+                AND DATE_FORMAT(c.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

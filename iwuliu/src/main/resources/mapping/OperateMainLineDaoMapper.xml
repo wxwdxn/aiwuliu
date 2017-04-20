@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.OperateMainLineDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Master_Operate_Main_Line" type="com.cn.gazelle.logistics.pojo.T_Master_Operate_Main_Line">
+
+        <id column="OPERATE_MAIN_LINE_ID" property="operate_main_line_id"/>
+        <result column="OPERATE_MAIN_LINE_NAME" property="operate_main_line_name"/>
+        <result column="START_PROVINCE_ID" property="start_province_id"/>
+        <result column="START_CITY_ID" property="start_city_id"/>
+        <result column="FINISH_PROVINCE_ID" property="finish_province_id"/>
+        <result column="FINISH_CITY_ID" property="finish_city_id"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据ID查询运营干线基础信息-->
+    <select id="findOperateMainLineById" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Operate_Main_Line">
+        SELECT
+            *
+        FROM
+            T_Master_Operate_Main_Line
+        WHERE
+            OPERATE_MAIN_LINE_ID = #{operate_main_line_id}
+    </select>
+
+    <!--根据线路简称查询运营干线基础信息-->
+    <select id="findOperateMainLineByName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Operate_Main_Line">
+        SELECT
+            *
+        FROM
+            T_Master_Operate_Main_Line
+        WHERE
+            OPERATE_MAIN_LINE_NAME = '${operate_main_line_name}' AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的运营干线列表信息（默认查询运营干线列表信息）-->
+    <select id="findAllOperateMainLine" resultMap="T_Master_Operate_Main_Line">
+        SELECT
+            *
+        FROM
+            T_Master_Operate_Main_Line
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'operate_main_line_name'">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询运营干线基础信息总记录数-->
+    <select id="findAllOperateMainLineRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Master_Operate_Main_Line
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--保存运营干线基础信息-->
+    <insert id="saveOperateMainLine" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Operate_Main_Line">
+        INSERT INTO
+                T_Master_Operate_Main_Line(OPERATE_MAIN_LINE_ID,
+                OPERATE_MAIN_LINE_NAME,
+                START_PROVINCE_ID,
+                START_CITY_ID,
+                FINISH_PROVINCE_ID,
+                FINISH_CITY_ID,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        SELECT
+                #{operate_main_line_id},
+                #{operate_main_line_name},
+                #{start_province_id},
+                #{start_city_id},
+                #{finish_province_id},
+                #{finish_city_id},
+                0,
+                #{last_update},
+                #{last_update_user_id}
+        FROM dual WHERE NOT EXISTS(SELECT OPERATE_MAIN_LINE_NAME FROM T_Master_Operate_Main_Line WHERE OPERATE_MAIN_LINE_NAME = #{operate_main_line_name} AND DELETE_FLAG = 0)
+    </insert>
+
+    <!--更新运营干线基础信息-->
+    <update id="updateOperateMainLine" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Operate_Main_Line">
+        UPDATE
+            T_Master_Operate_Main_Line
+        SET
+            OPERATE_MAIN_LINE_NAME = #{operate_main_line_name},
+            START_PROVINCE_ID = #{start_province_id},
+            START_CITY_ID = #{start_city_id},
+            FINISH_PROVINCE_ID = #{finish_province_id},
+            FINISH_CITY_ID = #{finish_city_id},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            OPERATE_MAIN_LINE_ID = #{operate_main_line_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据ID删除运营干线基础信息-->
+    <delete id="delOperateMainLine" parameterType="String">
+        UPDATE
+            T_Master_Operate_Main_Line
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            OPERATE_MAIN_LINE_ID = #{operate_main_line_id} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--查询所有运营干线信息不分页-->
+    <select id="findOperateMainLineList" resultMap="T_Master_Operate_Main_Line">
+        SELECT
+            *
+        FROM
+            T_Master_Operate_Main_Line WHERE DELETE_FLAG = 0
+    </select>
+
+    <!--根据起点城市ID终点城市ID查询运营干线基础信息-->
+    <select id="findOperateMainLineByStartCityAndFinishCity" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Operate_Main_Line">
+        SELECT
+        *
+        FROM
+            T_Master_Operate_Main_Line
+        WHERE
+            START_CITY_ID = #{start_city_id} AND FINISH_CITY_ID = #{finish_city_id} AND DELETE_FLAG = 0
+    </select>
+</mapper>

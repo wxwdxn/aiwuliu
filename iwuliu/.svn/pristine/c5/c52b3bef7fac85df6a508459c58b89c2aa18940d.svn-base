@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.MemberDaoMapper">
+    <!--根据ID查找会员信息-->
+    <select id="findMemberByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+            *
+        FROM
+            T_Data_Member
+        WHERE
+            MEMBER_ID=#{member_id} AND DELETE_FLAG='0'
+
+    </select>
+
+    <!--根据会员id实现存储过程-->
+    <select id="storeMemberByID" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member" statementType="CALLABLE">
+        {CALL sp_business_manage_abled(#{member_id,mode=IN,jdbcType=VARCHAR})}
+    </select>
+
+    <!--根据会员名查询会员列表-->
+    <select id="findMemberByName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+            *
+        FROM
+            T_Data_Member
+        WHERE
+            MEMBER_NAME = #{member_name} AND DELETE_FLAG='0'
+    </select>
+
+    <!--根据会员密码和会员名查询会员信息 -->
+    <select id="findMemberByPasswordAndName" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+            *
+        FROM
+            T_Data_Member
+        WHERE
+             MEMBER_NAME =#{member_name} AND MEMBER_PASSWORD =#{member_password} AND DELETE_FLAG='0'
+    </select>
+
+    <!--根据会员名和会员密码查询会员信息 -->
+    <select id="findMemberByNameAndPassword" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+            *
+        FROM
+            T_Data_Member
+        WHERE
+            MEMBER_NAME =#{member_name} AND MEMBER_PASSWORD =#{member_password} AND MEMBER_TYPE LIKE '%${member_type}%' AND DELETE_FLAG='0'
+    </select>
+
+    <!--根据关联信息id查询-->
+    <select id="findMerberByRelevance_info_id" parameterType="String"
+            resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+            *
+        FROM
+            T_Data_Member
+        WHERE
+            RELEVANCE_INFO_ID=#{relevance_info_id} AND DELETE_FLAG='0'
+    </select>
+
+    <!--根据用户所属关系id查询-->
+    <select id="findMemberByMember_belong_code" parameterType="String"
+            resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+            *
+        FROM
+            T_Data_Member
+        WHERE
+            MEMBER_BELONG_CODE LIKE '${member_belong_code}%' AND DELETE_FLAG='0'
+    </select>
+
+    <!--通过手机号查找会员信息-->
+    <select id="findMemberByMobilePhone" parameterType="String"
+            resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+            *
+        FROM
+            T_Data_Member
+        WHERE
+            MOBILE_PHONE =#{mobile_phone} AND DELETE_FLAG='0'
+    </select>
+
+    <!--通过用户所属关系编码和用户类型查找所有会员-->
+    <select id="findAllSubMemberInfo" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+        *
+        FROM
+        T_Data_Member
+        WHERE
+        MEMBER_BELONG_CODE LIKE '%${member_belong_code}%' AND ACCOUNT_TYPE =0 AND DELETE_FLAG='0'
+        <if test="member_type !='2'">
+            AND MEMBER_TYPE = #{member_type}
+        </if>
+    </select>
+
+    <!--查询所有的会员信息-->
+    <select id="findAll" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+            *
+        FROM
+            T_Data_Member
+        WHERE
+            DELETE_FLAG='0'
+    </select>
+
+    <!--保存会员信息-->
+    <insert id="saveMember" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        INSERT INTO
+                T_Data_Member(MEMBER_ID,
+                MEMBER_NAME,
+                MEMBER_PASSWORD,
+                MOBILE_PHONE,
+                MAIL_ADDRESS,
+                ACCOUNT_TYPE,
+                RELEVANCE_INFO_ID,
+                MEMBER_TYPE,
+                MEMBER_BELONG_CODE,
+                MEMBER_BUSINESS_MANAGE_CODE,
+                BELONG_REQUEST_RESULT,
+                BELONG_REQUEST_SUBMIT_TIME,
+                BELONG_REQUEST_DEAL_TIME,
+                BELONG_REQUEST_FAILURE_RESULT,
+                USER_HEAD_PIC_ID,
+                REGISTER_TIME,
+                SIGNED_ELECTRONICA_AGREEMENT_NO,
+                ACCOUNT_STATUS,
+                LOCK_REASON,
+                LOCK_TIME,
+                UNLOCK_TIME,
+                MEMBER_ACCOUNT_AMOUNT,
+                PAYMENT_PASSWORD,
+                LAST_PAYING_DATE,
+                CURRENT_DAY_ERROR_PAYMENT_PASSWORD_COMMIT_COUNT,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{member_id},
+                #{member_name},
+                #{member_password},
+                #{mobile_phone},
+                #{mail_address},
+                #{account_type},
+                #{relevance_info_id},
+                #{member_type},
+                #{member_belong_code},
+                #{member_business_manage_code},
+                #{belong_request_result},
+                #{belong_request_submit_time},
+                #{belong_request_deal_time},
+                #{belong_request_failure_result},
+                #{user_head_pic_id},
+                #{register_time},
+                #{signed_electronica_agreement_no},
+                #{account_status},
+                #{lock_reason},
+                #{lock_time},
+                #{unlock_time},
+                #{member_account_amount},
+                #{payment_password},
+                #{last_paying_date},
+                #{current_day_error_payment_password_commit_count},
+                #{delete_flag},
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新会员信息-->
+    <update id="updateMember" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        UPDATE
+        T_Data_Member
+        SET
+        MEMBER_NAME = #{member_name},
+        MEMBER_PASSWORD = #{member_password},
+        MOBILE_PHONE = #{mobile_phone},
+        MAIL_ADDRESS = #{mail_address},
+        ACCOUNT_TYPE = #{account_type},
+        RELEVANCE_INFO_ID = #{relevance_info_id},
+        MEMBER_TYPE = #{member_type},
+        MEMBER_BELONG_CODE = #{member_belong_code},
+        MEMBER_BUSINESS_MANAGE_CODE = #{member_business_manage_code},
+        BELONG_REQUEST_RESULT = #{belong_request_result},
+        BELONG_REQUEST_SUBMIT_TIME = #{belong_request_submit_time},
+        BELONG_REQUEST_DEAL_TIME = #{belong_request_deal_time},
+        BELONG_REQUEST_FAILURE_RESULT = #{belong_request_failure_result},
+        USER_HEAD_PIC_ID = #{user_head_pic_id},
+        REGISTER_TIME = #{register_time},
+        SIGNED_ELECTRONICA_AGREEMENT_NO = #{signed_electronica_agreement_no},
+        ACCOUNT_STATUS = #{account_status} ,
+        LOCK_REASON = #{lock_reason} ,
+        LOCK_TIME = #{lock_time},
+        UNLOCK_TIME = #{unlock_time} ,
+        MEMBER_ACCOUNT_AMOUNT = #{member_account_amount},
+        PAYMENT_PASSWORD = #{payment_password},
+        LAST_PAYING_DATE = #{last_paying_date},
+        CURRENT_DAY_ERROR_PAYMENT_PASSWORD_COMMIT_COUNT = #{current_day_error_payment_password_commit_count},
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+        MEMBER_ID = #{member_id}  AND DELETE_FLAG='0'
+    </update>
+
+    <!--重置会员密码-->
+    <update id="updatePassword">
+        UPDATE
+        T_Data_Member
+        SET
+        MEMBER_PASSWORD = #{member_password}
+        WHERE
+        MEMBER_NAME = #{member_name} AND DELETE_FLAG='0'
+    </update>
+
+    <!--删除会员信息-->
+    <delete id="delMember" parameterType="String">
+        UPDATE
+        T_Data_Member
+        SET
+        DELETE_FLAG = '1'
+        WHERE
+        MEMBER_ID = #{member_id} AND DELETE_FLAG = '0'
+    </delete>
+
+    <!--更新电子协议编码-->
+    <update id="updateAgreementCode">
+        UPDATE
+        T_Data_Member
+        SET
+        SIGNED_ELECTRONICA_AGREEMENT_NO = #{signed_electronica_agreement_no}
+        WHERE
+        MEMBER_NAME = #{member_name} AND DELETE_FLAG = '0'
+    </update>
+
+    <!--上传会员图像-->
+    <update id="updateHeadPic">
+        UPDATE
+        T_Data_Member
+        SET
+        USER_HEAD_PIC_ID = #{user_head_pic_id},
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+        where
+        MEMBER_NAME = #{member_name} AND DELETE_FLAG = '0'
+    </update>
+
+    <!--查询用户角色管理列表信息-->
+    <select id="queryUserRoleList" resultType="com.cn.gazelle.logistics.pojo.T_Data_User_Role_Manager">
+        SELECT
+        *
+        FROM
+        (SELECT
+        m.`MEMBER_ID`,
+        u.`USER_ID`,
+        u.`GROUP_NAME`,
+        u.`FUN_ROLE_NAME` AS ROLE_NAME,
+        p.`PERSON_NAME`,
+        p.`ID_CARD_NUMBER`,
+        m.`MOBILE_PHONE`,
+        m.`MEMBER_NAME`,
+        m.`MEMBER_PASSWORD`,
+        m.`USER_HEAD_PIC_ID`,
+        CASE WHEN m.`USER_HEAD_PIC_ID` IS NULL THEN '未上传' ELSE '已上传' END AS USER_HEAD_PIC,
+        m.`REGISTER_TIME`,
+        m.`SIGNED_ELECTRONICA_AGREEMENT_NO`,
+        m.`ACCOUNT_STATUS` as ACCOUNT_STATUS_CODE,
+        d.`DICDATA_NAME` as ACCOUNT_STATUS,
+        m.`LOCK_REASON`,
+        m.`LOCK_TIME`,
+        m.`UNLOCK_TIME`,
+        m.`LAST_UPDATE`
+        FROM
+        t_data_member AS m
+        LEFT JOIN t_data_person AS p ON p.`PERSON_ID` = m.`RELEVANCE_INFO_ID`
+        AND p.`DELETE_FLAG` = '0'
+        LEFT JOIN t_sys_user AS u ON u.`USER_PHONE` = m.`MOBILE_PHONE`
+        AND u.`DELETE_STATES` = '0'
+        left join
+        t_sys_dicdata as d
+        on
+        d.DICDATA_CODE = m.`ACCOUNT_STATUS` and d.DICTIONARY_ID = 'D2C45BF156874BA8BC7B984BDC5B09B9' and d.DELETE_STATES
+        = '0'
+        WHERE
+        m.`DELETE_FLAG` = '0') as UR
+        <where>
+            <if test="member_id != null and member_id!= ''">
+                UR.MEMBER_ID LIKE '%${member_id}%'
+            </if>
+            <if test="group_name != null and group_name!= ''">
+                AND UR.GROUP_NAME LIKE '%${group_name}%'
+            </if>
+            <if test="fun_role_name != null and fun_role_name!= ''">
+                AND UR.FUN_ROLE_NAME LIKE '%${fun_role_name}%'
+            </if>
+            <if test="member_name!= null and member_name!= ''">
+                AND UR.MEMBER_NAME LIKE '%${member_name}%'
+            </if>
+            <if test="person_name != null and person_name!= ''">
+                AND UR.PERSON_NAME LIKE '%${person_name}%'
+            </if>
+            <if test="id_card_back_pic_id != null and id_card_back_pic_id!= ''">
+                AND UR.ID_CARD_BACK_PIC_ID = #{id_card_back_pic_id}
+            </if>
+            <if test="register_time_start != null and register_time_start!= ''">
+                AND DATE_FORMAT(UR.REGISTER_TIME,'%Y-%m-%d') &gt;=#{register_time_start}
+            </if>
+            <if test="register_time_end != null and register_time_end!= ''">
+                AND DATE_FORMAT(UR.REGISTER_TIME,'%Y-%m-%d') &lt;=#{register_time_end}
+            </if>
+            <if test="account_status != null and account_status!= ''">
+                AND UR.ACCOUNT_STATUS_CODE = #{account_status}
+            </if>
+        </where>
+    </select>
+
+    <!--查询会员账户资金量（财务金融）-->
+    <select id="queryMemberAccountAmountSum" resultType="double">
+        SELECT
+        SUM(MEMBER_ACCOUNT_AMOUNT)
+        FROM
+        T_Data_Member
+        WHERE
+        DELETE_FLAG = '0'
+    </select>
+
+    <!--个人账户明细（虚拟账目查看）-->
+    <select id="queryAccountDetail" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+        SELECT
+        CONCAT(p.`PERSON_NAME`,'，',m.`MEMBER_NAME`) as MEMBER_NAME,
+        m.`MEMBER_ACCOUNT_AMOUNT`
+        FROM
+        t_data_member as m
+        INNER JOIN
+        t_data_person as p
+        ON
+        m.`RELEVANCE_INFO_ID` = p.`PERSON_ID` and p.`DELETE_FLAG`='0'
+        WHERE
+        m.`DELETE_FLAG` = '0'
+    </select>
+
+    <!--交易记录查询-->
+
+    <select id="queryTransactionRecords" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transaction_Info">
+        select
+        *
+        FROM
+        (
+        (select
+        '车主账户' as account_type,d.COMPANY_NAME AS account_dept,d.COMPANY_NAME AS account_name,d.MEMBER_NAME as account_no,d.THIRD_PARTY_ORDER_ID AS order_no,d.CREATE_TIME AS transaction_time,d.TRANSACTION_type AS transaction_type,'' as transaction_name,d.AMOUNT AS transaction_money,
+        d.MEMBER_ID,'' AS transaction_addr,d.MEMBER_ACCOUNT_AMOUNT AS account_money,d.person AS transaction_person
+        FROM(
+        SELECT
+        a.COMPANY_ID,a.COMPANY_NAME,CONCAT(a.CONTACT_NAME,',',b.MEMBER_NAME) as person ,b.MEMBER_NAME,b.MEMBER_ACCOUNT_AMOUNT,b.MEMBER_ID,c.AMOUNT,c.CREATE_TIME,c.PAYMENT_TYPE,c.THIRD_PARTY_ORDER_ID,
+        CASE c.PAYMENT_TYPE
+        WHEN '0' THEN '充值'
+        WHEN '1' THEN '提现'
+        WHEN '2' then '转出到车辆账户'
+        WHEN '3' THEN '车辆账户转入'
+        ELSE '其他' END AS `TRANSACTION_type`
+        FROM
+        t_data_company a
+        JOIN
+        t_data_member b
+        ON
+        a.COMPANY_ID = b.RELEVANCE_INFO_ID AND a.DELETE_FLAG = '0' and b.DELETE_FLAG = '0'
+        JOIN
+        t_data_member_payment_history c
+        ON
+        b.member_id = c.member_id	 AND c.DELETE_FLAG = '0') d
+        )
+        UNION ALL
+        (
+        SELECT
+        '车辆账户' AS account_type,x.company_name AS account_dept,x.plate_number AS account_name,x.member_name AS account_no,x.third_party_order_id AS order_no,x.create_time AS transaction_time,x.TRANSACTION_TYPE AS transaction_type,
+        x.TRANSACTION_NAME AS transaction_name,x.amount as transaction_money,x.MEMBER_ID,x.station_name AS transaction_addr,x.cash_amount AS account_money,x.transaction_person
+        FROM
+        (
+        SELECT
+        f.company_name,f.company_id,f.CONTACT_MOBILE_PHONE,CONCAT(f.CONTACT_NAME,',',f.contact_mobile_phone) as transaction_person,h.create_time,m.member_name,m.MEMBER_ID,g.PLATE_NUMBER,g.CASH_AMOUNT,h.amount,h.THIRD_PARTY_ORDER_ID,s.STATION_NAME,
+        CASE h.PAYMENT_TYPE
+        WHEN '0' THEN '个人账户转入'
+        WHEN '1' THEN '转出到个人账户'
+        WHEN '2' then '扫码支付'
+        END AS `TRANSACTION_type`,
+        dd.DICDATA_NAME as TRANSACTION_name
+        FROM
+        t_data_company f
+        JOIN
+        t_data_truck g
+        ON
+        f.company_id = g.owner_member_id AND f.delete_flag = '0' AND g.delete_flag = '0'
+        JOIN
+        t_data_truck_payment_history h
+        ON
+        g.truck_id = h.TRUCK_ID AND h.DELETE_FLAG = '0'
+        LEFT JOIN
+        t_sys_dicdata dd on dd.DICDATA_ID = h.FINACIAL_FLOW_TYPE and dd.DELETE_STATES='0'
+        join
+        t_data_member m
+        ON
+        f.CONTACT_MOBILE_PHONE = m.MEMBER_NAME AND m.DELETE_FLAG = '0'
+        JOIN
+        t_master_service_station s
+        ON
+        h.TARGET_ID = s.STATION_ID AND s.DELETE_FLAG = '0'
+        )x
+        )
+        ) DM
+        <where>
+            DM.member_id = #{member_id}
+            <if test="account_type != null and account_type!= ''">
+                AND  DM.account_type = #{account_type}
+            </if>
+            <if test="account_name != null and account_name!= ''">
+                AND DM.account_name = #{account_name}
+            </if>
+            <if test="account_no != null and account_no!= ''">
+                AND DM.account_no = #{account_no}
+            </if>
+            <if test="transaction_money != null and transaction_money!= ''">
+                AND DM.transaction_money = #{transaction_money}
+            </if>
+            <if test="transaction_type != null and transaction_type!= ''">
+                AND DM.transaction_type = #{transaction_type}
+            </if>
+            <if test="transaction_name!= null and transaction_name!= ''">
+                AND DM.transaction_name = #{transaction_name}
+            </if>
+            <if test="order_no != null and order_no!= ''">
+                AND DM.order_no = #{order_no}
+            </if>
+            <if test="start_time != null and start_time!= ''">
+                AND DATE_FORMAT(DM.transaction_time,'%Y-%m-%d') &gt;=#{start_time}
+            </if>
+            <if test="end_time != null and end_time!= ''">
+                AND DATE_FORMAT(DM.transaction_time,'%Y-%m-%d') &lt;=#{end_time}
+            </if>
+        </where>
+    </select>
+
+</mapper>

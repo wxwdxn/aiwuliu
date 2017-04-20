@@ -1,0 +1,28 @@
+.form-inline {
+  font-size: 13px;
+  font-size: 1.3rem;
+}
+.form-group {
+  margin-right: 15px;
+}
+.glyphicon {
+  font-size: 13px;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+.padding-left {
+  padding-left: 15px;
+}
+.latitudeAndlongitude {
+  cursor: pointer;
+}
+.latitudeAndlongitude {
+  cursor: pointer;
+}
+.modalMap {
+  height: 300px;
+  height: 25rem;
+}
+.modal-content .modalFooter a {
+  margin: 0;
+}

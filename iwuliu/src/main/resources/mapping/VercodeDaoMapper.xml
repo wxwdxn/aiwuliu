@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.VercodeDaoMapper">
+
+    <resultMap id="T_DATA_VERCODE" type="com.cn.gazelle.logistics.pojo.T_Data_Vercode">
+        <id column="VERCODE_ID" property="vercode_id" />
+        <result column="MEMBER_NAME" property="member_name" />
+        <result column="MOBILE_PHONE" property="mobile_phone" />
+        <result column="VER_CODE" property="ver_code" />
+        <result column="DELETE_FLAG" property="delete_flag" />
+        <result column="POST_TIME" property="post_time" />
+    </resultMap>
+
+    <!--根据手机号查询短信验证码-->
+    <select id="findVercode" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Vercode">
+        SELECT
+            VERCODE_ID,
+            MEMBER_NAME,
+            MOBILE_PHONE,
+            VER_CODE,
+            DELETE_FLAG,
+            POST_TIME
+        FROM
+            T_DATA_VERCODE
+        WHERE
+            MOBILE_PHONE=#{mobile_phone} AND DELETE_FLAG = '0' AND  POST_TIME  =
+            (
+            select max(POST_TIME)
+            from  T_DATA_VERCODE
+            )
+    </select>
+
+
+    <!--保存手机验证码信息-->
+    <insert id="saveVercode" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Vercode">
+        INSERT INTO
+                T_DATA_VERCODE (VERCODE_ID,
+                MEMBER_NAME,
+                MOBILE_PHONE,
+                VER_CODE,
+                DELETE_FLAG,
+                POST_TIME
+               )
+        VALUES (
+                #{vercode_id},
+                #{member_name},
+                #{mobile_phone},
+                #{ver_code},
+                #{delete_flag},
+                #{post_time}
+                )
+    </insert>
+
+
+    <!--更新手机验证码信息-->
+    <update id="updateVercode" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Vercode">
+        UPDATE
+            T_DATA_VERCODE
+        SET
+            DELETE_FLAG = '1'
+        WHERE
+            MOBILE_PHONE=#{mobile_phone} AND DELETE_FLAG = '0'
+    </update>
+
+</mapper>

@@ -1,0 +1,20 @@
+.QuerytheReset {
+  border: none;
+  padding: 0;
+}
+.QuerytheReset a {
+  margin: 0;
+  margin-left: 0 15px;
+}
+.glyphicon {
+  cursor: pointer;
+}
+.infoConditions .goodTypeSelect .form-group .goodTypeList ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+.fixed-table-body{
+  height:auto;
+}

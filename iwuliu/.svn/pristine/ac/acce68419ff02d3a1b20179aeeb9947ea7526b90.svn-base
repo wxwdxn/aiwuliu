@@ -1,0 +1,90 @@
+/*--------财务金融，提现审批开始-------------*/
+.withdrawalApproval {
+  font-size: 13px;
+  font-size: 1.3rem;
+  padding-top: 80px;
+  padding-top: 6rem;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed #d2d2d2;
+}
+.withdrawalApproval .withdrawalApprovalAll {
+  font-size: 13px;
+  font-size: 1.3rem;
+  text-align: center;
+}
+.withdrawalApproval .withdrawalApprovalAll span {
+  color: #fcb86f;
+}
+.withdrawalApproval .approval {
+  position: relative;
+  margin: 0 auto;
+  width: 492px;
+  height: 110px;
+  background: url(../../../common/images/tuopan_02.png);
+}
+.withdrawalApproval .approval .withdrawalBefore {
+  position: absolute;
+  left: -105px;
+  left: -5rem;
+  bottom: 15px;
+  bottom: 1.5rem;
+}
+.withdrawalApproval .approval .withdrawalBefore span {
+  color: #fcb86f;
+}
+.withdrawalApproval .approval .withdrawalBefore .withdrawalAmountDetailClick {
+  min-width: auto;
+  background: #69a2b5;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  color: #fff;
+}
+.withdrawalApproval .approval .withdrawalAfter {
+  position: absolute;
+  right: -185px;
+  right: -11rem;
+  bottom: 15px;
+  bottom: 1.5rem;
+}
+.withdrawalApproval .approval .withdrawalAfter span {
+  color: #fcb86f;
+}
+.withdrawalAfterQuery {
+  padding-top: 10px;
+}
+.withdrawalAfterQuery div {
+  height: 40px;
+  line-height: 40px;
+}
+.withdrawalAfterQuery div input[type="text"] {
+  width: 100%;
+  height: 100%;
+}
+.withdrawalAfterQuery div input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+.withdrawalAfterQuery div span {
+  font-weight: 900;
+}
+.withdrawalAftergOut {
+  padding: 10px 0;
+}
+.withdrawalAftergOut a {
+  display: inline-block;
+  margin-left: 15px;
+}
+/*--------财务金融，提现审批结束-------------*/
+label {
+  font-size: 13px;
+  font-size: 1.3rem;
+}
+.drawa {
+  font-size: 16px;
+  font-size: 1.6rem;
+  padding-right: 15px;
+}
+.display_inlineBlcok {
+  margin-bottom: 0 ;
+}

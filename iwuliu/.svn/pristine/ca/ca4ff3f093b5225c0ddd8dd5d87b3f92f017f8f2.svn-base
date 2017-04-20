@@ -1,0 +1,88 @@
+$(function(){
+    //点击左侧导航栏
+    $(".list-group-item").bind("click",function(){
+        $(this).addClass("menuActive").siblings().removeClass("menuActive")
+    });
+})
+
+//点击导航栏宽度变化
+function menuNarrow(ele){
+    var _isClick = $(ele).attr("isClick");
+    if(_isClick == "true"){
+        $(ele).attr("isClick","false")
+        $(ele).parents(".leftMenu").addClass("menu-min");
+        $(".iframeMain").addClass("iframeMainNarrow")
+    }else{
+        $(ele).attr("isClick","true")
+        $(ele).parents(".leftMenu").removeClass("menu-min");
+        $(".iframeMain").removeClass("iframeMainNarrow")
+    }
+}
+//下拉菜单
+function customDropDown(ele){
+    this.dropdown=ele;
+    this.placeholder=this.dropdown.find(".placeHolder");
+    this.options=this.dropdown.find("ul.dropdown-menu > li");
+    this.val='';
+    this.index=-1;//默认为-1;
+    this.initEvents();
+}
+customDropDown.prototype={
+    initEvents:function(){
+        var obj=this;
+        //这个方法可以不写，因为点击事件被Bootstrap本身就捕获了，显示下面下拉列表
+        obj.dropdown.on("click",function(event){
+            $(this).toggleClass("active");
+        });
+
+        //点击下拉列表的选项
+        obj.options.on("click",function(){
+            var opt=$(this);
+            obj.text=opt.find("a").text();
+            obj.val=opt.attr("value");
+            obj.dropdown.find(".placeHolder").attr("value",obj.val)
+            obj.index=opt.index();
+            obj.placeholder.text(obj.text);
+        });
+    },
+    getText:function(){
+        return this.text;
+    },
+    getValue:function(){
+        return this.val;
+    },
+    getIndex:function(){
+        return this.index;
+    }
+}
+
+//点击编辑按钮
+function detail_edit(ele){
+    var modalContent = $(ele).parents(".modal-content");
+    var formgroups = modalContent.find(".form-group");
+    var _isClick = $(ele).attr("isClick");
+    if(_isClick == "true"){
+        $(ele).attr("isClick","false");
+        $(ele).css("background","#eeeeee");
+        $(ele).attr("disabled","true")
+        formgroups.removeClass("uneditable");
+        formgroups.find("button").removeAttr("disabled");
+        formgroups.find("input").removeAttr("disabled");
+        $(".elementDisplayNone").removeClass("elementDisplayNone")
+    }
+}
+
+
+//删除数组中的制定值
+Array.prototype.indexOf = function(val) {
+    for (var i = 0; i < this.length; i++) {
+        if (this[i] == val) return i;
+    }
+    return -1;
+};
+Array.prototype.remove = function(val) {
+    var index = this.indexOf(val);
+    if (index > -1) {
+        this.splice(index, 1);
+    }
+};

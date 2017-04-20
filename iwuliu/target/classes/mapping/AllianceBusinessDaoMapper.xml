@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.AllianceBusinessDaoMapper">
+
+    <!--根据条件查询线下加盟服务站列表-->
+    <select id="findStationList" resultType="com.cn.gazelle.logistics.pojo.T_Master_Alliance_Business_Management">
+        SELECT
+        *
+        FROM
+        (SELECT
+        s.`STATION_ID` AS station_id,
+        s.`STATION_NAME` AS station_name,
+        s.`STATION_TYPE` AS station_type,
+        s.`PROVINCE_ID` AS province_id,
+        p.`DICDATA_NAME` AS province_name,
+        s.`CITY_ID` AS city_id,
+        c.`DICDATA_NAME` AS city_name,
+        s.`AREA_ID` AS area_id,
+        a.`DICDATA_NAME` AS area_name,
+        s.`TOWN_STREET` AS town_street,
+        s.`LONGITUDE` AS longitude,
+        s.`LATITUDE` AS latitude,
+        s.`WORK_BEGIN_TIME` AS work_begin_time,
+        s.`WORK_END_TIME` AS work_end_time,
+        s.`CONTACT_NAME` AS contact_name,
+        s.`CONTACT_PHONE` AS contact_phone,
+        b.`DICDATA_NAME` AS bank_name,
+        b.`DICDATA_CODE` AS bank_id,
+        s.`BANK_ACCOUNT` AS bank_account,
+        s.`BANK_ACCOUNT_PERSON_NAME` AS bank_account_person_name,
+        s.`BANK_ACCOUNT_PERSON_ID` AS bank_account_person_id,
+        s.`STATION_ID` AS qr_code_photo
+        FROM
+        `t_master_service_station` s
+        LEFT JOIN
+        `t_sys_dicdata` p ON p.`DICTIONARY_ID`='2EE02FDAE3BE4F06B8CFDF4425BA74BF' AND s.`PROVINCE_ID`=p.`DICDATA_CODE` AND p.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` c ON c.`DICTIONARY_ID`='66029BA5DC964A15B29852FA077327C0' AND s.`CITY_ID`=c.`DICDATA_CODE` AND c.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` a ON a.`DICTIONARY_ID`='D7FAF287624242ECB3304B6A62414779' AND s.`AREA_ID`=a.`DICDATA_CODE` AND a.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` b ON b.`DICTIONARY_ID`='40C440A05FD14E7CA187B00BD9EDEE21' AND s.`BANK_ID`=b.`DICDATA_CODE` AND b.`DELETE_STATES`=0
+        WHERE
+        s.`DELETE_FLAG`=0
+        ORDER BY s.LAST_UPDATE DESC) AS station
+        WHERE
+        station.`station_id` IS NOT NULL
+        <if test="station_name != null and station_name != ''">
+            AND station.`STATION_NAME` LIKE '%${station_name}%'
+        </if>
+        <if test="station_type != null and station_type != ''">
+            AND station.`STATION_TYPE` LIKE '%${station_type}%'
+        </if>
+        <if test="province_id != null and province_id != ''">
+            AND station.`PROVINCE_ID` LIKE '%${province_id}%'
+        </if>
+        <if test="city_id != null and city_id != ''">
+            AND station.`CITY_ID` LIKE '%${city_id}%'
+        </if>
+        <if test="area_id != null and area_id != ''">
+            AND station.`AREA_ID` LIKE '%${area_id}%'
+        </if>
+        <if test="town_street != null and town_street != ''">
+            AND station.`TOWN_STREET` LIKE '%${town_street}%'
+        </if>
+    </select>
+
+    <!--根据条件查找车辆详情-->
+    <select id="findAllianceBusinessById" resultType="com.cn.gazelle.logistics.pojo.T_Master_Alliance_Business_Management">
+        SELECT
+        *
+        FROM
+        (SELECT
+        s.`STATION_ID` AS station_id,
+        s.`STATION_NAME` AS station_name,
+        s.`STATION_TYPE` AS station_type,
+        s.`PROVINCE_ID` AS province_id,
+        p.`DICDATA_NAME` AS province_name,
+        s.`CITY_ID` AS city_id,
+        c.`DICDATA_NAME` AS city_name,
+        s.`AREA_ID` AS area_id,
+        a.`DICDATA_NAME` AS area_name,
+        s.`TOWN_STREET` AS town_street,
+        s.`LONGITUDE` AS longitude,
+        s.`LATITUDE` AS latitude,
+        s.`WORK_BEGIN_TIME` AS work_begin_time,
+        s.`WORK_END_TIME` AS work_end_time,
+        s.`CONTACT_NAME` AS contact_name,
+        s.`CONTACT_PHONE` AS contact_phone,
+        b.`DICDATA_NAME` AS bank_name,
+        b.`DICDATA_CODE` AS bank_id,
+        s.`BANK_ACCOUNT` AS bank_account,
+        s.`BANK_ACCOUNT_PERSON_NAME` AS bank_account_person_name,
+        s.`BANK_ACCOUNT_PERSON_ID` AS bank_account_person_id,
+        s.`STATION_ID` AS qr_code_photo
+        FROM
+        `t_master_service_station` s
+        LEFT JOIN
+        `t_sys_dicdata` p ON p.`DICTIONARY_ID`='2EE02FDAE3BE4F06B8CFDF4425BA74BF' AND s.`PROVINCE_ID`=p.`DICDATA_CODE` AND p.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` c ON c.`DICTIONARY_ID`='66029BA5DC964A15B29852FA077327C0' AND s.`CITY_ID`=c.`DICDATA_CODE` AND c.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` a ON a.`DICTIONARY_ID`='D7FAF287624242ECB3304B6A62414779' AND s.`AREA_ID`=a.`DICDATA_CODE` AND a.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` b ON b.`DICTIONARY_ID`='40C440A05FD14E7CA187B00BD9EDEE21' AND s.`BANK_ID`=b.`DICDATA_CODE` AND b.`DELETE_STATES`=0
+        WHERE
+        s.`DELETE_FLAG`=0) AS station
+        WHERE
+        station.`station_id`= #{station_id}
+    </select>
+
+</mapper>

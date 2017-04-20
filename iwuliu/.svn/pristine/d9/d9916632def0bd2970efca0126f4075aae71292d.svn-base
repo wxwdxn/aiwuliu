@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.VehicleDetailDaoMapper">
+
+    <!--根据条件查找车辆详情-->
+    <select id="findVehicleDetail" resultType="com.cn.gazelle.logistics.pojo.T_Data_Vehicle_Detail">
+        SELECT
+        *
+        FROM
+        (SELECT
+        t.`PLATE_NUMBER` AS plate_number,
+        d.`DICDATA_NAME` AS truck_brand,
+        tm.`TRUCK_MODEL_NAME` AS truck_model_name,
+        tct.`TRUCK_CARRIAGE_TYPE_NAME` AS truck_carriage_type,
+        d1.`DICDATA_NAME` AS truck_type,
+        d2.`DICDATA_NAME` AS fuel_type,
+        d3.`DICDATA_NAME` AS truck_length,
+        t.`VEHICLE_IDENTIFY_NUMBER` AS vehicle_identify_number,
+        t.`ENGINE_NUMBER` AS engine_number,
+        t.`LOAD_WEIGHT` AS load_weight,
+        t.`DRIVING_LICENCE_FIRST_PAGE_SAVE_PATH` AS driving_licence_first_page_save_path,
+        t.`DRIVING_LICENCE_SECOND_PAGE_SAVE_PATH` AS driving_licence_second_page_save_path,
+        t.`TRUCK_FIRST_PIC_SAVE_PATH` AS truck_first_pic_save_path,
+        t.`TRUCK_SECOND_PIC_SAVE_PATH` AS truck_second_pic_save_path,
+        t.`TRUCK_THIRD_PIC_SAVE_PATH` AS truck_third_pic_save_path,
+        GetLine(t.`TRUCK_ID`) AS transport_line,
+        #{organization_type} AS organization_type,
+        cy.`COMPANY_NAME` AS organization_name,
+        p.`PERSON_NAME` AS owner_name,
+        p.`PERSON_MOBILE_PHONE` AS person_mobile_phone,
+        p.`ID_CARD_NUMBER` AS id_card_number,
+        p.`ID_CARD_FRONT_PIC_ID` AS id_card_front_pic_id,
+        p.`ID_CARD_BACK_PIC_ID` AS id_card_back_pic_id,
+        t.`DENIED_SCHEDULE_COUNT` AS denied_schedule_count,
+        d4.`DICDATA_NAME` AS operate_status,
+        t.`OPERATE_STATUS_CHANGED_TIME` AS operate_status_changed_time,
+        t.`DENIED_SCHEDULE_LAST_TIME` AS denied_schedule_last_time,
+        t.`SUBMIT_VERIFY_TIME` AS submit_verify_time,
+        t.`VERIFY_PASSED_TIME` AS verify_passed_time,
+        t.`VERIFY_REFUSED_TIME` AS verify_refused_time,
+        d5.`DICDATA_NAME` AS verify_status,
+        t.`VERIFY_REFUSED_REASON` AS verify_refused_reason
+        FROM
+        t_data_truck t
+        LEFT JOIN
+        t_data_truck_model tm ON t.`TRUCK_MODEL_NO`=tm.`TRUCK_MODEL_NO` AND tm.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata d ON d.`DICDATA_ID`=tm.`TRUCK_BRAND_ID` AND d.`DELETE_STATES`=0
+        LEFT JOIN
+        t_master_truck_carriage_type tct ON tct.`TRUCK_CARRIAGE_TYPE_ID`=t.`TRUCK_CARRIAGE_TYPE_ID` AND tct.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata d1 ON d1.`DICDATA_ID`=t.`TRUCK_TYPE_ID` AND d1.`DELETE_STATES`=0
+        LEFT JOIN
+        t_sys_dicdata d2 ON d2.`DICDATA_ID`=t.`TRUCK_FUEL_TYPE_ID` AND d2.`DELETE_STATES`=0
+        LEFT JOIN
+        t_sys_dicdata d3 ON d3.`DICDATA_ID`=t.`TRUCK_LENGTH_ID` AND d3.`DELETE_STATES`=0
+        LEFT JOIN
+        t_data_company cy ON t.`OWNER_MEMBER_ID`=cy.`COMPANY_ID` AND cy.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_data_person p ON t.`MANAGER_MEMBER_ID`=p.`PERSON_ID` AND p.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata d4 ON d4.`DICTIONARY_ID`='1F039E8A4082473FA2C859E521A4A0E4' AND d4.`DICDATA_CODE`=t.`OPERATE_STATUS` AND d4.`DELETE_STATES`=0
+        LEFT JOIN
+        t_sys_dicdata d5 ON d5.`DICTIONARY_ID`='0D1DFD26128E4E35BBECA6D1F4FCE4FE' AND d5.`DICDATA_CODE`=t.`VERIFY_STATUS` AND d5.`DELETE_STATES`=0
+        WHERE
+        t.`DELETE_FLAG`=0) AS vehicle
+        WHERE
+        vehicle.`plate_number` = #{plate_number}
+    </select>
+
+</mapper>

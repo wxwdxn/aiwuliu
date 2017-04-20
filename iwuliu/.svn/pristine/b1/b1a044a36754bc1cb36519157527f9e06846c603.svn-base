@@ -1,0 +1,303 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：schedulingOrderController.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2016-11-23
+ * 作    者: WXW
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.controller.operationController;
+
+import com.cn.gazelle.logistics.dao.DispatchSheetDaoMapper;
+import com.cn.gazelle.logistics.pojo.*;
+import com.cn.gazelle.logistics.service.*;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.ResponseUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Logger;
+
+/**
+ * 类 名 称：schedulingOrderController
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ *          01 
+ *          02
+ *@authot WXW
+ */
+@Controller
+@RequestMapping(value = "/schedulingOrderManager")
+public class SchedulingOrderController {
+    Logger logger=Logger.getLogger("SchedulingOrderController.class");
+    @Resource
+    private ScheduleSheetService scheduleSheetService;
+    @Resource
+    private TruckService truckService;
+    @Resource
+    private TruckModelService truckModelService;
+    @Resource
+    private TransportationOrderService transportationOrderService;
+    @Resource
+    private OperateMainLineService operateMainLineService;
+    @Resource
+    private DicdataService dicdataService;
+    @Resource
+    private TransportationScheduleFinanceRecordService scheduleFinanceRecordService;
+    @Resource
+    private PersonService personService;
+    @Resource
+    private DispatchSheetDaoMapper dispatchSheetDaoMapper;
+
+    /**
+     * 方法名称：home
+     * 内容摘要：调度单管理页面。
+     *
+     * @return string 调度单管理页面。
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "home")
+    public String home(ModelMap model) {
+        return "operationManager/schedulingOrderManager/schedulingOrderManager";
+    }
+
+    /**
+     * 方法名称：schedulingOrderManagerDetailHome
+     * 内容摘要：跳转详情页面。
+     *
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "schedulingOrderManagerDetailHome")
+    public String schedulingOrderManagerDetailHome(ModelMap mode,String schedulingSheetId) {
+        return "operationManager/schedulingOrderManagerDetail/schedulingOrderManagerDetail";
+    }
+    /**
+     * 方法名 称：
+     * 内容描述：查询调度单信息
+     * 方法描述：该类有 个方法
+     *          01
+     *          02
+     *@authot WXW
+     */
+    @ResponseBody
+    @RequestMapping(value = "findScheduleByConditions")
+    @Transactional
+    public void findScheduleByConditions(@RequestParam(defaultValue = "",required = false)String schedulePlanNumber,
+                                         @RequestParam(defaultValue = "",required = false)String truckPlate,
+                                         @RequestParam(defaultValue = "",required = false)String startTime,
+                                         @RequestParam(defaultValue = "",required = false)String endTime,
+                                         @RequestParam(defaultValue = "",required = false)String lineName,
+                                         @RequestParam(defaultValue = "",required = false)String truckModel,
+                                         @RequestParam(defaultValue = "",required = false)String person,
+                                         @RequestParam(defaultValue = "",required = false)String personPhone,
+                                       HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+        try{
+            SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            List<Map<String,String>> list = new ArrayList<Map<String,String>>();
+            List<T_Data_SchedingSheet> schedingSheetList = scheduleSheetService.findScheduleByConditions(truckPlate, schedulePlanNumber, lineName, truckModel, endTime, startTime,person,personPhone);
+           for (T_Data_SchedingSheet schedingSheet:schedingSheetList){
+               Map map=new HashMap();
+               String schedulingSheetId = schedingSheet.getSchedulingSheetId();
+               map.put("schedulingSheetId",schedulingSheetId);
+               String planName = schedingSheet.getPlanName();
+               map.put("planName",planName);
+               String plateNumber = schedingSheet.getPlateNumber();
+               map.put("plateNumber",plateNumber);
+               String lineName1 = schedingSheet.getLineName();
+               map.put("lineName",lineName1);
+               int juli1 = schedingSheet.getJuli();
+               double juli = juli1 / 1000;
+               map.put("juli",juli);
+               String modelName = schedingSheet.getModelName();
+               map.put("modelName",modelName);
+               String cargoType = schedingSheet.getCargoType();
+               map.put("cargoType",cargoType);
+               String total = schedingSheet.getTotal();
+               map.put("total",total);
+               String acceptTime = schedingSheet.getAcceptTime();
+               Date parse = format.parse(acceptTime);
+               map.put("acceptTime",format.format(parse));
+               String personName="";
+               String phone="";
+               List<T_Data_Transportation_Dispatch_Sheet> dispatchSheetList = dispatchSheetDaoMapper.findByScheduleId(schedulingSheetId);
+               if (dispatchSheetList.size()!=0){
+                   for (int i=0;i<dispatchSheetList.size();i++){
+                       String receiveMemberId = dispatchSheetList.get(i).getReceiveMemberId();
+                       if (i==0){
+                           personName = personService.findPersonByID(receiveMemberId).getPerson_name();
+                           phone = personService.findPersonByID(receiveMemberId).getPerson_mobile_phone();
+                       }else {
+                           personName +="/"+ personService.findPersonByID(receiveMemberId).getPerson_name();
+                           phone +="/"+ personService.findPersonByID(receiveMemberId).getPerson_mobile_phone();
+                       }
+                   }
+
+               }
+               map.put("personName",personName);
+               map.put("personPhone",phone);
+               list.add(map);
+           }
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(list));
+        }catch (Exception e){
+            logger.info(e.getMessage());
+        }
+    }
+    /**
+     * 方法名 称：schedulingOrderDetail
+     * 内容描述：根据调度单id 获取详情
+     * 方法描述：该类有 个方法
+     *@authot WXW
+     */
+    @RequestMapping(value = "/schedulingOrderDetail")
+    @Transactional
+    public void schedulingOrderDetail(HttpServletRequest request,HttpServletResponse response,String schedulingSheetId){
+        List<Map<String,String>> list = new ArrayList<Map<String,String>>();
+        List<T_Sys_Dicdata> dicdataList_status = new ArrayList<T_Sys_Dicdata>();
+        HashMap<String, String> hashMap = new HashMap<String, String>();
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            T_Data_Transportation_Schedule_Sheet scheduleSheet = scheduleSheetService.findScheduleSheetById(schedulingSheetId);
+            String planNumber = scheduleSheet.getSchedule_plan_number();
+            hashMap.put("planNumber",planNumber);
+            T_Data_Transportation_Plan plan = transportationOrderService.findBySchedulePlanNumber(planNumber);
+            String mainLineId = plan.getOperate_main_line_id();
+            T_Master_Operate_Main_Line mainLine = operateMainLineService.findOperateMainLineById(mainLineId);
+            String lineName = mainLine.getOperate_main_line_name();
+            hashMap.put("lineName",lineName);
+            String scheduleTruckId = scheduleSheet.getScheduleTruckId();
+            T_Data_Truck truck = truckService.findTruckByID(scheduleTruckId);
+            String modelNo = truck.getTruck_model_no();
+            T_Data_Truck_Model truckModel = truckModelService.findTruckModelByNo(modelNo);
+            hashMap.put("modelName",truckModel.getTruck_model_name());
+            double allocateTotal = scheduleSheet.getAllocateTotal();
+            hashMap.put("total",String.valueOf(allocateTotal));
+            hashMap.put("plateNumber",truck.getPlate_number());
+            hashMap.put("offTime",scheduleSheet.getSetOffTime());
+            Date parse = format.parse(scheduleSheet.getAcceptTime());
+            hashMap.put("receveTime",format.format(parse));
+            Date parse1 = format.parse(scheduleSheet.getLoadingStartTime());
+            hashMap.put("loadWeight",String.valueOf(scheduleSheet.getLoadingCargoAmount()));
+            hashMap.put("loadStart",format.format(parse1));
+            Date parse2 = format.parse(scheduleSheet.getLoadingEndTime());
+            hashMap.put("loadEnd",format.format(parse2));
+            hashMap.put("loadPath",scheduleSheet.getLoadingProofPath());
+            String loadLongitude = scheduleSheet.getLoadLongitude();
+            String loadLatitude = scheduleSheet.getLoadLatitude();
+            String loadposition="";
+            String responses = null;
+            Map<String, Object> retList = null;
+            HttpClient client = new HttpClient();
+            if (loadLatitude!=null && loadLongitude!=null){
+                //获取装货位置
+                String addressStr = "http://restapi.amap.com/v3/geocode/regeo?output=JSON&location=" + loadLongitude + ',' + loadLatitude + "&key=5107d8c6eaacd4c780ed2a820e3680fc&radius=1000&extensions=all&roadlevel=1&batch=false";
+                Gson gson = new Gson();
+                HttpMethod method = new GetMethod(addressStr);
+                client.executeMethod(method);
+                responses = method.getResponseBodyAsString();
+                method.releaseConnection();
+                retList = gson.fromJson(responses, new TypeToken<Map<String, Object>>() {
+                }.getType());
+                Map<String, Object> ret = (Map<String, Object>) retList.get("regeocode");
+                loadposition = (String) ret.get("formatted_address");
+                //装货位置
+            }
+            hashMap.put("loadposition",loadposition);
+            hashMap.put("unloadWeight",String.valueOf(scheduleSheet.getUnLoadingCargoAmount()));
+            Date parse3 = format.parse(scheduleSheet.getUnloadingStartTime());
+            hashMap.put("unloadStart",format.format(parse3));
+            Date parse4 = format.parse(scheduleSheet.getUnloadingEndTime());
+            hashMap.put("unloadEnd",format.format(parse4));
+            hashMap.put("unloadPath",scheduleSheet.getUnloadingProofPath());
+            //获取卸货位置
+            String unloadLongitude = scheduleSheet.getUnloadLongitude();
+            String unloadLatitude = scheduleSheet.getUnloadLatitude();
+            String unloadposition="";
+            if (unloadLatitude!=null &&unloadLongitude!=null){
+                String addressStr2 = "http://restapi.amap.com/v3/geocode/regeo?output=JSON&location=" + unloadLongitude + ',' + unloadLatitude + "&key=5107d8c6eaacd4c780ed2a820e3680fc&radius=1000&extensions=all&roadlevel=1&batch=false";
+                Gson gson2 = new Gson();
+                HttpClient client2 = new HttpClient();
+                HttpMethod method2 = new GetMethod(addressStr2);
+                client.executeMethod(method2);
+                responses = method2.getResponseBodyAsString();
+                method2.releaseConnection();
+                retList = gson2.fromJson(responses, new TypeToken<Map<String, Object>>() {
+                }.getType());
+                Map<String, Object> ret2 = (Map<String, Object>) retList.get("regeocode");
+                unloadposition = (String) ret2.get("formatted_address");
+            }
+
+            hashMap.put("unloadposition",unloadposition);
+            hashMap.put("unitPrice",scheduleSheet.getTransportUnitPrice());
+            int status = scheduleSheet.getStatus();
+            dicdataList_status = dicdataService.findAllDicdataByID("6339B4F9A2A04D80A2DDF25F44BA81C1", String.valueOf(status));
+            hashMap.put("status",dicdataList_status.get(0).getDicdata_name());
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(hashMap));
+        }catch (Exception e){
+            logger.info(e.getMessage());
+        }
+    }
+
+    /**
+     * 方法名称：scheduleFlowTable
+     * 内容摘要：获取调度单的流水列表（分页）。
+     *
+     * @param request      request
+     * @param response     response
+     * @param schedulingSheetId   调度id
+     */
+    @RequestMapping(value = "/scheduleFlowTable")
+    public void scheduleFlowTable(HttpServletRequest request,HttpServletResponse response,String schedulingSheetId){
+        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+        try {
+            SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            List<T_Data_Transportation_Schedule_Finance_Record> recordList = scheduleFinanceRecordService.findFinacialFlowByScheduleId(schedulingSheetId);
+            for (T_Data_Transportation_Schedule_Finance_Record record : recordList) {
+                HashMap map = new HashMap();
+                String createTime = record.getCreate_time();
+                Date parse = format.parse(createTime);
+                map.put("createTime",format.format(parse));
+                String flowType = record.getFinacial_flow_type();
+                T_Sys_Dicdata dicdata = dicdataService.findDicdataByID(flowType);
+                map.put("flowType",dicdata.getDicdata_name());
+                String stationId = record.getTarget_service_station_id();
+                map.put("stationId",stationId);
+                Double amount = record.getAmount();
+                map.put("amount",String.valueOf(amount));
+                String createTime2 = record.getCreate_time();
+                map.put("createTime2",createTime2);
+                String path = record.getDisbursement_voucher_image_save_path();
+                map.put("path",path);
+                String longitude = record.getLongitude();
+                map.put("longitude",longitude);
+                String latitude = record.getLatitude();
+                map.put("latitude",latitude);
+                String personId = record.getDeal_person_id();
+                T_Data_Person person = personService.findPersonByID(personId);
+                map.put("personId",person.getPerson_name());
+                list.add(map);
+            }
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(list));
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+        }
+    }
+
+}

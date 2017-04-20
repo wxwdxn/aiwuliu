@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.ProtocolOrderDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Sys_Order" type="com.cn.gazelle.logistics.pojo.T_Sys_Order">
+
+        <id column="ORDER_ID" property="order_id"/>
+        <result column="PROTOCOL_TYPE" property="protocol_type"/>
+        <result column="SENDER" property="sender"/>
+        <result column="PROTOCOL_SN" property="protocol_sn"/>
+        <result column="ENGLISH_FIELD" property="english_field"/>
+        <result column="FIELD_NAME" property="field_name"/>
+        <result column="FIELD_TYPE" property="field_type"/>
+        <result column="FIELD_LEN" property="field_len"/>
+        <result column="FIELD_COMMENT" property="field_comment"/>
+        <result column="FIELD_DATE" property="field_date"/>
+        <result column="DELETE_STATES" property="delete_states"/>
+    </resultMap>
+
+    <!--根据ID查找通讯指令信息-->
+    <select id="findOrderByID"  resultType="com.cn.gazelle.logistics.pojo.T_Sys_Order">
+        SELECT
+        *
+        FROM
+        T_Sys_Order
+        WHERE
+        ORDER_ID = #{order_id} AND DELETE_STATES = '0'
+    </select>
+
+    <!--根据通讯指令名查找信息-->
+    <select id="findOrderByProtocolType" parameterType="String" resultMap="T_Sys_Order">
+        SELECT
+        *
+        FROM
+        T_Sys_Order
+        WHERE
+        PROTOCOL_TYPE = #{protocol_type} AND DELETE_STATES = '0'
+    </select>
+
+    <!--查询所有通讯指令信息-->
+    <select id="findAllOrder" resultMap="T_Sys_Order">
+        SELECT
+        *
+        FROM
+        T_Sys_Order
+        WHERE
+        DELETE_STATES = '0'
+        <if test="protocol_type !='' ">
+            AND PROTOCOL_TYPE LIKE '%${protocol_type}%'
+        </if>
+        ORDER BY FIELD_DATE
+        limit #{page},#{rows}
+
+    </select>
+
+    <!--查找符合条件的通讯指令总记录数-->
+    <select id="findAllOrderSearchCount" parameterType="String" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        T_Sys_Order
+        WHERE
+        PROTOCOL_TYPE LIKE '%${protocol_type}%'AND DELETE_STATES = '0'
+    </select>
+
+    <!--保存通讯指令信息-->
+    <insert id="saveOrder" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Order">
+        INSERT INTO
+        T_Sys_Order (ORDER_ID,
+        PROTOCOL_TYPE,
+        SENDER,
+        PROTOCOL_SN,
+        ENGLISH_FIELD,
+        FIELD_NAME,
+        FIELD_TYPE,
+        FIELD_LEN,
+        FIELD_COMMENT,
+        FIELD_DATE,
+        DELETE_STATES)
+        VALUES (
+        #{order_id},
+        #{protocol_type},
+        #{sender},
+        #{protocol_sn},
+        #{english_field},
+        #{field_name},
+        #{field_type},
+        #{field_len},
+        #{field_comment},
+        #{field_date},
+        '0' );
+    </insert>
+
+    <!--更新通讯指令信息-->
+    <update id="updateOrder" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Order">
+        UPDATE
+        T_Sys_Order
+        SET
+        PROTOCOL_TYPE = #{protocol_type},
+        SENDER = #{sender},
+        PROTOCOL_SN = #{protocol_sn},
+        ENGLISH_FIELD = #{english_field},
+        FIELD_NAME =  #{field_name},
+        FIELD_TYPE =  #{field_type},
+        FIELD_LEN =  #{field_len},
+        FIELD_COMMENT =  #{field_comment},
+        FIELD_DATE = #{field_date}
+        WHERE
+        ORDER_ID = #{order_id} AND DELETE_STATES = '0'
+    </update>
+
+    <!--删除通讯指令信息-->
+    <delete id="delOrder" parameterType="String">
+        UPDATE
+        T_Sys_Order
+        SET
+        DELETE_STATES = '1'
+        WHERE
+        ORDER_ID = #{order_id}
+    </delete>
+</mapper>

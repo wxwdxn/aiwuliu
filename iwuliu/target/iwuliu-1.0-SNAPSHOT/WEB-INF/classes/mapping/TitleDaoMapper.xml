@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TitleDaoMapper">
+    <resultMap id="T_Master_Electronic_Agreement_Title" type="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Title">
+        <id column="TITLE_ID" property="title_id"/>
+        <result column="MEMBER_TYPE" property="member_type"/>
+        <result column="ELECTRONIC_AGREEMENT_TITLE" property="electronic_agreement_title"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+    <!--根据ID查找协议标题信息-->
+    <select id="findTitleByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Title">
+        SELECT
+            *
+        FROM
+            T_Master_Electronic_Agreement_Title
+        WHERE
+            TITLE_ID = #{title_id} AND DELETE_FLAG='0'
+    </select>
+
+    <!--根据电子协议编号查找协议标题信息-->
+    <select id="findTitleByName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Title">
+        SELECT
+        *
+        FROM
+        T_Master_Electronic_Agreement_Title
+        WHERE
+        ELECTRONIC_AGREEMENT_TITLE = #{electronic_agreement_title} AND DELETE_FLAG='0'
+    </select>
+
+    <!--查找所有协议标题信息(有参)-->
+    <select id="findAllTitle" resultMap="T_Master_Electronic_Agreement_Title">
+        SELECT
+            *
+        FROM
+            T_Master_Electronic_Agreement_Title WHERE  DELETE_FLAG='0'
+        <if test="electronic_agreement_title !='' ">
+            AND ELECTRONIC_AGREEMENT_TITLE LIKE '%${electronic_agreement_title}%'
+        </if>
+        limit #{page},#{rows}
+
+    </select>
+
+    <!--查找所有协议标题信息(无参)-->
+    <select id="findAll" resultMap="T_Master_Electronic_Agreement_Title">
+        SELECT
+            *
+        FROM
+            T_Master_Electronic_Agreement_Title
+        WHERE DELETE_FLAG='0'
+    </select>
+
+
+    <!--查找符合条件的协议标题总记录数-->
+    <select id="findAllTitleRowsCount" parameterType="String" resultType="Integer">
+        SELECT
+        COUNT(*)
+        FROM
+        T_Master_Electronic_Agreement_Title
+        WHERE
+        ELECTRONIC_AGREEMENT_TITLE LIKE '%${electronic_agreement_title}%' AND DELETE_FLAG='0'
+    </select>
+
+    <!--保存协议标题信息-->
+    <insert id="saveTitle" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Title">
+        INSERT INTO
+                T_Master_Electronic_Agreement_Title (TITLE_ID,
+                MEMBER_TYPE,
+                ELECTRONIC_AGREEMENT_TITLE,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        select
+                #{title_id},
+                #{member_type},
+                #{electronic_agreement_title},
+                '0',
+                #{last_update},
+                #{last_update_user_id}
+                FROM dual WHERE not exists(SELECT * FROM T_Master_Electronic_Agreement_Title WHERE DELETE_FLAG = 0  AND MEMBER_TYPE = #{member_type})
+
+    </insert>
+
+    <!--更新协议标题信息-->
+    <update id="updateTitle" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Title">
+        UPDATE
+            T_Master_Electronic_Agreement_Title
+        SET
+            MEMBER_TYPE = #{member_type},
+            ELECTRONIC_AGREEMENT_TITLE = #{electronic_agreement_title},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            TITLE_ID = #{title_id} AND DELETE_FLAG = '0'
+    </update>
+
+    <!--删除协议标题信息-->
+    <delete id="delTitle" parameterType="String">
+        UPDATE
+            T_Master_Electronic_Agreement_Title
+        SET
+            DELETE_FLAG = '1'
+        WHERE
+            TITLE_ID = #{title_id}
+    </delete>
+
+    <!--根据用户类型查找协议标题-->
+    <select id="findTitleByMemberType" parameterType="String"  resultType="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Title" >
+        SELECT
+            *
+        FROM
+            T_Master_Electronic_Agreement_Title
+        WHERE
+            MEMBER_TYPE = #{member_type} AND DELETE_FLAG = '0'
+    </select>
+
+</mapper>

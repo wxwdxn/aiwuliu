@@ -1,0 +1,17 @@
+.iframeMain .infoConditions {
+  padding: 0;
+}
+.iframeMain .infoConditions .buttons {
+  margin: 0 25px;
+}
+/*表格显示*/
+.fixed-table-body{
+  height:auto;
+}
+
+#myModal label,
+#mymanuallyAssign label,
+#UnmyModal label{
+  min-width: 104px;
+  text-align: right;
+}

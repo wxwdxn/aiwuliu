@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckAlarmDetailDaoMapper">
+
+    <!--保存卡车警情明细信息-->
+    <insert id="saveTruckAlarmDetail" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Alarm_Detail">
+        INSERT INTO
+                T_Data_Truck_Alarm_Detail(SUMMARY_ID,
+                ALARM_TYPE,
+                NEW_ALARM_FLAG,
+                ALARM_VALUE,
+                ALARM_THRESHOLD,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{summary_id},
+                #{alarm_type},
+                #{new_alarm_flag},
+                #{alarm_value},
+                #{alarm_threshold},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新卡车警情明细信息-->
+    <update id="updateTruckAlarmDetail" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Alarm_Detail">
+        UPDATE
+            T_Data_Truck_Alarm_Detail
+        SET
+            ALARM_TYPE = #{alarm_type},
+            NEW_ALARM_FLAG = #{new_alarm_flag},
+            ALARM_VALUE = #{alarm_value},
+            ALARM_THRESHOLD = #{alarm_threshold},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            SUMMARY_ID = #{summary_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据工况No删除卡车警情明细信息-->
+    <delete id="delTruckAlarmDetail" parameterType="String">
+        UPDATE
+            T_Data_Truck_Alarm_Detail
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            SUMMARY_ID = #{summary_id} AND DELETE_FLAG = 0
+    </delete>
+</mapper>

@@ -1,0 +1,27 @@
+package com.cn.gazelle.logistics.service;
+
+
+import com.cn.gazelle.logistics.pojo.T_Data_Vehicle;
+
+import javax.jws.WebService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称: VehicleService
+ * 内容摘要: 车辆管理查询接口
+ * 方法描述：该类有2个方法：
+ * 01 findVehicleListCompany   根据条件查找车辆列表(物流公司)
+ * 02 findVehicleListDriver   根据条件查找车辆列表(司机)
+ *
+ * @author QJ
+ */
+@WebService
+public interface VehicleService {
+    // 根据条件查找车辆列表(物流公司)
+    List<T_Data_Vehicle> findVehicleListCompany(HashMap<String,String> conditions);
+
+    // 根据条件查找车辆列表(司机)
+    List<T_Data_Vehicle> findVehicleListDriver(HashMap<String,String> conditions);
+}

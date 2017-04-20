@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.SysInfoDaoMapper">
+    <!--更新系统信息-->
+    <update id="updateSysInfo" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Sys_Info">
+        UPDATE
+        T_Data_Sys_Info
+        SET
+        MEMBER_SERVER_TELEPHONE = #{member_server_telephone},
+        DENIED_COOL_DOWN_TIME = #{denied_cool_down_time},
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+    </update>
+
+    <!--查找系统信息-->
+    <select id="findSysInfo" resultType="com.cn.gazelle.logistics.pojo.T_Data_Sys_Info">
+        SELECT
+        *
+        FROM
+        T_Data_Sys_Info
+    </select>
+
+
+</mapper>

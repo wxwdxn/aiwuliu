@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckFaultDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Truck_Fault" type="com.cn.gazelle.logistics.pojo.T_Data_Truck_Fault">
+
+        <id column="FAULT_NUMBER" property="fault_number"/>
+        <result column="OBD_ID" property="obd_id"/>
+        <result column="CLIENT_ACQUISITION_TIME" property="client_acquisition_time"/>
+        <result column="FAULT_CODE" property="fault_code"/>
+        <result column="FAULT_ATTRIBUTE" property="fault_attribute"/>
+        <result column="FAULT_HAPPEN_TIMES" property="fault_happen_times"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--保存卡车故障信息-->
+    <insert id="saveTruckFault" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Fault">
+        INSERT INTO
+                T_Data_Truck_Fault(FAULT_NUMBER,
+                OBD_ID,
+                CLIENT_ACQUISITION_TIME,
+                FAULT_CODE,
+                FAULT_ATTRIBUTE,
+                FAULT_HAPPEN_TIMES,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{fault_number},
+                #{obd_id},
+                #{client_acquisition_time},
+                #{fault_code},
+                #{fault_attribute},
+                #{fault_happen_times},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新卡车故障信息-->
+    <update id="updateTruckFault" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Fault">
+        UPDATE
+            T_Data_Truck_Fault
+        SET
+            OBD_ID = #{obd_id},
+            CLIENT_ACQUISITION_TIME = #{client_acquisition_time},
+            FAULT_CODE = #{fault_code},
+            FAULT_ATTRIBUTE = #{fault_attribute},
+            FAULT_HAPPEN_TIMES = #{fault_happen_times},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            FAULT_NUMBER = #{fault_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据故障No删除卡车故障信息-->
+    <delete id="delTruckFault" parameterType="String">
+        UPDATE
+            T_Data_Truck_Fault
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            FAULT_NUMBER = #{fault_number} AND DELETE_FLAG = 0
+    </delete>
+</mapper>

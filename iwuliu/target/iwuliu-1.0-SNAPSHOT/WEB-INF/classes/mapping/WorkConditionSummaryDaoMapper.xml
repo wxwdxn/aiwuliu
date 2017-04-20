@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.WorkConditionSummaryDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Work_Condition_Summary" type="com.cn.gazelle.logistics.pojo.T_Data_Work_Condition_Summary">
+
+        <id column="SUMMARY_NUMBER" property="summary_number"/>
+        <result column="OBD_ID" property="obd_id"/>
+        <result column="SERVER_ACQUISITION_TIME" property="server_acquisition_time"/>
+        <result column="LAST_ACCON_TIME" property="last_accon_time"/>
+        <result column="TOTAL_TRIP_MILEAGE" property="total_trip_mileage"/>
+        <result column="CURRENT_TRIP_MILEAGE" property="current_trip_mileage"/>
+        <result column="TOTAL_FUEL" property="total_fuel"/>
+        <result column="CURRENT_FUEL" property="current_fuel"/>
+        <result column="VSTATE" property="vstate"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--保存卡车工况统计信息-->
+    <insert id="saveWorkConditionSummary" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Work_Condition_Summary">
+        INSERT INTO
+                T_Data_Work_Condition_Summary(SUMMARY_NUMBER,
+                OBD_ID,
+                SERVER_ACQUISITION_TIME,
+                LAST_ACCON_TIME,
+                TOTAL_TRIP_MILEAGE,
+                CURRENT_TRIP_MILEAGE,
+                TOTAL_FUEL,
+                CURRENT_FUEL,
+                VSTATE,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{summary_number},
+                #{obd_id},
+                #{server_acquisition_time},
+                #{last_accon_time},
+                #{total_trip_mileage},
+                #{current_trip_mileage},
+                #{total_fuel},
+                #{current_fuel},
+                #{vstate},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新卡车工况统计信息-->
+    <update id="updateWorkConditionSummary" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Work_Condition_Summary">
+        UPDATE
+            T_Data_Work_Condition_Summary
+        SET
+            OBD_ID = #{obd_id},
+            SERVER_ACQUISITION_TIME = #{server_acquisition_time},
+            LAST_ACCON_TIME = #{last_accon_time},
+            TOTAL_TRIP_MILEAGE = #{total_trip_mileage},
+            CURRENT_TRIP_MILEAGE = #{current_trip_mileage},
+            TOTAL_FUEL = #{total_fuel},
+            CURRENT_FUEL = #{current_fuel},
+            VSTATE = #{vstate},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            SUMMARY_NUMBER= #{summary_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据统计No删除卡车工况统计信息-->
+    <delete id="delWorkConditionSummary" parameterType="String">
+        UPDATE
+            T_Data_Work_Condition_Summary
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            SUMMARY_NUMBER = #{summary_number} AND DELETE_FLAG = 0
+    </delete>
+</mapper>

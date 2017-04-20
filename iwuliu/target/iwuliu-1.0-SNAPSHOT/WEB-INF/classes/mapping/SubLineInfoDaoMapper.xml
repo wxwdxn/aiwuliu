@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.gazelle.logistics.dao.SubLineInfoDaoMapper" >
+  <resultMap id="T_Master_Sub_Line_Info" type="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Info" >
+    <id column="LINE_ID" property="line_id"  />
+    <result column="OPERATE_MAIN_LINE_ID" property="operate_main_line_id" />
+    <result column="LINE_NO" property="line_no" />
+    <result column="REMARK" property="remark" />
+    <result column="AVERAGE_GAS_CONSUMPTION" property="average_gas_consumption" />
+    <result column="AVERAGE_DIESEL_FUEL_CONSUMPTION" property="average_diesel_fuel_consumption"  />
+    <result column="AVERAGE_HIGHWAY_TOLLS" property="average_highway_tolls" />
+    <result column="AVERAGE_NATIONAL_ROAD_TOLLS" property="average_national_road_tolls"  />
+    <result column="AVERAGE_NATIONAL_ROAD_FINE" property="average_national_road_fine"/>
+    <result column="DELETE_FLAG" property="delete_flag" />
+    <result column="LAST_UPDATE" property="last_update" />
+    <result column="LAST_UPDATE_USER_ID" property="last_update_user_id" />
+  </resultMap>
+
+  <!--根据ID查找干线概要信息-->
+  <select id="findSubLineInfoByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Info">
+    SELECT
+    *
+    FROM
+    T_Master_Sub_Line_Info
+    WHERE
+    LINE_ID = #{line_id} AND DELETE_FLAG = '0'
+  </select>
+
+  <!--根据路线编号查找干线概要信息-->
+  <select id="findSubLineInfoByNo" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Info">
+    SELECT
+    *
+    FROM
+    T_Master_Sub_Line_Info
+    WHERE
+    LINE_NO = #{line_no} AND DELETE_FLAG = '0'
+  </select>
+
+  <!--查找所有干线概要信息(有参)-->
+  <select id="findAllSubLineInfo" resultMap="T_Master_Sub_Line_Info">
+    SELECT
+    *
+    FROM
+    T_Master_Sub_Line_Info
+    WHERE
+    DELETE_FLAG = '0'
+    <if test="line_no !='' ">
+      AND line_no LIKE '%${line_no}%'
+    </if>
+    limit #{page},#{rows}
+
+  </select>
+
+  <!--查找所有干线概要信息(无参)-->
+  <select id="findAll" resultMap="T_Master_Sub_Line_Info">
+    SELECT
+    *
+    FROM
+    T_Master_Sub_Line_Info
+    WHERE
+    DELETE_FLAG = '0'
+    </select>
+
+  <!--查找符合条件的干线概要总记录数-->
+  <select id="findAllSubLineInfoRowsCount" parameterType="String" resultType="int">
+    SELECT
+    COUNT(*)
+    FROM
+    T_Master_Sub_Line_Info
+    WHERE
+    LINE_NO LIKE '%${line_no}%' AND DELETE_FLAG = '0'
+  </select>
+
+  <!--保存干线概要信息-->
+  <insert id="saveSubLineInfo" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Info">
+    INSERT INTO
+    T_Master_Sub_Line_Info (LINE_ID,
+    OPERATE_MAIN_LINE_ID,
+    LINE_NO,
+    REMARK,
+    AVERAGE_GAS_CONSUMPTION,
+    AVERAGE_DIESEL_FUEL_CONSUMPTION,
+    AVERAGE_HIGHWAY_TOLLS,
+    AVERAGE_NATIONAL_ROAD_TOLLS,
+    AVERAGE_NATIONAL_ROAD_FINE,
+    DELETE_FLAG,
+    LAST_UPDATE,
+    LAST_UPDATE_USER_ID
+    )
+    SELECT
+    #{line_id},
+    #{operate_main_line_id},
+    #{line_no},
+    #{remark},
+    #{average_gas_consumption},
+    #{average_diesel_fuel_consumption},
+    #{average_highway_tolls},
+    #{average_national_road_tolls},
+    #{average_national_road_fine},
+    '0',
+    #{last_update} ,
+    #{last_update_user_id}
+    FROM dual WHERE NOT EXISTS(SELECT OPERATE_MAIN_LINE_ID FROM T_Master_Sub_Line_Info WHERE OPERATE_MAIN_LINE_ID = #{operate_main_line_id} AND LINE_NO = #{line_no} AND DELETE_FLAG = 0)
+  </insert>
+
+  <!--更新干线概要信息-->
+  <update id="updateSubLineInfo" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Info">
+    UPDATE
+    T_Master_Sub_Line_Info
+    SET
+    OPERATE_MAIN_LINE_ID = #{operate_main_line_id},
+    LINE_NO = #{line_no},
+    REMARK = #{remark},
+    AVERAGE_GAS_CONSUMPTION = #{average_gas_consumption},
+    AVERAGE_DIESEL_FUEL_CONSUMPTION = #{average_diesel_fuel_consumption},
+    AVERAGE_HIGHWAY_TOLLS = #{average_highway_tolls},
+    AVERAGE_NATIONAL_ROAD_TOLLS = #{average_national_road_tolls},
+    AVERAGE_NATIONAL_ROAD_FINE = #{average_national_road_fine},
+    DELETE_FLAG =  '0',
+    LAST_UPDATE = #{last_update},
+    LAST_UPDATE_USER_ID = #{last_update_user_id}
+    WHERE
+    LINE_ID = #{line_id}
+  </update>
+
+  <!--删除干线概要信息-->
+  <delete id="delSubLineInfo" parameterType="String">
+    UPDATE
+    T_Master_Sub_Line_Info
+    SET
+    DELETE_FLAG = '1'
+    WHERE
+    LINE_ID = #{line_id}
+  </delete>
+
+  <!--根据干线线路id查找干线概要信息-->
+  <select id="findSubLineInfoByOperateID" parameterType="String" resultMap="T_Master_Sub_Line_Info">
+    SELECT
+    *
+    FROM
+    T_Master_Sub_Line_Info
+    WHERE
+    OPERATE_MAIN_LINE_ID = #{operate_main_line_id} AND DELETE_FLAG = '0'
+  </select>
+
+  <!--查询所有干线线路信息不分页-->
+  <select id="findSubLineInfoList" resultMap="T_Master_Sub_Line_Info">
+    SELECT
+    *
+    FROM
+    T_Master_Sub_Line_Info WHERE DELETE_FLAG = 0
+  </select>
+
+
+</mapper>

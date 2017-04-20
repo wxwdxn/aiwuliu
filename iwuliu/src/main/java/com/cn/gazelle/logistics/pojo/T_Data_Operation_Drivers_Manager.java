@@ -1,0 +1,131 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：T_Data_Operation_Drivers_Manager.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2016-11-16
+ * 作    者: YK
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.pojo;
+
+/**
+ * 类 名 称：T_Data_Operation_Drivers_Manager
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ *          01 
+ *@authot YK
+ */
+public class T_Data_Operation_Drivers_Manager {
+    private String crew_name ;                   // 车组成员
+    private String organization_type ;           // 机构类型
+    private String company_name ;                // 机构名称
+    private String owner_name ;                  // 车主
+    private String owner_phone ;                 // 车主手机
+    private String crew_phone ;                  // 车组成员手机
+    private String id_card_number ;              // 证件号码
+    private String driver_licence_number ;       // 驾驶档案编号
+    private String plate_number ;                // 车牌号
+    private String truck_carriage_type_name ;    // 车厢类型
+    private String line ;                        // 常跑干线
+    private String driving_status ;               // 审核状态
+
+    public String getCrew_name() {
+        return crew_name;
+    }
+
+    public void setCrew_name(String crew_name) {
+        this.crew_name = crew_name;
+    }
+
+    public String getOrganization_type() {
+        return organization_type;
+    }
+
+    public void setOrganization_type(String organization_type) {
+        this.organization_type = organization_type;
+    }
+
+    public String getCompany_name() {
+        return company_name;
+    }
+
+    public void setCompany_name(String company_name) {
+        this.company_name = company_name;
+    }
+
+    public String getOwner_name() {
+        return owner_name;
+    }
+
+    public void setOwner_name(String owner_name) {
+        this.owner_name = owner_name;
+    }
+
+    public String getOwner_phone() {
+        return owner_phone;
+    }
+
+    public void setOwner_phone(String owner_phone) {
+        this.owner_phone = owner_phone;
+    }
+
+    public String getCrew_phone() {
+        return crew_phone;
+    }
+
+    public void setCrew_phone(String crew_phone) {
+        this.crew_phone = crew_phone;
+    }
+
+    public String getId_card_number() {
+        return id_card_number;
+    }
+
+    public void setId_card_number(String id_card_number) {
+        this.id_card_number = id_card_number;
+    }
+
+    public String getDriver_licence_number() {
+        return driver_licence_number;
+    }
+
+    public void setDriver_licence_number(String driver_licence_number) {
+        this.driver_licence_number = driver_licence_number;
+    }
+
+    public String getPlate_number() {
+        return plate_number;
+    }
+
+    public void setPlate_number(String plate_number) {
+        this.plate_number = plate_number;
+    }
+
+    public String getTruck_carriage_type_name() {
+        return truck_carriage_type_name;
+    }
+
+    public void setTruck_carriage_type_name(String truck_carriage_type_name) {
+        this.truck_carriage_type_name = truck_carriage_type_name;
+    }
+
+    public String getLine() {
+        return line;
+    }
+
+    public void setLine(String line) {
+        this.line = line;
+    }
+
+    public String getDriving_status() {
+        return driving_status;
+    }
+
+    public void setDriving_status(String driving_status) {
+        this.driving_status = driving_status;
+    }
+}

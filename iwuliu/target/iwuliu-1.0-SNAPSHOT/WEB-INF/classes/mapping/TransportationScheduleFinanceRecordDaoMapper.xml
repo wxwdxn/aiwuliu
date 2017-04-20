@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TransportationScheduleFinanceRecordDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Transportation_Schedule_Finance_Record" type="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Finance_Record">
+
+        <id column="FINACIAL_FLOW_ID" property="finacial_flow_id"/>
+        <result column="SCHEDULE_ID" property="schedule_id"/>
+        <result column="FINACIAL_FLOW_DIRECTION" property="finacial_flow_direction"/>
+        <result column="FINACIAL_FLOW_TYPE" property="finacial_flow_type"/>
+        <result column="TRUCK_PAYMENT_HISTORY_NUMBER" property="truck_payment_history_number"/>
+        <result column="MEMBER_PAYMENT_HISTORY_NUMBER" property="member_payment_history_number"/>
+        <result column="TARGET_SERVICE_STATION_ID" property="target_service_station_id"/>
+        <result column="AMOUNT" property="amount"/>
+        <result column="CREATE_TIME" property="create_time"/>
+        <result column="DISBURSEMENT_VOUCHER_IMAGE_SAVE_PATH" property="disbursement_voucher_image_save_path"/>
+        <result column="LONGITUDE" property="longitude"/>
+        <result column="LATITUDE" property="latitude"/>
+        <result column="DEAL_PERSON_ID" property="deal_person_id"/>
+        <result column="REMARK" property="remark"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据位置ID查询货物运输调度单财务流水信息-->
+    <select id="findFinacialFlowById" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Finance_Record">
+        SELECT
+            *
+        FROM
+            T_Data_Transportation_Schedule_Finance_Record
+        WHERE
+            FINACIAL_FLOW_ID = #{finacial_flow_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的货物运输调度单财务流水信息（默认查询所有货物运输调度单财务流水信息）-->
+    <select id="findAllFinacialFlow" resultMap="T_Data_Transportation_Schedule_Finance_Record">
+        SELECT
+            *
+        FROM
+        T_Data_Transportation_Schedule_Finance_Record t
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'schedule_id'">
+            AND t.${search_type} IN (
+            SELECT m.schedule_id FROM (SELECT schedule_sheet_id AS schedule_id FROM `t_data_transportation_schedule_sheet` WHERE code LIKE '%${name}%')AS m
+            )
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询货物运输调度单财务流水信息总记录数-->
+    <select id="findAllFinacialFlowRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+        T_Data_Transportation_Schedule_Finance_Record
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--保存货物运输调度单财务流水信息-->
+    <insert id="saveFinacialFlow" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Finance_Record">
+        INSERT INTO
+                T_Data_Transportation_Schedule_Finance_Record(FINACIAL_FLOW_ID,
+                SCHEDULE_ID,
+                FINACIAL_FLOW_DIRECTION,
+                FINACIAL_FLOW_TYPE,
+                TRUCK_PAYMENT_HISTORY_NUMBER,
+                MEMBER_PAYMENT_HISTORY_NUMBER,
+                TARGET_SERVICE_STATION_ID,
+                AMOUNT,
+                CREATE_TIME,
+                DISBURSEMENT_VOUCHER_IMAGE_SAVE_PATH,
+                LONGITUDE,
+                LATITUDE,
+                DEAL_PERSON_ID,
+                REMARK,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{finacial_flow_id},
+                #{schedule_id},
+                #{finacial_flow_direction},
+                #{finacial_flow_type},
+                #{truck_payment_history_number},
+                #{member_payment_history_number},
+                #{target_service_station_id},
+                #{amount},
+                #{create_time},
+                #{disbursement_voucher_image_save_path},
+                #{longitude},
+                #{latitude},
+                #{deal_person_id},
+                #{remark},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新货物运输调度单财务流水信息-->
+    <update id="updateFinacialFlow" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Finance_Record">
+        UPDATE
+            T_Data_Transportation_Schedule_Finance_Record
+        SET
+            SCHEDULE_ID= #{schedule_id},
+            FINACIAL_FLOW_DIRECTION = #{finacial_flow_direction},
+            FINACIAL_FLOW_TYPE = #{finacial_flow_type},
+            TRUCK_PAYMENT_HISTORY_NUMBER = #{truck_payment_history_number},
+            MEMBER_PAYMENT_HISTORY_NUMBER = #{member_payment_history_number},
+            TARGET_SERVICE_STATION_ID = #{target_service_station_id},
+            AMOUNT = #{amount},
+            CREATE_TIME = #{create_time},
+            DISBURSEMENT_VOUCHER_IMAGE_SAVE_PATH = #{disbursement_voucher_image_save_path},
+            LONGITUDE = #{longitude},
+            LATITUDE = #{latitude},
+            DEAL_PERSON_ID = #{deal_person_id},
+            REMARK = #{remark},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            FINACIAL_FLOW_ID = #{finacial_flow_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据ID删除货物运输调度单财务流水信息-->
+    <delete id="delFinacialFlow" parameterType="String">
+        UPDATE
+            T_Data_Transportation_Schedule_Finance_Record
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            FINACIAL_FLOW_ID = #{finacial_flow_id} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--根据调度单ID查询货物运输调度单财务流水信息-->
+    <select id="findFinacialFlowByScheduleId" resultMap="T_Data_Transportation_Schedule_Finance_Record">
+        SELECT
+            *
+        FROM
+            T_Data_Transportation_Schedule_Finance_Record
+        WHERE
+            SCHEDULE_ID = #{schedule_id} AND DELETE_FLAG = 0 ORDER BY CREATE_TIME DESC
+    </select>
+
+    <!--根据调度单ID查询货物运输调度单财务流水信息-->
+    <select id="findAmountByScheduleIdAndTypeId" resultType="int">
+        SELECT
+          SUM(amount)
+        FROM
+          `t_data_transportation_schedule_finance_record`
+        WHERE SCHEDULE_ID = #{schedule_id}
+        AND
+          FINACIAL_FLOW_TYPE = #{finacial_flow_type}
+        AND
+          DELETE_FLAG = 0
+
+    </select>
+
+</mapper>

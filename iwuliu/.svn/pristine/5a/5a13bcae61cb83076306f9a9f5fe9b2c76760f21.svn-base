@@ -1,0 +1,346 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：WithdrawApplyServiceImpl.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2016-12-28
+ * 作    者: YK
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.service.impl;
+
+import com.cn.gazelle.logistics.dao.*;
+import com.cn.gazelle.logistics.pojo.*;
+import com.cn.gazelle.logistics.service.WithdrawApplyService;
+import com.cn.gazelle.logistics.util.DateUtil;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.RadomUtil;
+import com.cn.gazelle.logistics.util.TargetIDUtil;
+import com.cn.gazelle.logistics.util.message.base.MessageUtil;
+import com.cn.gazelle.logistics.util.rbUtil.config.Decipher;
+import com.cn.gazelle.logistics.util.rbUtil.config.ReapalConfig;
+import com.cn.gazelle.logistics.util.rbUtil.config.ReapalSubmit;
+import org.apache.log4j.Logger;
+import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
+import javax.annotation.Resource;
+import javax.jws.WebService;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称：WithdrawApplyServiceImpl
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ * 01
+ * 02
+ *
+ * @authot YK
+ */
+@Service
+@WebService(endpointInterface = "com.cn.gazelle.logistics.service.WithdrawApplyService", targetNamespace = "http://service.logistics.gazelle.cn.com/")
+public class WithdrawApplyServiceImpl implements WithdrawApplyService {
+    private static final String STATUS_UNPROCESSED = "0";                 // 未处理
+    private static final String STATUS_FAILED = "3";                      // 未通过（余额不足）
+    private static final String STATUS_NOPASSED = "2";                    // 未通过
+    private static final String FIALED_REASON = "余额不足";                // 余额不足
+    private static final String AGENTPAY_URL = "/agentpay/pay";           // 代付请求地址
+    private static final String RESULT_CODE_SUCCESS = "0000";             // 成功
+    private static final String PAYMENT_TYPE_WITHDRAW = "1";              // 提现
+    private static final String PAYMENT_RESULT_WAITING = "2";             // 等待支付结果
+    private static final String RETURN_RESULT_SUCCESS = "0";              // 回传状态（已提交）
+    private static final String WITHDRAW_APPLY_STATUS_SUBMIT = "1";       // 已提交
+
+    // Log初始化
+    Logger logger = Logger.getLogger(WithdrawApplyServiceImpl.class);
+    @Resource
+    private MemberDaoMapper memberDaoMapper;
+    @Resource
+    private MemberBankAccountDaoMapper memberBankAccountDaoMapper;
+    @Resource
+    private WithdrawApplyDaoMapper withdrawApplyDaoMapper;
+    @Resource
+    private PersonDaoMapper personDaoMapper;
+    @Resource
+    private DicdataDaoMapper dicdataDaoMapper;
+    @Resource
+    private MemberPaymentHistoryDaoMapper memberPaymentHistoryDaoMapper;
+
+    /**
+     * 方法描述:个人账户确认提现（支付）
+     *
+     * @param member_name
+     * @return
+     */
+    @Transactional
+    public String confirmWithdrawApply(String member_name, String pay_type, String account_no, String batch_amount) {
+        logger.info("member_name=" + member_name);
+        logger.info("pay_type=" + pay_type);
+        logger.info("account_no=" + account_no);
+        logger.info("batch_amount=" + batch_amount);
+        String json = null;
+        String ecode = null;
+        double member_account_amount = 0.00;                              // 会员账户资金量
+        String account_no_data = null;                                    // 数据库银行绑定编号
+        double amount_Unprocessed = 0.00;                                 // 未处理金额
+        String content = null;                                            // 批次明细
+        String bank_account = null;                                       // 银行账户
+        String person_name = null;                                        // 姓名
+        String bank_name = null;                                          // 银行名称
+        String order_no = null;                                           // 订单号
+        T_Data_Member member = null;                                      // 会员信息
+        T_Data_Person person = null;                                      // 会员个人信息
+        T_Data_Member_Bank_Account bankAccount = null;                    // 银行信息
+        List<T_Data_Member_Bank_Account> memberBankAccountList = null;    // 会员银行卡信息
+        List<T_Data_Withdraw_Apply> withdrawApplyList = null;             // 会员提现申请列表信息
+        Map result = new HashMap();                                       // 返回json map封装
+        Map<String, String> rbMap = new HashMap<String, String>(0);       // 融宝map
+        Date time_server = DateUtil.getDate();                            // 服务器时间
+        T_Data_Withdraw_Apply withdrawApply = new T_Data_Withdraw_Apply();// 新增提现申请信息
+
+        try {
+            // 查找银行信息
+            bankAccount = this.memberBankAccountDaoMapper.findMemberBankAccountByAccountNo(account_no);
+            bank_account = bankAccount.getBank_account();
+            // 查询银行卡的开户行
+            List<T_Sys_Dicdata> bank_nameList = dicdataDaoMapper.
+                    findAllDicdataByID("40C440A05FD14E7CA187B00BD9EDEE21", bankAccount.getBank_id());
+            bank_name = bank_nameList.get(0).getDicdata_name();
+            // 查找会员信息
+            member = this.memberDaoMapper.findMemberByName(member_name);
+            member_account_amount = member.getMember_account_amount();
+            // 查找会员个人信息
+            person = this.personDaoMapper.findPersonByID(member.getRelevance_info_id());
+            person_name = person.getPerson_name();
+            // 查找该账户下的银行信息
+            memberBankAccountList = this.memberBankAccountDaoMapper.findAll(member.getMember_id());
+            // 计算未处理提现申请金额总数
+            for (T_Data_Member_Bank_Account memberBankAccount : memberBankAccountList) {
+                account_no_data = memberBankAccount.getAccount_no();
+                // 查找该银行账户的提现申请为处理的信息
+                withdrawApplyList = this.withdrawApplyDaoMapper.
+                        findWithdrawApplyByAccountAndStatus(account_no_data, STATUS_UNPROCESSED);
+                if (withdrawApplyList != null && withdrawApplyList.size() != 0) {
+                    for (T_Data_Withdraw_Apply withdrawapply_unprocessed : withdrawApplyList) {
+                        amount_Unprocessed += withdrawapply_unprocessed.getCash_amount();
+                    }
+                }
+            }
+            // 判断个人账户金额是否满足提现
+            if (member_account_amount >= (amount_Unprocessed + Double.parseDouble(batch_amount))) {
+                // 在提现申请信息表中添加一条状态为0（未处理）的数据
+                withdrawApply.setAccount_no(account_no);
+                withdrawApply.setCash_amount(Double.parseDouble(batch_amount));
+                withdrawApply.setApply_time(time_server);
+                withdrawApply.setStatus(STATUS_UNPROCESSED);
+                withdrawApply.setLast_update_user_id("M:" + member_name);
+                withdrawApply.setLast_update(time_server);
+                this.withdrawApplyDaoMapper.saveWithdrawApply(withdrawApply);
+                // 调用融宝接口进行提现(默认审核通过)
+                rbMap.put("charset", ReapalConfig.charset);
+                rbMap.put("trans_time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                rbMap.put("notify_url", ReapalConfig.agent_pay_notify_url);
+                rbMap.put("batch_no", RadomUtil.getBatchNo());
+                rbMap.put("batch_count", "1");
+                rbMap.put("batch_amount", batch_amount);
+                rbMap.put("pay_type", pay_type);
+                order_no = RadomUtil.getOrderNo();
+                // 备注传0，异步通知接收到的订单状态是成功的，非0，异步通知接收到的订单状态是失败的
+                content = ReapalConfig.order_no + "," + bank_account + "," + person_name + "," + bank_name + "," + "" +
+                        "," + "" + "," + ReapalConfig.withdraw_type + "," + batch_amount + "," + ReapalConfig.money_type
+                        + "," + "" + "," + "" + "," + member_name + "," + ReapalConfig.card_type + "," + person.getId_card_number() + "," +
+                        "" + "," + order_no + "," + "0";
+                rbMap.put("content", content);
+                // 生成签名
+                String post = ReapalSubmit.agentPayBuildSubmit(rbMap, AGENTPAY_URL);
+                String res = Decipher.decryptData(post);
+                //将json字符串转换成json对象,获取相应的key值
+                JSONObject obj = new JSONObject(res);
+                String result_code = (String) obj.get("result_code");
+                logger.info(result_code);
+                // 判断代付提交接口是否提交成功（接口提交成功不代表代付成功，需要参看异步通知的反馈结果）
+                if (result_code.equals(RESULT_CODE_SUCCESS)) {
+                    // 会员支付历史信息表新增一条信息,回调状态为已提交，支付结果为等待支付结果
+                    T_Data_Member_Payment_History paymentHistory = new T_Data_Member_Payment_History();
+                    paymentHistory.setMember_id(member.getMember_id());
+                    paymentHistory.setPayment_type(PAYMENT_TYPE_WITHDRAW);
+                    paymentHistory.setTarget_id(TargetIDUtil.getTargetID(account_no));
+                    paymentHistory.setTarget_bank_account(bank_account);
+                    paymentHistory.setAmount(Double.parseDouble(batch_amount));
+                    paymentHistory.setCreate_time(time_server);
+                    paymentHistory.setReturn_result(RETURN_RESULT_SUCCESS);
+                    paymentHistory.setReturn_time(time_server);
+                    paymentHistory.setPayment_result(PAYMENT_RESULT_WAITING);
+                    paymentHistory.setThird_party_order_id(order_no);
+                    paymentHistory.setDelete_flag("0");
+                    paymentHistory.setLast_update_user_id("M:" + member_name);
+                    paymentHistory.setLast_update(time_server);
+                    this.memberPaymentHistoryDaoMapper.saveMemberPaymentHistory(paymentHistory);
+                    // 更新提现申请表信息，状态为1
+                    logger.info("history_number=====>"+paymentHistory.getHistory_number());
+                    withdrawApply.setPayment_history_number(paymentHistory.getHistory_number());
+                    withdrawApply.setStatus(WITHDRAW_APPLY_STATUS_SUBMIT);
+                    this.withdrawApplyDaoMapper.updateWithdrawApply(withdrawApply);
+                    ecode = "1000"; // 成功
+                } else {
+                    //提交失败,调用融宝确认提现接口未成功
+                    withdrawApply.setStatus(STATUS_NOPASSED);
+                    withdrawApply.setDeny_reason((String) obj.get("result_msg"));
+                    logger.info("withdrawApply=" + JSONUtil.toJSONString(withdrawApply));
+                    logger.info("id=" + withdrawApply.getApply_number());
+                    this.withdrawApplyDaoMapper.updateWithdrawApply(withdrawApply);
+                    ecode = "1001";
+                    result.put("ecode", ecode);
+                }
+                logger.info("解密返回的数据==========>" + res);
+            } else {
+                // 个人账户金额不满足提现,插入一条未通过数据(注：此时的审核人和审核时间为空)
+                withdrawApply.setAccount_no(account_no);
+                withdrawApply.setCash_amount(Double.parseDouble(batch_amount));
+                withdrawApply.setApply_time(time_server);
+                withdrawApply.setStatus(STATUS_FAILED);
+                withdrawApply.setDeny_reason(FIALED_REASON);
+                withdrawApply.setLast_update_user_id("M:" + member_name);
+                withdrawApply.setLast_update(time_server);
+                this.withdrawApplyDaoMapper.saveWithdrawApply(withdrawApply);
+                ecode = "1004"; // 余额不足
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            ecode = "2000";
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); // 手动回滚
+        }
+        result.put("ecode", ecode);
+        json = JSONUtil.toJSONString(result);
+        return json;
+    }
+
+    /**
+     * 方法名称:findWithdrawApplyByNumber
+     * 方法描述：根据会员支付历史编号查找提现申请信息
+     *
+     * @param payment_history_number
+     * @return T_Data_Withdraw_Apply
+     */
+    public T_Data_Withdraw_Apply findWithdrawApplyByNumber(String payment_history_number) {
+        T_Data_Withdraw_Apply apply = null;
+        try {
+            apply = this.withdrawApplyDaoMapper.findWithdrawApplyByNumber(payment_history_number);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + MessageUtil.seacheInfoError);
+        }
+        return apply;
+    }
+
+    /**
+     * 方法名称:updateWithdrawApply
+     * 方法描述：更新提现申请信息
+     *
+     * @param withdrawApply
+     */
+    public void updateWithdrawApply(T_Data_Withdraw_Apply withdrawApply) {
+        try {
+            this.withdrawApplyDaoMapper.updateWithdrawApply(withdrawApply);
+            logger.info(MessageUtil.saveInfo);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + MessageUtil.saveInfoError);
+        }
+    }
+
+    /**
+     * 方法名称:findWithdrawApplyDetail
+     * 方法描述：查询个人账户提现申请信息
+     *
+     * @param start_time
+     * @param end_time
+     * @return List<T_Data_Withdraw_Apply_Detail>
+     */
+    public List<T_Data_Withdraw_Apply_Detail> findWithdrawApplyDetail(String start_time, String end_time,List<String> checkStatuss) {
+        List<T_Data_Withdraw_Apply_Detail> applyList = null;
+        try {
+            applyList = this.withdrawApplyDaoMapper.findWithdrawApplyDetail(start_time,end_time,checkStatuss);
+
+            logger.info(applyList);
+            for(T_Data_Withdraw_Apply_Detail applyDetail:applyList){
+                String status = applyDetail.getStatus();
+                if("0".equals(status)){
+                    applyDetail.setWithdraw_status("待审核");
+                }else if("1".equals(status) || "5".equals(status)){
+                    applyDetail.setWithdraw_status("审核通过");
+                }else if ("2".equals(status) || "3".equals(status) ||"4".equals(status)){
+                    applyDetail.setWithdraw_status("审核未通过");
+                }
+//                applyList.add(applyDetail);
+            }
+            logger.info(applyList);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + MessageUtil.seacheInfoError);
+        }
+        return applyList;
+    }
+
+    /**
+     * 方法名称:indWithdrawApplyDetailOfTruck
+     * 方法描述：查询车辆账户提现申请信息
+     *
+     * @param start_time
+     * @param end_time
+     * @return List<T_Data_Withdraw_Apply_Detail>
+     */
+    public List<T_Data_Withdraw_Apply_Detail> findWithdrawApplyDetailOfTruck(String start_time, String end_time,String withdraw_status) {
+        List<T_Data_Withdraw_Apply_Detail> applyList = null;
+        try {
+            applyList = this.withdrawApplyDaoMapper.findWithdrawApplyDetailOfTruck(start_time, end_time,withdraw_status);
+
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + MessageUtil.seacheInfoError);
+        }
+        return applyList;
+    }
+
+    /**
+     * 方法名称:findWithdrawApplySumOfMember
+     * 方法描述：查询个人账户提现申请总额
+     * @return double
+     */
+    public double findWithdrawApplySumOfMember() {
+        double applySum = 0.00;
+        try {
+            applySum = this.withdrawApplyDaoMapper.findWithdrawApplySumOfMember();
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + MessageUtil.seacheInfoError);
+        }
+        return applySum;
+    }
+
+    /**
+     * 方法名称:findWithdrawApplySumOfTruck
+     * 方法描述：查询车辆账户提现申请总额
+     * @return double
+     */
+    public double findWithdrawApplySumOfTruck() {
+        double applySum = 0.00;
+        try {
+            applySum = this.withdrawApplyDaoMapper.findWithdrawApplySumOfTruck();
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + MessageUtil.seacheInfoError);
+        }
+        return applySum;
+    }
+
+}
+

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckTransportLineDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Truck_Transport_Line" type="com.cn.gazelle.logistics.pojo.T_Data_Truck_Transport_Line">
+
+        <id column="LINE_ID" property="line_id"/>
+        <result column="TRUCK_ID" property="truck_id"/>
+        <result column="START_PROVINCE_ID" property="start_province_id"/>
+        <result column="START_CITY_ID" property="start_city_id"/>
+        <result column="END_PROVINCE_ID" property="end_province_id"/>
+        <result column="END_CITY_ID" property="end_city_id"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据ID查询车辆常跑路线信息-->
+    <select id="findTruckTransportByLineID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Transport_Line">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Transport_Line
+        WHERE
+            LINE_ID=#{line_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据卡车ID查询车辆常跑路线信息-->
+    <select id="findTruckTransportByTruckID" resultMap="T_Data_Truck_Transport_Line">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Transport_Line
+        WHERE
+            TRUCK_ID = #{truck_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询所有车辆常跑路线信息（默认查询所有车辆常跑路线列表信息）-->
+    <select id="findAllTruckTransportLine" resultMap="T_Data_Truck_Transport_Line">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Transport_Line t
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'start_province_id'">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        <if test="search_type !=''and search_type== 'start_city_id'">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        <if test="search_type !=''and search_type== 'end_province_id'">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        <if test="search_type !=''and search_type== 'end_city_id'">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        <if test="search_type != ''and search_type=='truck_id'">
+            AND t.${search_type} IN (
+            SELECT m.truck_id FROM (SELECT truck_id AS truck_id FROM `t_data_truck` WHERE plate_number LIKE '%${name}%')AS m
+            )
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询符合条件的车辆常跑路线信息总数-->
+    <select id="findAllTruckTransportLineRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Data_Truck_Transport_Line
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--保存车辆常跑路线信息-->
+    <insert id="saveTruckTransportLine" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Transport_Line">
+         INSERT INTO
+                  T_Data_Truck_Transport_Line(
+                  LINE_ID,
+                  TRUCK_ID,
+                  START_PROVINCE_ID,
+                  START_CITY_ID,
+                  END_PROVINCE_ID,
+                  END_CITY_ID,
+                  DELETE_FLAG,
+                  LAST_UPDATE,
+                  LAST_UPDATE_USER_ID)
+         SELECT
+                 #{line_id},
+                 #{truck_id},
+                 #{start_province_id},
+                 #{start_city_id},
+                 #{end_province_id},
+                 #{end_city_id},
+                 0,
+                 #{last_update},
+                 #{last_update_user_id}
+                 FROM DUAL WHERE NOT EXISTS(
+                 SELECT TRUCK_ID FROM T_Data_Truck_Transport_Line WHERE TRUCK_ID=#{truck_id}AND START_PROVINCE_ID=#{start_province_id}AND START_CITY_ID=#{start_city_id}AND END_PROVINCE_ID=#{end_province_id}AND END_CITY_ID=#{end_city_id}AND DELETE_FLAG=0)
+    </insert>
+
+    <!--更新车辆常跑路线信息-->
+    <update id="updateTruckTransportLine" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Transport_Line">
+        UPDATE
+            T_Data_Truck_Transport_Line
+        SET
+            TRUCK_ID = #{truck_id},
+            START_PROVINCE_ID = #{start_province_id},
+            START_CITY_ID = #{start_city_id},
+            END_PROVINCE_ID = #{end_province_id},
+            END_CITY_ID = #{end_city_id},
+            DELETE_FLAG = #{delete_flag},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            LINE_ID = #{line_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--删除车辆常跑路线信息-->
+    <delete id="delTruckTransportLine" parameterType="String">
+        UPDATE
+            T_Data_Truck_Transport_Line
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            LINE_ID = #{line_id} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--根据卡车ID查询车辆常跑路线信息-->
+    <select id="findTruckTransportByTruckIDAndCity" resultMap="T_Data_Truck_Transport_Line">
+        SELECT
+        *
+        FROM
+        T_Data_Truck_Transport_Line
+        WHERE
+        TRUCK_ID = #{truck_id} AND START_CITY_ID = #{start_city_id} AND END_CITY_ID = #{end_city_id} AND DELETE_FLAG = 0
+    </select>
+</mapper>

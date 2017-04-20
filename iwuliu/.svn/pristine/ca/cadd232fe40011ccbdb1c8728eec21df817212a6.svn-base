@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.VehicleDaoMapper">
+
+    <!--根据条件查找车辆列表（物流公司）-->
+    <select id="findVehicleListCompany" resultType="com.cn.gazelle.logistics.pojo.T_Data_Vehicle">
+        SELECT
+        *
+        FROM
+        (SELECT
+        '物流公司' AS 'organization_type',
+        t.`PLATE_NUMBER` AS plate_number,
+        d.`DICDATA_NAME` AS truck_brand,
+        tm.`TRUCK_BRAND_ID` AS truck_brand_id,
+        tm.`TRUCK_MODEL_NAME` AS truck_model_name,
+        tm.`TRUCK_MODEL_NO` AS truck_brand_no,
+        cy.`COMPANY_NAME` AS organization_name,
+        p.`PERSON_NAME` AS owner_name,
+        dd.`DICDATA_NAME` AS truck_type,
+        dd.`DICDATA_ID` AS truck_type_id,
+        tct.`TRUCK_CARRIAGE_TYPE_NAME` AS truck_carriage_type,
+        GetLine(t.`TRUCK_ID`) AS transport_line,
+        ddvs.`DICDATA_NAME` AS verify_status
+        FROM
+        t_data_truck t
+        LEFT JOIN
+        t_data_truck_model tm ON t.`TRUCK_MODEL_NO`=tm.`TRUCK_MODEL_NO` AND tm.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata d ON d.`DICDATA_ID`=tm.`TRUCK_BRAND_ID` AND d.`DELETE_STATES`=0
+        LEFT JOIN
+        t_data_company cy ON t.`OWNER_MEMBER_ID`=cy.`COMPANY_ID` AND cy.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_data_person p ON t.`MANAGER_MEMBER_ID`=p.`PERSON_ID` AND p.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata dd ON dd.`DICDATA_ID`=t.`TRUCK_TYPE_ID` AND dd.`DELETE_STATES`=0
+        LEFT JOIN
+        t_master_truck_carriage_type tct ON tct.`TRUCK_CARRIAGE_TYPE_ID`=t.`TRUCK_CARRIAGE_TYPE_ID` AND
+        tct.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata ddvs ON ddvs.`DICTIONARY_ID`='0D1DFD26128E4E35BBECA6D1F4FCE4FE' AND
+        ddvs.`DICDATA_CODE`=t.`VERIFY_STATUS` AND ddvs.`DELETE_STATES`=0
+        WHERE
+        t.`DELETE_FLAG`=0 AND t.`OWNER_MEMBER_ID` IS NOT NULL) AS vehicle
+        WHERE
+        vehicle.`organization_type`='物流公司'
+        <if test="plate_number != null and plate_number != ''">
+            AND vehicle.`PLATE_NUMBER` LIKE '%${plate_number}%'
+        </if>
+        <if test="organization_name != null and organization_name != ''">
+            AND vehicle.`ORGANIZATION_NAME` LIKE '%${organization_name}%'
+        </if>
+        <if test="owner_name != null and owner_name != ''">
+            AND vehicle.`OWNER_NAME` LIKE '%${owner_name}%'
+        </if>
+        <if test="truck_brand != null and truck_brand != ''">
+            AND vehicle.`TRUCK_BRAND_ID` LIKE '%${truck_brand}%'
+        </if>
+        <if test="truck_model_name != null and truck_model_name != ''">
+            AND vehicle.`TRUCK_BRAND_NO` LIKE '%${truck_model_name}%'
+        </if>
+        <if test="truck_type != null and truck_type != ''">
+            AND vehicle.`TRUCK_TYPE_ID` LIKE '%${truck_type}%'
+        </if>
+        <if test="start_city != null and start_city != ''">
+            AND vehicle.`TRANSPORT_LINE` LIKE '%${start_city}-%'
+        </if>
+        <if test="end_city != null and end_city != ''">
+            AND vehicle.`TRANSPORT_LINE` LIKE '%-${end_city}%'
+        </if>
+        <if test="verify_status != null and verify_status != ''">
+            AND vehicle.`VERIFY_STATUS` LIKE '%${verify_status}%'
+        </if>
+    </select>
+
+    <!--根据条件查找车辆列表（司机）-->
+    <select id="findVehicleListDriver" resultType="com.cn.gazelle.logistics.pojo.T_Data_Vehicle">
+        SELECT
+        *
+        FROM
+        (SELECT
+        '司机' AS 'organization_type',
+        t.`PLATE_NUMBER` AS plate_number,
+        d.`DICDATA_NAME` AS truck_brand,
+        tm.`TRUCK_BRAND_ID` AS truck_brand_id,
+        tm.`TRUCK_MODEL_NAME` AS truck_model_name,
+        tm.`TRUCK_MODEL_NO` AS truck_brand_no,
+        cy.`COMPANY_NAME` AS organization_name,
+        p.`PERSON_NAME` AS owner_name,
+        dd.`DICDATA_NAME` AS truck_type,
+        dd.`DICDATA_ID` AS truck_type_id,
+        tct.`TRUCK_CARRIAGE_TYPE_NAME` AS truck_carriage_type,
+        GetLine(t.`TRUCK_ID`) AS transport_line,
+        ddvs.`DICDATA_NAME` AS verify_status
+        FROM
+        t_data_truck t
+        LEFT JOIN
+        t_data_truck_model tm ON t.`TRUCK_MODEL_NO`=tm.`TRUCK_MODEL_NO` AND tm.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata d ON d.`DICDATA_ID`=tm.`TRUCK_BRAND_ID` AND d.`DELETE_STATES`=0
+        LEFT JOIN
+        t_data_company cy ON t.`OWNER_MEMBER_ID`=cy.`COMPANY_ID` AND cy.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_data_person p ON t.`MANAGER_MEMBER_ID`=p.`PERSON_ID` AND p.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata dd ON dd.`DICDATA_ID`=t.`TRUCK_TYPE_ID` AND dd.`DELETE_STATES`=0
+        LEFT JOIN
+        t_master_truck_carriage_type tct ON tct.`TRUCK_CARRIAGE_TYPE_ID`=t.`TRUCK_CARRIAGE_TYPE_ID` AND
+        tct.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata ddvs ON ddvs.`DICTIONARY_ID`='0D1DFD26128E4E35BBECA6D1F4FCE4FE' AND
+        ddvs.`DICDATA_CODE`=t.`VERIFY_STATUS` AND ddvs.`DELETE_STATES`=0
+        WHERE
+        t.`DELETE_FLAG`=0 AND t.`OWNER_MEMBER_ID` IS NULL) AS vehicle
+        WHERE
+        vehicle.`organization_type`='司机'
+        <if test="plate_number != null and plate_number != ''">
+            AND vehicle.`PLATE_NUMBER` LIKE '%${plate_number}%'
+        </if>
+        <if test="organization_name != null and organization_name != ''">
+            AND vehicle.`ORGANIZATION_NAME` LIKE '%${organization_name}%'
+        </if>
+        <if test="owner_name != null and owner_name != ''">
+            AND vehicle.`OWNER_NAME` LIKE '%${owner_name}%'
+        </if>
+        <if test="truck_brand != null and truck_brand != ''">
+            AND vehicle.`TRUCK_BRAND_ID` LIKE '%${truck_brand}%'
+        </if>
+        <if test="truck_model_name != null and truck_model_name != ''">
+            AND vehicle.`TRUCK_BRAND_NO` LIKE '%${truck_model_name}%'
+        </if>
+        <if test="truck_type != null and truck_type != ''">
+            AND vehicle.`TRUCK_TYPE_ID` LIKE '%${truck_type}%'
+        </if>
+        <if test="start_city != null and start_city != ''">
+            AND vehicle.`TRANSPORT_LINE` LIKE '%${start_city}-%'
+        </if>
+        <if test="end_city != null and end_city != ''">
+            AND vehicle.`TRANSPORT_LINE` LIKE '%-${end_city}%'
+        </if>
+        <if test="verify_status != null and verify_status != ''">
+            AND vehicle.`VERIFY_STATUS` LIKE '%${verify_status}%'
+        </if>
+    </select>
+
+    <!--根据条件查找物流公司车辆列表-->
+    <select id="findCompanyVehicleList" resultType="com.cn.gazelle.logistics.pojo.T_Data_Logistics_Vehicle">
+        SELECT
+        *
+        FROM
+        (SELECT
+        t.`PLATE_NUMBER` AS plate_number,
+        m.`MEMBER_NAME` AS username,
+        d.`DICDATA_ID` AS truck_brand_id,
+        d.`DICDATA_NAME` AS truck_brand,
+        tm.`TRUCK_MODEL_NO` AS truck_model_id,
+        tm.`TRUCK_MODEL_NAME` AS truck_model,
+        tct.`TRUCK_CARRIAGE_TYPE_ID` AS truck_carriage_type_id,
+        tct.`TRUCK_CARRIAGE_TYPE_NAME` AS truck_carriage_type,
+        d1.`DICDATA_NAME` AS truck_type,
+        d2.`DICDATA_NAME` AS truck_fuel_type,
+        d3.`DICDATA_NAME` AS truck_length,
+        t.`VEHICLE_IDENTIFY_NUMBER` AS vehicle_identify_number,
+        t.`LOAD_WEIGHT` AS load_weight,
+        p.`PERSON_NAME` AS owner_name,
+        p.`PERSON_MOBILE_PHONE` AS owner_phone,
+        p.`ID_CARD_NUMBER` AS owner_id,
+        t.`MANAGER_MEMBER_ID` AS owner_member,
+        GetDriver(t.`TRUCK_ID`) AS vehicle_crew
+        FROM
+        `t_data_truck` t
+        LEFT JOIN
+        `t_data_truck_model` tm ON t.`TRUCK_MODEL_NO` = tm.`TRUCK_MODEL_NO` AND tm.`DELETE_FLAG`=0
+        LEFT JOIN
+        `t_data_member` m ON t.`OWNER_MEMBER_ID` = m.`RELEVANCE_INFO_ID` AND m.`DELETE_FLAG`=0
+        LEFT JOIN
+        `t_sys_dicdata` d ON d.`DICDATA_ID`=tm.`TRUCK_BRAND_ID` AND d.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_master_truck_carriage_type` tct ON tct.`TRUCK_CARRIAGE_TYPE_ID`=t.`TRUCK_CARRIAGE_TYPE_ID` AND
+        tct.`DELETE_FLAG`=0
+        LEFT JOIN
+        `t_sys_dicdata` d1 ON d1.`DICDATA_ID`=t.`TRUCK_TYPE_ID` AND d1.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` d2 ON d2.`DICDATA_ID`=t.`TRUCK_FUEL_TYPE_ID` AND d2.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` d3 ON d3.`DICDATA_ID`=t.`TRUCK_LENGTH_ID` AND d3.`DELETE_STATES`=0
+        LEFT JOIN
+        t_data_person p ON t.`MANAGER_MEMBER_ID`=p.`PERSON_ID` AND p.`DELETE_FLAG`=0
+        WHERE
+        t.`DELETE_FLAG`=0) AS vehicle
+        WHERE
+        vehicle.`plate_number` IS NOT NULL
+        <if test="plate_number != null and plate_number != ''">
+            AND vehicle.`PLATE_NUMBER` LIKE '%${plate_number}%'
+        </if>
+        <if test="truck_carriage_type != null and truck_carriage_type != ''">
+            AND vehicle.`TRUCK_CARRIAGE_TYPE_ID` LIKE '%${truck_carriage_type}%'
+        </if>
+        <if test="truck_brand != null and truck_brand != ''">
+            AND vehicle.`TRUCK_BRAND_ID` LIKE '%${truck_brand}%'
+        </if>
+        <if test="truck_model != null and truck_model != ''">
+            AND vehicle.`TRUCK_MODEL_ID` LIKE '%${truck_model}%'
+        </if>
+        <if test="owner_member != null and owner_member == 1">
+            AND vehicle.`OWNER_MEMBER` IS NOT NULL AND vehicle.`OWNER_MEMBER` !='none'
+        </if>
+        <if test="owner_member != null and owner_member == 2">
+            AND (vehicle.`OWNER_MEMBER` IS NULL OR vehicle.`OWNER_MEMBER`='none')
+        </if>
+        <if test="owner_name != null and owner_name != ''">
+            AND vehicle.`OWNER_NAME` LIKE '%${owner_name}%'
+        </if>
+        <if test="owner_phone != null and owner_phone != ''">
+            AND vehicle.`OWNER_PHONE` LIKE '%${owner_phone}%'
+        </if>
+        <if test="owner_id != null and owner_id != ''">
+            AND vehicle.`OWNER_ID` LIKE '%${owner_id}%'
+        </if>
+        <if test="username != null and username != ''">
+            AND vehicle.`USERNAME` LIKE '%${username}%'
+        </if>
+    </select>
+
+    <!--查询物流公司下无车辆的司机列表-->
+    <select id="findCompanyVehicleDriverList" resultType="com.cn.gazelle.logistics.pojo.T_Data_Company_Vehicle_Driver">
+        SELECT
+        *
+        FROM
+        (SELECT
+        p.`PERSON_NAME` AS person_name,
+        p.`PERSON_MOBILE_PHONE` AS person_mobile_phone,
+        p.`ID_CARD_NUMBER` AS id_card_number,
+        p.`DRIVER_LICENCE_NUMBER` AS driver_licence_number,
+        cm.`MEMBER_NAME` AS member_name
+        FROM
+        `t_data_person` p
+        LEFT JOIN
+        `t_data_member` m ON p.`PERSON_ID`=m.`RELEVANCE_INFO_ID` AND m.`DELETE_FLAG`=0
+        LEFT JOIN
+        `t_data_member` cm ON
+        CONCAT(m.`MEMBER_BELONG_CODE`,'/',m.`RELEVANCE_INFO_ID`)=CONCAT(cm.`RELEVANCE_INFO_ID`,'/',m.`RELEVANCE_INFO_ID`)
+        WHERE
+        p.`DELETE_FLAG`=0 AND p.`DRIVING_TRUCK_ID` IS NULL) AS person
+        WHERE
+        person.`member_name` IS NOT NULL
+        <if test="person_name != null and person_name != ''">
+            AND person.`PERSON_NAME` LIKE '%${person_name}%'
+        </if>
+        <if test="person_mobile_phone != null and person_mobile_phone != ''">
+            AND person.`PERSON_MOBILE_PHONE` LIKE '%${person_mobile_phone}%'
+        </if>
+        <if test="id_card_number != null and id_card_number != ''">
+            AND person.`ID_CARD_NUMBER` LIKE '%${id_card_number}%'
+        </if>
+        <if test="username != null and username != ''">
+            AND person.`MEMBER_NAME` LIKE '%${username}%'
+        </if>
+    </select>
+
+    <!--查找公司下所有审核通过的车辆-->
+    <select id="findTrucksOfCompany" resultType="com.cn.gazelle.logistics.pojo.T_Data_Company_Truck_Info">
+    SELECT
+    t.`TRUCK_ID`,
+    t.`PLATE_NUMBER`,
+    d.`DICDATA_NAME` AS TRUCK_BRAND_ID,
+    tm.`TRUCK_MODEL_NAME` AS TRUCK_MODEL_NO,
+    tct.`TRUCK_CARRIAGE_TYPE_NAME` AS TRUCK_CARRIAGE_TYPE_ID,
+    dd.`DICDATA_NAME` AS TRUCK_TYPE_ID,
+    ddd.`DICDATA_NAME` AS TRUCK_CARRIAGE_TYPE_ID,
+    dddd.`DICDATA_CODE` AS TRUCK_LENGTH_ID,
+    t.`VEHICLE_IDENTIFY_NUMBER`
+    FROM
+    t_data_truck AS t
+    LEFT JOIN
+    t_data_truck_model tm
+    ON
+    t.`TRUCK_MODEL_NO`= tm.`TRUCK_MODEL_NO`
+    AND tm.`DELETE_FLAG` = 0
+    LEFT JOIN
+    t_sys_dicdata d
+    ON d.`DICDATA_ID` = tm.`TRUCK_BRAND_ID`
+    AND d.`DELETE_STATES`= 0
+    LEFT JOIN
+    t_master_truck_carriage_type tct
+    ON tct.`TRUCK_CARRIAGE_TYPE_ID` = t.`TRUCK_CARRIAGE_TYPE_ID`
+    AND tct.`DELETE_FLAG`=0
+    LEFT JOIN
+    t_sys_dicdata dd
+    ON
+    dd.`DICDATA_ID` = t.`TRUCK_TYPE_ID`
+    AND
+    dd.`DELETE_STATES` = 0
+    LEFT JOIN
+    t_sys_dicdata ddd
+    ON
+    ddd.`DICDATA_CODE` = t.`TRUCK_FUEL_TYPE_ID`
+    AND
+    ddd.`DELETE_STATES` = 0
+    LEFT JOIN
+    t_sys_dicdata dddd
+    ON
+    dddd.`DICTIONARY_ID` = t.`TRUCK_LENGTH_ID`
+    AND
+    dddd.`DELETE_STATES` = 0
+    WHERE
+    t.`DELETE_FLAG` = 0
+    AND
+    t.`VERIFY_STATUS` = 2
+    AND
+    t.`OWNER_MEMBER_ID` = #{company_id}
+    AND t.`PLATE_NUMBER` LIKE '%${plate_number}%'
+    </select>
+</mapper>

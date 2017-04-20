@@ -1,0 +1,51 @@
+package com.cn.gazelle.logistics.service;
+
+import com.cn.gazelle.logistics.pojo.T_Data_Member_Bank_Account;
+import com.cn.gazelle.logistics.pojo.T_Data_Member_Payment_History;
+
+import javax.jws.WebService;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by zf on 2016/12/12.
+ */
+@WebService
+public interface MemberPayService {
+
+    //根据绑定编号查询会员银行卡信息
+    T_Data_Member_Bank_Account findMemberBankAccountByAccountNo(String account_no);
+
+    //根据会员Id查询会员银行卡信息
+    List<T_Data_Member_Bank_Account> findAll(String member_id);
+
+    //保存会员银行卡信息
+    void saveMemberBankAccount(T_Data_Member_Bank_Account memberBankAccount);
+
+    //更新会员银行卡信息
+    void updateMemberBankAccount(T_Data_Member_Bank_Account memberBankAccount);
+
+    //根据绑定编号删除会员银行卡信息
+    void delMemberBankAccount(String account_no);
+
+
+    //根据绑定编号查询会员支付历史信息
+    T_Data_Member_Payment_History findMemberPaymentHistoryByAccountNo(String history_number);
+
+    //根据第三方订单Id查询会员支付历史信息
+    T_Data_Member_Payment_History findMemberPayMentHistoryByOrderNo(String order_no);
+
+    //根据会员Id和交易时间查询会员支付历史信息
+    List<T_Data_Member_Payment_History> findHistoryAll(HashMap<String, String> conditions);
+
+    //保存会员Id支付历史信息
+    void saveMemberPaymentHistory(T_Data_Member_Payment_History memberPaymentHistory);
+
+    //更新会员支付历史信息
+    void updateMemberPaymentHistory(T_Data_Member_Payment_History memberPaymentHistory);
+
+
+
+    //根据绑定编号删除会员支付历史信息
+    void delMemberPaymentHistory(String history_number);
+}

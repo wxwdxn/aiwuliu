@@ -1,0 +1,40 @@
+package com.cn.gazelle.logistics.service;
+
+import com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply;
+import com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply_Detail;
+
+import javax.jws.WebService;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * 类 名 称: WithdrawApplyService
+ * 内容摘要: 提现申请接口
+ * 方法描述：该类有2个方法：
+ *
+ * @author YK
+ */
+@WebService
+public interface WithdrawApplyService {
+    // 个人账户确认提现（支付）
+    public String confirmWithdrawApply(String member_name, String ACCOUNT_NO, String pay_type, String batch_amount);
+
+    // 根据会员支付历史编号查找提现申请信息
+    T_Data_Withdraw_Apply findWithdrawApplyByNumber(String payment_history_number);
+
+    // 更新提现申请信息
+    public void updateWithdrawApply(T_Data_Withdraw_Apply withdrawApply);
+
+    // 查询个人账户提现申请信息
+    List<T_Data_Withdraw_Apply_Detail> findWithdrawApplyDetail(HashMap<String,String> conditions);
+
+    // 查询车辆账户提现申请信息
+    List<T_Data_Withdraw_Apply_Detail> findWithdrawApplyDetailOfTruck(String start_time, String end_time,String withdraw_status);
+
+    // 查询个人账户提现申请总额
+    double  findWithdrawApplySumOfMember();
+
+    // 查询车辆账户提现申请总额
+    double findWithdrawApplySumOfTruck();
+
+}

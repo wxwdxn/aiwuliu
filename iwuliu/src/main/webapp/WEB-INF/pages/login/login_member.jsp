@@ -1,0 +1,202 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: YK
+  Date: 2016/9/19
+  Time: 9:41
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <title></title>
+</head>
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/login/css/login-member.css"/>
+<script src="<%=request.getContextPath()%>/static/common/js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/login/js/login--member.js" type="text/javascript" charset="utf-8"></script>
+<%--cookies记录用户密码--%>
+<script type="text/javascript" src="<%=request.getContextPath()%>/static/common/js/jquery.cookie.js"></script>
+<!--[if lt IE 9]>
+<script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+<script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<body>
+<div class="login_main">
+    <img class="login_back" src="<%=request.getContextPath()%>/static/common/images/beijing.png"/>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <a class="navbar-brand" href="javascript:;">
+                <img src="<%=request.getContextPath()%>/static/common/images/logo_01.png"/>
+            </a>
+        </div>
+    </nav>
+    <div class="container-fluid loginText">
+        <div class="row">
+            <div class="col-md-6 login_title">
+                <h1>
+                    瞪羚物流生态管理系统
+                </h1>
+                <p>
+                    运输业务撮合成交&nbsp;&nbsp;物流运输透明管理
+                </p>
+                <p>
+                    财务结算方便快捷&nbsp;&nbsp;信息采集信用金融
+                </p>
+                <h3>
+                    物流+互联网
+                </h3>
+            </div>
+            <div class="col-md-6 login_signIn">
+                <div class="col-md-5 col-md-offset-2 login sign_in">
+                    <h4>
+                        账户登录
+                    </h4>
+                    <div class="form-horizontal account">
+                        <div class="form-group">
+                            <label class="sr-only" >Amount (in dollars)</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-user"></span>
+                                </div>
+                                <input type="text" class="form-control" id="userName" placeholder="请输入账号">
+                            </div>
+                            <p></p>
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only">Amount (in dollars)</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-lock"></span>
+                                </div>
+                                <input type="password" class="form-control" id="passWord" placeholder="请输入密码"
+                                       oncopy="return false" onpaste="return false"  ondragstart="return false" onselectstart="return false">
+                            </div>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-inline rememberPwd">
+                        <div class="form-group remPwd">
+                            <span isRem=false onclick="changeStatics(this)" class="isRem glyphicon glyphicon-unchecked"></span>
+                            <label>记住密码</label>
+                        </div>
+                        <div class="form-group forgetPwd">
+                            <label onclick="forgetPwd()">忘记密码？</label>
+                        </div>
+                    </div>
+                    <div class="btn loginIn" onclick="login()">
+                        登录
+                    </div>
+                    <p id="showMsg" style="color: #fff;"></p>
+                </div>
+                <div class="col-md-5 col-md-offset-2 register sign_in hidden">
+                    <h4>
+                        修改密码
+                    </h4>
+                    <div class="form-horizontal account">
+                        <div class="form-group">
+                            <label class="sr-only">Amount (in dollars)</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span>账&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;户</span>
+                                </div>
+                                <input type="text" class="form-control" id="changeUserName" placeholder="请输入手机">
+                            </div>
+                            <p></p>
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only">Amount (in dollars)</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span>密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码</span>
+                                </div>
+                                <input type="password" class="form-control" id="newPwd" placeholder="新密码"
+                                       oncopy="return false" onpaste="return false"  ondragstart="return false" onselectstart="return false">
+                            </div>
+                            <p></p>
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only">Amount (in dollars)</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span>确认密码</span>
+                                </div>
+                                <input type="password" class="form-control" id="againNewPwd" placeholder="再次输入密码"
+                                       oncopy="return false" onpaste="return false"  ondragstart="return false" onselectstart="return false">
+                            </div>
+                            <p></p>
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only">Amount (in dollars)</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span>验&nbsp;&nbsp;证&nbsp;&nbsp;码</span>
+                                </div>
+                                <input type="text" class="form-control" id="number" placeholder="验证码">
+                                <div class="input-group-addon">
+                                    <span isClick=true onclick="getCode(this)" class="code">获取验证码</span>
+                                </div>
+                            </div>
+                            <p id="prompt"></p>
+                        </div>
+                    </div>
+                    <div class="btn registerBtn" onclick="editPsw()">
+                        确认修改
+                    </div>
+
+                </div>
+                <div class="col-md-5 col-md-offset-2 registerSuccess sign_in hidden">
+                    <h4>
+                        修改成功
+                    </h4>
+                    <h3>
+                        恭喜！您的密码修改成功
+                        请重新登录使用
+                        <i class="selfChick">10</i>s后自动跳转
+                    </h3>
+                    <div class="btn back_login" onclick="back_login()">
+                        返回登录
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="logi_bottom">
+    <div class="col-md-offset-2 col-md-8 about">
+        <p class="text-center">
+            <a href="javascript:;">
+                关于瞪羚科技
+            </a>|
+            <a href="javascript:;">
+                合作伙伴
+            </a>|
+            <a href="javascript:;">
+                商务合作/广告投放
+            </a>|
+            <a href="javascript:;">
+                联系我们
+            </a>
+        </p><br />
+        <p class="text-center">
+            Copyright&copy;2013-2016版权所有 北京市
+            瞪羚科技股份有限公司（京ICP备1000000号-1）
+        </p>
+    </div>
+    <div class="col-md-2 qrCode">
+        <img src="<%=request.getContextPath()%>/static/common/images/qrCode.png"/>
+        <button class="btn btn-primary ardroid">
+            安卓
+        </button>
+        <button class="btn btn-primary IOS">
+            IOS
+        </button>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.OBDEquipmentTruckBindingDaoMapper">
+    <resultMap id="T_Data_OBD_Equipment_Truck_Binding" type="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment_Truck_Binding">
+        <id column="BINDING_NUMBER" property="binding_number"></id>
+        <result column="EQUIPMENT_ID" property="equipment_id"></result>
+        <result column="TRUCK_ID" property="truck_id"></result>
+        <result column="BINDING_TIME" property="binding_time"></result>
+        <result column="UNBINDING_TIME" property="unbinding_time"></result>
+        <result column="DELETE_FLAG" property="delete_flag"></result>
+        <result column="LAST_UPDATE" property="last_update"></result>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"></result>
+    </resultMap>
+
+    <!--根据truck_id查询OBD设备卡车绑定信息-->
+    <select id="findOBDTruckBindingInfoByTruckID" resultType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment_Truck_Binding">
+        SELECT
+        BINDING_NUMBER,
+        EQUIPMENT_ID,
+        TRUCK_ID,
+        BINDING_TIME,
+        UNBINDING_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        FROM
+        T_Data_OBD_Equipment_Truck_Binding
+        WHERE DELETE_FLAG=0 AND TRUCK_ID=#{truck_id} AND UNBINDING_TIME IS NULL
+    </select>
+
+
+    <!--根据绑定信息标号查询OBD设备卡车绑定信息-->
+    <select id="findByBindingNumber" resultType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment_Truck_Binding">
+        select
+        *
+        FROM
+        T_Data_OBD_Equipment_Truck_Binding
+        WHERE DELETE_FLAG=0 AND BINDING_NUMBER=#{binding_number}
+    </select>
+
+    <!--根据设备id查询OBD设备卡车绑定信息-->
+    <select id="findByEquipmentId" resultType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment_Truck_Binding">
+        select
+        *
+        FROM
+        T_Data_OBD_Equipment_Truck_Binding
+        WHERE DELETE_FLAG=0 AND EQUIPMENT_ID=#{equipment_id}
+    </select>
+
+    <!--添加OBD设备卡车绑定信息-->
+    <insert id="saveOBDTruckBindingInfo" parameterType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment_Truck_Binding">
+        INSERT INTO
+        T_Data_OBD_Equipment_Truck_Binding(
+        EQUIPMENT_ID,
+        TRUCK_ID,
+        BINDING_TIME,
+        UNBINDING_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID)
+        VALUES (
+        #{equipment_id},
+        #{truck_id},
+        #{binding_time},
+        #{unbinding_time},
+        0,
+        #{last_update},
+        #{last_update_user_id}
+        )
+    </insert>
+    <!--更新信息-->
+    <update id="updateOBDTruckBindingInfo" parameterType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment_Truck_Binding">
+        UPDATE
+        T_Data_OBD_Equipment_Truck_Binding
+        SET
+        EQUIPMENT_ID= #{equipment_id},
+        TRUCK_ID= #{truck_id},
+        BINDING_TIME= #{binding_time},
+        UNBINDING_TIME= #{unbinding_time},
+        DELETE_FLAG=0,
+        LAST_UPDATE= #{last_update},
+        LAST_UPDATE_USER_ID=#{last_update_user_id}
+        WHERE
+        BINDING_NUMBER= #{binding_number} AND DELETE_FLAG=0
+
+    </update>
+
+    <!--删除信息-->
+    <update id="delOBDTruckBindingInfo" parameterType="String">
+        UPDATE
+        T_Data_OBD_Equipment_Truck_Binding
+        SET
+        DELETE_FLAG=1
+        WHERE
+        BINDING_NUMBER= #{binding_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--查询所有的不分页-->
+    <select id="findAllOBDTruckBindingList">
+        SELECT *
+        FROM T_Data_OBD_Equipment_Truck_Binding
+        WHERE  DELETE_FLAG = 0
+    </select>
+
+    <!--查询运维OBD设备管理列表-->
+    <select id="findOBDTruckBindingInfoList" resultType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Truck_Binding_Info">
+        SELECT
+            *
+        FROM
+        (SELECT
+        otb.`BINDING_NUMBER`,
+        d.`DICDATA_NAME` AS OBD_BRAND,d.`DICDATA_CODE` AS OBD_BRAND_VALUE,o.`OBD_ID`,o.`EQUIPMENT_PHONE_NUMBER`,o.`REGISTER_TIME`,
+        t.`PLATE_NUMBER`,otb.`BINDING_TIME`,dm.`DICDATA_name`AS TRUCK_BRAND,m.`TRUCK_MODEL_NAME`,otb.`UNBINDING_TIME`
+        FROM
+        t_data_obd_equipment AS o
+        LEFT JOIN
+        t_sys_dicdata AS d
+        ON
+        (o.`BRAND_ID` = d.`DICDATA_CODE`) AND d.`DELETE_STATES`='0' AND d.`DICTIONARY_ID`='F26ACEE58D0041169AD0A183AAF83D11'
+        LEFT JOIN
+        t_data_obd_equipment_truck_binding AS otb
+        ON
+        (otb.`EQUIPMENT_ID` = o.`EQUIPMENT_ID`) AND otb.`DELETE_FLAG` = '0'
+        LEFT JOIN
+        t_data_truck AS t
+        ON
+        (t.`TRUCK_ID` = otb.`TRUCK_ID`) AND t.`DELETE_FLAG` ='0'
+        LEFT JOIN
+        t_data_truck_model AS m
+        ON
+        (m.`TRUCK_MODEL_NO` = t.`TRUCK_MODEL_NO`) AND m.`DELETE_FLAG`='0'
+        LEFT JOIN
+        t_sys_dicdata AS dm
+        ON
+        (dm.`DICDATA_ID`= m.`TRUCK_BRAND_ID`) AND dm.`DELETE_STATES`='0'
+        WHERE
+        o.`DELETE_FLAG` = '0') AS OM
+        <where>
+
+            <if test="obd_brand_value != null and obd_brand_value!= ''">
+                OM.OBD_BRAND_VALUE LIKE '%${obd_brand_value}%'
+            </if>
+            <if test="obd_id != null and obd_id!= ''">
+                AND OM.OBD_ID LIKE '%${obd_id}%'
+            </if>
+            <if test="equipment_phone_number!= null and equipment_phone_number!= ''">
+                AND OM.EQUIPMENT_PHONE_NUMBER LIKE '%${equipment_phone_number}%'
+            </if>
+            <if test="plate_number != null and plate_number!= ''">
+                AND OM.PLATE_NUMBER LIKE '%${plate_number}%'
+            </if>
+            <if test="register_time_start != null and register_time_start!= ''">
+                AND DATE_FORMAT(OM.REGISTER_TIME,'%Y-%m-%d') &gt;=#{register_time_start}
+            </if>
+            <if test="register_time_end != null and register_time_end!= ''">
+                AND DATE_FORMAT(OM.REGISTER_TIME,'%Y-%m-%d') &lt;=#{register_time_end}
+            </if>
+            <if test='equipment_status == "1"'>
+                AND OM.UNBINDING_TIME IS NULL
+            </if>
+            <if test='equipment_status == "0"'>
+            AND OM.UNBINDING_TIME !=""
+            </if>
+
+            <if test="binding_number != null and binding_number!= ''">
+                AND OM.BINDING_NUMBER = #{binding_number}
+            </if>
+        </where>
+    </select>
+
+</mapper>

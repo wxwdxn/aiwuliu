@@ -1,0 +1,103 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：T_Data_Withdraw_Apply_Detail.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2017-01-10
+ * 作    者: YK
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.pojo;
+
+/**
+ * 类 名 称：T_Data_Withdraw_Apply_Detail
+ * 内容描述：提现申请实体类
+ *@authot YK
+ */
+public class T_Data_Withdraw_Apply_Detail {
+    private String apply_number;                      // 申请编号
+    private String account_type;                      // 账户类型
+    private String account_name;                      // 账户名
+    private String target;                            // 提现目标卡号
+    private String withdraw_amount;                   // 提现金额
+    private String withdraw_status;                   // 提现状态
+    private String status;                            // 状态
+    private String deny_reason;                       // 状态
+    private String apply_time;                        // 申请时间
+
+    public String getApply_number() {
+        return apply_number;
+    }
+
+    public void setApply_number(String apply_number) {
+        this.apply_number = apply_number;
+    }
+
+    public String getAccount_type() {
+        return account_type;
+    }
+
+    public void setAccount_type(String account_type) {
+        this.account_type = account_type;
+    }
+
+    public String getAccount_name() {
+        return account_name;
+    }
+
+    public void setAccount_name(String account_name) {
+        this.account_name = account_name;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
+    public String getWithdraw_amount() {
+        return withdraw_amount;
+    }
+
+    public void setWithdraw_amount(String withdraw_amount) {
+        this.withdraw_amount = withdraw_amount;
+    }
+
+    public String getWithdraw_status() {
+        return withdraw_status;
+    }
+
+    public void setWithdraw_status(String withdraw_status) {
+        this.withdraw_status = withdraw_status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getDeny_reason() {
+        return deny_reason;
+    }
+
+    public void setDeny_reason(String deny_reason) {
+        this.deny_reason = deny_reason;
+    }
+
+    public String getApply_time() {
+        return apply_time;
+    }
+
+    public void setApply_time(String apply_time) {
+        this.apply_time = apply_time;
+    }
+}
+

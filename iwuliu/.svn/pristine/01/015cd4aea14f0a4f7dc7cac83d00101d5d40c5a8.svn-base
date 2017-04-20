@@ -1,0 +1,45 @@
+.form-inline {
+  font-size: 13px;
+  font-size: 1.3rem;
+}
+.form-group {
+  margin-right: 15px;
+}
+.glyphicon {
+  font-size: 13px;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+.padding-left {
+  padding-left: 15px;
+}
+.latitudeAndlongitude {
+  cursor: pointer;
+}
+.latitudeAndlongitude {
+  cursor: pointer;
+}
+.modalMap {
+  height: 300px;
+  height: 25rem;
+  position: relative;
+}
+.modal-content .modalFooter a {
+  margin: 0;
+}
+.display_inlineBlcok.latitude span,
+.display_inlineBlcok.longitude span {
+  width: 87px;
+}
+.display_inlineBlcok span {
+  margin-right: 0;
+}
+#ModalMap1 .modalDialog{
+  width:60%;
+}
+#ModalMap1 .modalMap{
+  height:45rem;
+}
+#ModalMap1 #container1{
+   height:100%;
+ }

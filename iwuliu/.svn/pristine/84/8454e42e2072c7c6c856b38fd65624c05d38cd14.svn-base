@@ -1,0 +1,227 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <!--***车联服务***-->
+    <div class="panel panel-default">
+        <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+             aria-expanded="true" aria-controls="collapseOne" role="tab" id="headingOne">
+            <h4 class="panel-title">
+                <img src="<%=request.getContextPath()%>/static/common/images/icon_1.png"/>
+                <a>
+                    车联服务
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <ul class="list-group">
+                <li class="list-group-item vehicleMonitoring">
+                    <a href="<%=request.getContextPath()%>/operationWelcome/home">
+                        车辆监控
+                    </a>
+                </li>
+                <li class="list-group-item trackThePlayback">
+                    <a href="<%=request.getContextPath()%>/operationWelcome/truckReplay_home">
+                        轨迹回放
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--***报表管理***-->
+    <div class="panel panel-default">
+        <div class="panel-heading reportManager" class="collapsed">
+            <a href="<%=request.getContextPath()%>/reportManager/home">
+                <h4 class="panel-title">
+                    <img src="<%=request.getContextPath()%>/static/common/images/icon_5.png"/>
+                    报表管理
+                </h4>
+            </a>
+        </div>
+    </div>
+    <!--***合同管理***-->
+    <div class="panel panel-default">
+        <div class="panel-heading operationContractManager" class="collapsed">
+            <a href="<%=request.getContextPath()%>/operationWelcome/operationContractManager_home">
+                <h4 class="panel-title">
+                    <img src="<%=request.getContextPath()%>/static/common/images/icon_3.png"/>
+                    <a href="<%=request.getContextPath()%>/operationWelcome/operationContractManager_home">
+                        合同管理
+                    </a>
+                </h4>
+            </a>
+        </div>
+    </div>
+    <!--***计划管理***-->
+    <div class="panel panel-default">
+        <div class="panel-heading operationPlanManager" class="collapsed">
+            <a href="<%=request.getContextPath()%>/operationWelcome/operationPlanManager_home">
+                <h4 class="panel-title">
+                    <img src="<%=request.getContextPath()%>/static/common/images/icon_4.png"/>
+                    计划管理
+                </h4>
+            </a>
+        </div>
+    </div>
+    <!--***运单管理***-->
+    <div class="panel panel-default">
+        <div class="panel-heading" class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix" role="tab" id="headingSix">
+            <h4 class="panel-title">
+                <img src="<%=request.getContextPath()%>/static/common/images/icon_6.png"/>
+                <a>
+                    运单管理
+                </a>
+            </h4>
+        </div>
+        <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+            <ul class="list-group">
+                <li class="list-group-item transportPlan">
+                    <a href="<%=request.getContextPath()%>/operationWelcome/manualOrderList">
+                        运输派单
+                    </a>
+                </li>
+                <li class="list-group-item vehiclePlan">
+                    <a href="<%=request.getContextPath()%>/operationWelcome/manualTruckList">
+                        车辆派单
+                    </a>
+                </li>
+                <li class="list-group-item schedulingOrderManager">
+                    <a href="<%=request.getContextPath()%>/schedulingOrderManager/home">
+                        运单查询
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--***财务金融***-->
+    <div class="panel panel-default">
+        <div class="panel-heading" class="collapsed" data-toggle="collapse" data-parent="#accordion"
+             href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven" role="tab" id="headingSeven">
+            <h4 class="panel-title">
+                <img src="<%=request.getContextPath()%>/static/common/images/icon_7.png"/>
+                <a>
+                    财务金融
+                </a>
+            </h4>
+        </div>
+        <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
+            <ul class="list-group">
+                <li class="list-group-item virtualAccount">
+                    <a href="<%=request.getContextPath()%>/virtualAccountManager/virtualAccount">
+                        虚拟账目查看
+                    </a>
+                </li>
+                <li class="list-group-item transactionRecords">
+                    <a href="<%=request.getContextPath()%>/transactionManager/transactionRecords">
+                        交易记录查询
+                    </a>
+                </li>
+                <li class="list-group-item withdrawalApproval">
+                    <a href="<%=request.getContextPath()%>/withdrawalApprovalManager/withdrawalApproval">
+                        提现审批
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--***物流管理***-->
+    <div class="panel panel-default">
+        <div class="panel-heading" class="collapsed" data-toggle="collapse" data-parent="#accordion"
+             href="#collapseEight" aria-expanded="false" aria-controls="collapseEight" role="tab" id="headingEight">
+            <h4 class="panel-title">
+                <img src="<%=request.getContextPath()%>/static/common/images/icon_8.png"/>
+                <a>
+                    物流管理
+                </a>
+            </h4>
+        </div>
+        <div id="collapseEight" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingEight">
+            <ul class="list-group">
+                <li class="list-group-item logisticsInfoManager">
+                    <a href="<%=request.getContextPath()%>/logisticsCompanyManager/home">
+                        物流公司信息管理（平台人员）
+                    </a>
+                </li>
+                <li class="list-group-item offlineLogisticsInfoManager">
+                    <a href="<%=request.getContextPath()%>/offlineLogisticsInfoManager/home">
+                        物流公司信息管理（线下）
+                    </a>
+                </li>
+				<li class="list-group-item logisticsVehicleManager">
+					<a href="<%=request.getContextPath()%>/logisticsVehicleManager/home">
+						物流公司车辆管理
+					</a>
+				</li>
+                <li class="list-group-item vehicleManager">
+                    <a href="<%=request.getContextPath()%>/vehicleManager/home">
+                        车辆管理
+                    </a>
+                </li>
+                <li class="list-group-item driverManager">
+                    <a href="<%=request.getContextPath()%>/driverManager/home">
+                        司机管理
+                    </a>
+                </li>
+
+                <li class="list-group-item logisticsDriverManager">
+                    <a href="<%=request.getContextPath()%>/logisticsDriverManager/home">
+                        物流司机管理
+                    </a>
+                </li>
+                <li class="list-group-item logisticsApprovaList">
+                    <a href="<%=request.getContextPath()%>/logisticsApprovaManager/home">
+                        物流公司审核列表
+                    </a>
+                </li>
+                <li class="list-group-item ownerManager">
+                    <a href="<%=request.getContextPath()%>/ownerManager/home">
+                        货主管理
+                    </a>
+                </li>
+                <li class="list-group-item OBDEquipManager">
+                    <a href="<%=request.getContextPath()%>/OBDEquipManager/home">
+                        设备管理
+                    </a>
+                </li>
+                <li class="list-group-item routerManager">
+                    <a href="<%=request.getContextPath()%>/routerManager/home">
+                        线路管理
+                    </a>
+                </li>
+                <li class="list-group-item goodTypeManager">
+                    <a href="/iwuliu/goodTypeManager/home;">
+                        货物类型管理
+                    </a>
+                </li>
+                <li class="list-group-item carTypeManager">
+                    <a href="/iwuliu/carTypeManager/home;">
+                        车厢类型管理
+                    </a>
+                </li>
+                <li class="list-group-item vehicleModelManager">
+                    <a href="<%=request.getContextPath()%>/vehicleModelManager/home">
+                        车辆型号管理
+                    </a>
+                </li>
+                <li class="list-group-item freightYardManager">
+                    <a href="<%=request.getContextPath()%>/freightYardManager/home">
+                        货场管理
+                    </a>
+                </li>
+                <%--<li class="list-group-item schedulingOrderManager">--%>
+                    <%--<a href="<%=request.getContextPath()%>/schedulingOrderManager/home">--%>
+                        <%--调度单管理--%>
+                    <%--</a>--%>
+                <%--</li>--%>
+                <li class="list-group-item allianceBusinessManagement">
+                    <a href="<%=request.getContextPath()%>/allianceBusiness/home">
+                        线下加盟商管理
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+<div isClick=true class="menuNarrow" onclick="menuNarrow(this)">
+    <img src="<%=request.getContextPath()%>/static/common/images/menuNarrow.png"/>
+</div>
+					

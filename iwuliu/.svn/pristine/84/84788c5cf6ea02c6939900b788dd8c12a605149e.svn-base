@@ -1,0 +1,75 @@
+﻿#商户编号
+#customernumber=10012555363
+customernumber=10012438801
+#customernumber=10011830666
+#
+#商户密钥
+#key=9j4z99JQ39Q40ly705X60Q5XD16BTL33567iD9LlP6JziYTbg9Qy0FfTXb4z
+key=574584H38Msx80980026QKzbX588Zv0xh95ph8ZG67dj7x69k5091xvm0013
+#key=98S39x7q6ap7fDE6H8Xtz32M24r1B90JL97839M32692d91E8y58587duq96
+#
+#4.1 子账户注册接口请求地址
+RegisterApi=https://o2o.yeepay.com/zgt-api/api/register
+#
+#4.2 账户信息修改接口请求地址
+ModifyRequestApi=https://o2o.yeepay.com/zgt-api/api/modifyRequest
+#
+#4.3 账户信息修改查询接口请求地址
+QueryModifyRequestApi=https://o2o.yeepay.com/zgt-api/api/queryModifyRequest
+#
+#4.4 支付接口请求地址
+PayApi=https://o2o.yeepay.com/zgt-api/api/pay
+#
+#4.5 无卡直连短信验证码发送接口请求地址
+SendSmsApi=https://o2o.yeepay.com/zgt-api/api/sendSms
+#
+#4.6 无卡直连短信验证码确认接口请求地址
+ConfirmSmsApi=https://o2o.yeepay.com/zgt-api/api/confirmSms
+#
+#4.7 订单查询接口请求地址
+QueryOrderApi=https://o2o.yeepay.com/zgt-api/api/queryOrder
+#
+#4.8 转账接口请求地址
+TransferApi=https://o2o.yeepay.com/zgt-api/api/transfer
+#
+#4.9 转账查询接口请求地址
+TransferQueryApi=https://o2o.yeepay.com/zgt-api/api/transferQuery
+#
+#4.10 分账接口请求地址
+DivideApi=https://o2o.yeepay.com/zgt-api/api/divide
+#
+#4.11 分账查询接口请求地址
+QueryDivideApi=https://o2o.yeepay.com/zgt-api/api/queryDivide
+#
+#4.12 订单退款接口请求地址
+RefundApi=https://o2o.yeepay.com/zgt-api/api/refund
+#
+#4.13 订单退款查询接口请求地址
+QueryRefundApi=https://o2o.yeepay.com/zgt-api/api/queryRefund
+#
+#4.14 担保确认接口请求地址
+SettleConfirmApi=https://o2o.yeepay.com/zgt-api/api/settleConfirm
+#
+#4.15 余额查询接口请求地址
+QueryBalanceApi=https://o2o.yeepay.com/zgt-api/api/queryBalance
+#
+#4.16 提现接口接口请求地址
+CashTransferApi=https://o2o.yeepay.com/zgt-api/api/cashTransfer
+#
+#4.17 提现查询接口请求地址
+QueryCashTransferApi=https://o2o.yeepay.com/zgt-api/api/queryCashTransfer
+#
+#4.18 结算结果查询接口请求地址
+QuerySettlementApi=https://o2o.yeepay.com/zgt-api/api/querySettlement
+#
+#4.19 查询绑卡列表接口请求地址
+QueryBindCardsApi=https://o2o.yeepay.com/zgt-api/api/queryBindCards
+#
+#4.20 解绑接口请求地址
+UnbindCardApi=https://o2o.yeepay.com/zgt-api/api/unbindCard
+#
+#4.21 对账文件下载接口请求地址
+DownloadOrderDocumentApi=http://o2o.yeepay.com/zgt/auth/AuthDown/downloadOrderDocument
+#
+#资质上传接口
+uploadApi=http://o2o.yeepay.com/zgt-api/api/uploadLedgerQualifications

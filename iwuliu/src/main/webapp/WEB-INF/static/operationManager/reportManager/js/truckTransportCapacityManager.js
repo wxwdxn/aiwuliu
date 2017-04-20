@@ -1,0 +1,51 @@
+/**
+ * Created by YK on 2016/8/22.
+ */
+var transportCapacityChart = echarts.init(document.getElementById("transportCapacity"));
+var app = {};
+transportCapacity_option = null;
+transportCapacity_option = {
+    title : {
+        text: '爱物流卡车运力统计',
+        subtext: '瞪羚科技',
+        x:'center'
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c}辆 ({d}%)"
+    },
+    legend: {
+        orient: 'vertical',
+        left: 'left',
+        data: ['仓栅','集装箱','罐车','其他卡车']
+    },
+    series : [
+        {
+            name: '车辆类型',
+            type: 'pie',
+            radius : '50%',
+            center: ['50%', '50%'],
+            data:[
+                {value:16, name:'仓栅'},
+                {value:12, name:'集装箱'},
+                {value:8, name:'罐车'},
+                {value:12, name:'其他卡车'}
+            ],
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }
+    ]
+};
+
+window.onresize = function(){
+    transportCapacityChart.resize();
+};
+if (transportCapacity_option && typeof transportCapacity_option === "object") {
+    transportCapacityChart.setOption(transportCapacity_option, true);
+}
+

@@ -1,0 +1,392 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称: RouterServiceImpl.Java
+ * 系统编号：Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：02
+ * 模块名称：线路管理查询接口实现
+ * 设计文件：
+ * 完成日期：2016-11-19
+ * 作    者：QJ
+ * 内容摘要：线路管理查询
+ */
+
+package com.cn.gazelle.logistics.service.impl;
+
+
+import com.cn.gazelle.logistics.dao.OperateMainLineDaoMapper;
+import com.cn.gazelle.logistics.dao.RouterDaoMapper;
+import com.cn.gazelle.logistics.dao.SubLineInfoDaoMapper;
+import com.cn.gazelle.logistics.dao.SubLineNodeDaoMapper;
+import com.cn.gazelle.logistics.pojo.*;
+import com.cn.gazelle.logistics.service.RouterService;
+import com.cn.gazelle.logistics.util.DateUtil;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.UUIDUtil;
+import com.cn.gazelle.logistics.util.message.base.MessageUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.jws.WebService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称: RouterServiceImpl
+ * 内容摘要: 线路管理查询接口
+ * 方法描述：该类有4个方法：
+ * 01 findRouterList        根据条件查找线路列表
+ * 02 findRouterDetailList  运营干线ID查询干线、线路、节点信息
+ * 03 saveRouterInfo        新增线路信息
+ * 04 saveRouterInfo        新增线路信息
+ *
+ * @author QJ
+ */
+@Service
+@WebService(endpointInterface = "com.cn.gazelle.logistics.service.RouterService", targetNamespace = "http://service.logistics.gazelle.cn.com/")
+public class RouterServiceImpl implements RouterService {
+    public static String code;                                 // 全局变量
+    // Log初始化
+    Logger logger = Logger.getLogger(RouterServiceImpl.class);
+
+    @Resource
+    private RouterDaoMapper routerDaoMapper;
+    @Resource
+    private OperateMainLineDaoMapper operateMainLineDaoMapper;
+    @Resource
+    private SubLineInfoDaoMapper subLineInfoDaoMapper;
+    @Resource
+    private SubLineNodeDaoMapper subLineNodeDaoMapper;
+
+    /**
+     * 方法名称：findRouterList
+     * 内容摘要：根据条件查找线路列表
+     *
+     * @return findRouterList 线路列表
+     */
+    public List<T_Data_Router> findRouterList(HashMap<String, String> conditions) {
+        List<T_Data_Router> findRouterList = null;
+        try {
+            findRouterList = this.routerDaoMapper.findRouterList(conditions);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError + e.getMessage());
+        }
+        return findRouterList;
+    }
+
+    /**
+     * 方法名称：findRouterDetailList
+     * 内容摘要：运营干线ID查询干线、线路、节点信息
+     *
+     * @return findRouterDetailList 干线、线路、节点信息
+     */
+    public List<T_Data_Router_Detail> findRouterDetailList(String operate_main_line_id) {
+        List<T_Data_Router_Detail> findRouterDetailList = null;
+        try {
+            findRouterDetailList = this.routerDaoMapper.findRouterDetailList(operate_main_line_id);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError + e.getMessage());
+        }
+        return findRouterDetailList;
+    }
+
+    /**
+     * 方法名称：saveRouterInfo
+     * 内容摘要：新增线路信息
+     *
+     * @param list     线路信息
+     * @param userName 用户名
+     * @return flag
+     */
+    @Transactional
+    public int saveRouterInfo(String list, String userName) {
+        Gson gson = new Gson();
+        Map<String, Object> data = gson.fromJson(list, new TypeToken<Map<String, Object>>() {
+        }.getType());
+        T_Master_Operate_Main_Line operateMainLine = new T_Master_Operate_Main_Line();
+        T_Master_Operate_Main_Line operateMainLine_old = null;
+        int count_operateMainLine = 0;
+        int count_subLineInfo = 0;
+        int count_subLineNode = 0;
+        int flag = 0;
+        // 通过路线简称判断运营干线是否存在
+        operateMainLine_old = this.operateMainLineDaoMapper.findOperateMainLineByName((String) data.get("mainRouter"));
+        if (operateMainLine_old == null) {
+            try {
+                // 保存到运营干线基础信息表
+                operateMainLine.setOperate_main_line_id(UUIDUtil.getUUID());
+                operateMainLine.setOperate_main_line_name((String) data.get("mainRouter"));
+                operateMainLine.setStart_province_id((String) data.get("startProvince"));
+                operateMainLine.setStart_city_id((String) data.get("startCity"));
+                operateMainLine.setFinish_province_id((String) data.get("endProvince"));
+                operateMainLine.setFinish_city_id((String) data.get("endCity"));
+                operateMainLine.setDelete_flag(0);
+                operateMainLine.setLast_update(DateUtil.getDate());
+                operateMainLine.setLast_update_user_id("U:" + userName);
+                count_operateMainLine = this.operateMainLineDaoMapper.saveOperateMainLine(operateMainLine);
+                if (count_operateMainLine == 1) {
+                    List<Map<String, Object>> lineAll = (List<Map<String, Object>>) data.get("lineAll");
+                    // 保存到干线路线基础信息表
+                    if (lineAll.size() != 0) {
+                        for (int i = 0; i < lineAll.size(); i++) {
+                            T_Master_Sub_Line_Info lineInfo = new T_Master_Sub_Line_Info();
+                            lineInfo.setLine_id(UUIDUtil.getUUID());
+                            lineInfo.setOperate_main_line_id(operateMainLine.getOperate_main_line_id());
+                            Map temp = new HashMap();
+                            temp = (Map) lineAll.get(i);
+                            String remark = (String) temp.get("routerNodeName");
+                            lineInfo.setRemark(remark);
+                            lineInfo.setLine_no(i);
+                            lineInfo.setDelete_flag("0");
+                            lineInfo.setLast_update(DateUtil.getDate());
+                            lineInfo.setLast_update_user_id("U:" + userName);
+                            count_subLineInfo = this.subLineInfoDaoMapper.saveSubLineInfo(lineInfo);
+                            if (count_subLineInfo == 1) {
+                                List<Map<String, Object>> lines = (List<Map<String, Object>>) temp.get("lines");
+                                if (lines.size() != 0) {
+                                    for (int j = 0; j < lines.size(); j++) {
+                                        T_Master_Sub_Line_Detail subLineNode = new T_Master_Sub_Line_Detail();
+                                        subLineNode.setLine_id(UUIDUtil.getUUID());
+                                        subLineNode.setMain_line_info_id(lineInfo.getLine_id());
+                                        Map temp1 = new HashMap();
+                                        temp1 = (Map) lines.get(j);
+                                        String nodeNumber = (String) temp1.get("nodeNumber");
+                                        subLineNode.setNode_no((String) temp1.get("nodeNumber"));
+                                        String nodeName = (String) temp1.get("nodeName");
+                                        subLineNode.setNode_name(nodeName);
+                                        String nodeLongitude = (String) temp1.get("nodeLongitude");
+                                        subLineNode.setLongitude(nodeLongitude);
+                                        String nodeLatitude = (String) temp1.get("nodeLatitude");
+                                        subLineNode.setLatitude(nodeLatitude);
+                                        subLineNode.setDelete_flag(0);
+                                        subLineNode.setLast_update(DateUtil.getDate());
+                                        subLineNode.setLast_update_user_id("U:" + userName);
+                                        count_subLineNode = subLineNodeDaoMapper.saveSubLineNode(subLineNode);
+                                        if (count_subLineNode == 1) {
+                                            flag = 1;
+                                        } else {
+                                            flag = 0;
+                                            throw new RuntimeException(flag + "");
+                                        }
+                                    }
+                                } else {
+                                    flag = 0;
+                                    throw new RuntimeException(flag + "");
+                                }
+                            } else {
+                                flag = 0;
+                                throw new RuntimeException(flag + "");
+                            }
+                        }
+                    } else {
+                        flag = 0;
+                        throw new RuntimeException(flag + "");
+                    }
+                } else {
+                    flag = 0;
+                    throw new RuntimeException(flag + "");
+                }
+            } catch (Exception e) {
+                flag = -1;
+                throw new RuntimeException(flag + "");
+            }
+        } else {
+            flag = 2; // 运营干线已存在
+        }
+        return flag;
+    }
+
+    /**
+     * 方法名称：upDateRouterInfo
+     * 内容摘要：编辑线路信息
+     *
+     * @param list     线路信息
+     * @param userName 用户名
+     * @return flag
+     */
+    @Transactional
+    public int upDateRouterInfo(String list, String userName) {
+        Gson gson = new Gson();
+        Map<String, Object> data = gson.fromJson(list, new TypeToken<Map<String, Object>>() {
+        }.getType());
+        T_Master_Operate_Main_Line operateMainLine = null;
+        T_Master_Operate_Main_Line operateMainLine_old = null;
+        int count_operateMainLine = 0;
+        int count_subLineInfo = 0;
+        int count_subLineNode = 0;
+        int flag = 0;
+        String operate_main_line_id = (String) data.get("operate_main_line_id");
+        operateMainLine = this.operateMainLineDaoMapper.findOperateMainLineById(operate_main_line_id);
+        if (operateMainLine != null) {
+            try {
+                List removeRouterArr = (List) data.get("removeRouterArr");
+                List removeRouterNodeDetailArr = (List) data.get("removeRouterNodeDetailArr");
+                if (removeRouterNodeDetailArr != null && removeRouterNodeDetailArr.size() != 0) {
+                    for (int removeRouterNodeDetailNumber = 0; removeRouterNodeDetailNumber < removeRouterNodeDetailArr.size(); removeRouterNodeDetailNumber++) {
+                        String removeRouterNodeDetail_id = (String) removeRouterNodeDetailArr.get(removeRouterNodeDetailNumber);
+                        subLineNodeDaoMapper.delSubLineNode(removeRouterNodeDetail_id);
+                    }
+                }
+                if (removeRouterArr != null && removeRouterArr.size() != 0) {
+                    for (int removeRouterNumber = 0; removeRouterNumber < removeRouterArr.size(); removeRouterNumber++) {
+                        String removeRouter_id = (String) removeRouterArr.get(removeRouterNumber);
+                        List<T_Master_Sub_Line_Detail> subLineDetailList = this.subLineNodeDaoMapper.findSubLineNodeByInfoID(removeRouter_id);
+                        for (T_Master_Sub_Line_Detail subLineDetail : subLineDetailList) {
+                            subLineNodeDaoMapper.delSubLineNode(subLineDetail.getLine_id());
+                        }
+                        subLineInfoDaoMapper.delSubLineInfo(removeRouter_id);
+                    }
+                }
+                operateMainLine_old = operateMainLineDaoMapper.findOperateMainLineByName((String) data.get("mainRouter"));
+                if (operateMainLine_old == null || operate_main_line_id.equals(operateMainLine_old.getOperate_main_line_id())) {
+                    operateMainLine.setOperate_main_line_name((String) data.get("mainRouter"));
+                    operateMainLine.setStart_province_id((String) data.get("startProvinceValue"));
+                    operateMainLine.setStart_city_id((String) data.get("startCityValue"));
+                    operateMainLine.setFinish_province_id((String) data.get("endProvinceValue"));
+                    operateMainLine.setFinish_city_id((String) data.get("endCityValue"));
+                    operateMainLine.setDelete_flag(0);
+                    operateMainLine.setLast_update(DateUtil.getDate());
+                    operateMainLine.setLast_update_user_id("U:" + userName);
+                    count_operateMainLine = operateMainLineDaoMapper.updateOperateMainLine(operateMainLine);
+                    if (count_operateMainLine == 1) {
+                        List<Map<String, Object>> lineAll = (List<Map<String, Object>>) data.get("lineAll");
+                        if (lineAll != null && lineAll.size() != 0) {
+                            for (int i = 0; i < lineAll.size(); i++) {
+                                T_Master_Sub_Line_Info lineInfo_old = null;
+                                Map temp = new HashMap();
+                                temp = (Map) lineAll.get(i);
+                                String lineInfo_id = (String) temp.get("sub_line_info_id");
+                                String remark = (String) temp.get("sub_line_info_name");
+                                lineInfo_old = subLineInfoDaoMapper.findSubLineInfoByID(lineInfo_id);
+                                List<Map<String, Object>> lines = (List<Map<String, Object>>) temp.get("routerNode");
+                                if (lineInfo_old != null) {
+                                    // 查询线路存在，对线路进行编辑
+                                    lineInfo_old.setRemark(remark);
+                                    lineInfo_old.setLine_no(i);
+                                    lineInfo_old.setLast_update(DateUtil.getDate());
+                                    lineInfo_old.setLast_update_user_id("U:" + userName);
+                                    count_subLineInfo = subLineInfoDaoMapper.updateSubLineInfo(lineInfo_old);
+                                    if (count_subLineInfo == 1) {
+                                        if (lines.size() != 0) {
+                                            for (int j = 0; j < lines.size(); j++) {
+                                                T_Master_Sub_Line_Detail subLineNode_old = null;
+                                                Map temp1 = new HashMap();
+                                                temp1 = (Map) lines.get(j);
+                                                String subLineNode_id = (String) temp1.get("sub_line_detail_id");
+                                                String nodeNumber = (String) temp1.get("node_no");
+                                                String nodeName = (String) temp1.get("node_name");
+                                                String nodeLongitude = (String) temp1.get("nodeLongitude");
+                                                String nodeLatitude = (String) temp1.get("nodeLatitude");
+                                                subLineNode_old = subLineNodeDaoMapper.findSubLineNodeById(subLineNode_id);
+                                                if (subLineNode_old != null) {
+                                                    // 查询节点存在，对节点进行编辑
+                                                    subLineNode_old.setNode_no(nodeNumber);
+                                                    subLineNode_old.setNode_name(nodeName);
+                                                    subLineNode_old.setLongitude(nodeLongitude);
+                                                    subLineNode_old.setLatitude(nodeLatitude);
+                                                    subLineNode_old.setLast_update(DateUtil.getDate());
+                                                    subLineNode_old.setLast_update_user_id("U:" + userName);
+                                                    count_subLineNode = subLineNodeDaoMapper.updateSubLineNode(subLineNode_old);
+                                                    if (count_subLineNode == 1) {
+                                                        flag = 1;   // 保存节点成功
+                                                    } else {
+                                                        flag = 0;   // 保存节点失败
+                                                        throw new RuntimeException(flag + "");
+                                                    }
+                                                } else {
+                                                    // 新增节点
+                                                    T_Master_Sub_Line_Detail subLineNode = new T_Master_Sub_Line_Detail();
+                                                    subLineNode.setLine_id(UUIDUtil.getUUID());
+                                                    subLineNode.setMain_line_info_id(lineInfo_id);
+                                                    subLineNode.setNode_no(nodeNumber);
+                                                    subLineNode.setNode_name(nodeName);
+                                                    subLineNode.setLongitude(nodeLongitude);
+                                                    subLineNode.setLatitude(nodeLatitude);
+                                                    subLineNode.setDelete_flag(0);
+                                                    subLineNode.setLast_update(DateUtil.getDate());
+                                                    subLineNode.setLast_update_user_id("U:" + userName);
+                                                    count_subLineNode = subLineNodeDaoMapper.saveSubLineNode(subLineNode);
+                                                    if (count_subLineNode == 1) {
+                                                        flag = 1;   // 保存节点成功
+                                                    } else {
+                                                        flag = 0;   // 保存节点失败
+                                                        throw new RuntimeException(flag + "");
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        flag = 0;   // 更新线路失败
+                                        throw new RuntimeException(flag + "");
+                                    }
+                                } else {
+                                    // 新线路
+                                    T_Master_Sub_Line_Info lineInfo = new T_Master_Sub_Line_Info();
+                                    lineInfo.setLine_id(UUIDUtil.getUUID());
+                                    lineInfo.setOperate_main_line_id(operateMainLine.getOperate_main_line_id());
+                                    lineInfo.setRemark(remark);
+                                    lineInfo.setLine_no(i);
+                                    lineInfo.setDelete_flag("0");
+                                    lineInfo.setLast_update(DateUtil.getDate());
+                                    lineInfo.setLast_update_user_id("U:" + userName);
+                                    count_subLineInfo = subLineInfoDaoMapper.saveSubLineInfo(lineInfo);
+                                    lineInfo_id = lineInfo.getLine_id();
+                                    if (count_subLineInfo == 1) {
+                                        if (lines.size() != 0) {
+                                            for (int j = 0; j < lines.size(); j++) {
+                                                T_Master_Sub_Line_Detail subLineNode = new T_Master_Sub_Line_Detail();
+                                                subLineNode.setLine_id(UUIDUtil.getUUID());
+                                                subLineNode.setMain_line_info_id(lineInfo_id);
+                                                Map temp1 = new HashMap();
+                                                temp1 = (Map) lines.get(j);
+                                                String nodeNumber = (String) temp1.get("node_no");
+                                                subLineNode.setNode_no(nodeNumber);
+                                                String nodeName = (String) temp1.get("node_name");
+                                                subLineNode.setNode_name(nodeName);
+                                                String nodeLongitude = (String) temp1.get("nodeLongitude");
+                                                subLineNode.setLongitude(nodeLongitude);
+                                                String nodeLatitude = (String) temp1.get("nodeLatitude");
+                                                subLineNode.setLatitude(nodeLatitude);
+                                                subLineNode.setDelete_flag(0);
+                                                subLineNode.setLast_update(DateUtil.getDate());
+                                                subLineNode.setLast_update_user_id("U:" + userName);
+                                                count_subLineNode = subLineNodeDaoMapper.saveSubLineNode(subLineNode);
+                                                if (count_subLineNode == 1) {
+                                                    flag = 1;   // 保存节点成功
+                                                } else {
+                                                    flag = 0;   // 保存节点失败
+                                                    throw new RuntimeException(flag + "");
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        flag = 0;   // 保存线路失败
+                                        throw new RuntimeException(flag + "");
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        flag = 0;   // 保存干线失败
+                        throw new RuntimeException(flag + "");
+                    }
+                } else {
+                    flag = 2; // 运营干线简称已存在
+                }
+            } catch (Exception e) {
+                flag = -1;
+                throw new RuntimeException(flag + "");
+            }
+        } else {
+            flag = 2; // 运营干线不存在
+        }
+        return flag;
+    }
+}

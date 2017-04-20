@@ -1,0 +1,5 @@
+#myModalDetail label,
+#myModalNewAdd label {
+    min-width: 104px;
+    text-align: right;
+}

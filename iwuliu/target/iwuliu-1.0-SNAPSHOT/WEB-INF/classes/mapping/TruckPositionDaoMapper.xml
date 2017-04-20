@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckPositionDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Truck_Position" type="com.cn.gazelle.logistics.pojo.T_Data_Truck_Position">
+
+        <id column="POSITION_NUMBER" property="position_number"/>
+        <result column="OBD_ID" property="obd_id"/>
+        <result column="CLIENT_ACQUISITION_TIME" property="client_acquisition_time"/>
+        <result column="LONGITUDE" property="longitude"/>
+        <result column="LATITUDE" property="latitude"/>
+        <result column="SPEED" property="speed"/>
+        <result column="DIRECTION" property="direction"/>
+        <result column="STATUS" property="status"/>
+        <result column="SATELLITE_NUMBER" property="satellite_number"/>
+        <result column="RPM" property="rpm"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据位置No查询卡车定位信息-->
+    <select id="findTruckPositionByPositionNumber" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Position">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Position
+        WHERE
+            POSITION_NUMBER = #{position_number} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据OBD ID查询卡车定位信息-->
+    <select id="findTruckPositionByObdId" resultMap="T_Data_Truck_Position">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Position
+        WHERE
+            OBD_ID = #{obd_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的卡车定位列表信息（默认查询所有卡车定位列表信息）-->
+    <select id="findAllTruckPosition" resultMap="T_Data_Truck_Position">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Position t
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'obd_id'">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询卡车定位信息总记录数-->
+    <select id="findAllTruckPositionRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Data_Truck_Position t
+        WHERE
+            DELETE_FLAG = 0
+    </select>
+
+    <!--保存卡车定位基础信息-->
+    <insert id="saveTruckPosition" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Position">
+        INSERT INTO
+                T_Data_Truck_Position(POSITION_NUMBER,
+                OBD_ID,
+                CLIENT_ACQUISITION_TIME,
+                LONGITUDE,
+                LATITUDE,
+                SPEED,
+                DIRECTION,
+                STATUS,
+                SATELLITE_NUMBER,
+                RPM,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{position_number},
+                #{obd_id},
+                #{client_acquisition_time},
+                #{longitude},
+                #{latitude},
+                #{speed},
+                #{direction},
+                #{status},
+                #{satellite_number},
+                #{rpm},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新卡车定位基础信息-->
+    <update id="updateTruckPosition" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Position">
+        UPDATE
+            T_Data_Truck_Position
+        SET
+            OBD_ID = #{obd_id},
+            CLIENT_ACQUISITION_TIME = #{client_acquisition_time},
+            LONGITUDE = #{longitude},
+            LATITUDE = #{latitude},
+            SPEED = #{speed},
+            DIRECTION = #{direction},
+            STATUS = #{status},
+            SATELLITE_NUMBER = #{satellite_number},
+            RPM = #{rpm},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            POSITION_NUMBER = #{position_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据位置No删除卡车定位基础信息-->
+    <delete id="delTruckPosition" parameterType="String">
+        UPDATE
+            T_Data_Truck_Position
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            POSITION_NUMBER = #{position_number} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--根据OBD ID倒叙查询最近10条卡车定位信息-->
+    <select id="findLastTruckPositionByObdId" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Position">
+        SELECT
+        *
+        FROM
+        T_Data_Truck_Position
+        WHERE
+        OBD_ID = #{obd_id} AND DELETE_FLAG = 0
+        ORDER BY CLIENT_ACQUISITION_TIME DESC
+        limit 0,10
+    </select>
+
+    <!--根据OBD ID倒叙查询符合时间段的最近卡车定位信息-->
+    <select id="findTruckPositionDateByObdId" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Position">
+        SELECT
+        *
+        FROM
+        T_Data_Truck_Position
+        WHERE
+        OBD_ID = #{obd_id} AND CLIENT_ACQUISITION_TIME BETWEEN #{start_time} AND #{end_time} AND DELETE_FLAG = 0
+        ORDER BY CLIENT_ACQUISITION_TIME DESC
+    </select>
+
+    <!--根据OBD ID查询驾驶天数-->
+    <select id="findDrivingDaysByObdId" resultType="int">
+        SELECT
+        COUNT(DISTINCT(DATE_FORMAT(p.CLIENT_ACQUISITION_TIME,'%Y-%m-%d'))) AS DRIVING_DAYS
+        FROM
+        t_data_truck_position AS p
+        <where>
+            p.DELETE_FLAG = '0'
+            <if test="start_time != null and start_time!= ''">
+                AND DATE_FORMAT(p.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &gt;=#{start_time}
+            </if>
+            <if test="end_time != null and end_time!= ''">
+                AND DATE_FORMAT(p.CLIENT_ACQUISITION_TIME,'%Y-%m-%d') &lt;=#{end_time}
+            </if>
+        </where>
+    </select>
+
+    <!--根据OBD_ID查询车辆最新的卡车定位信息-->
+    <select id="findLatestTruckPositionByOBD" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Position">
+        SELECT
+        p.LONGITUDE ,
+        p.LATITUDE
+        FROM
+        t_data_truck_position AS p
+        WHERE
+        p.OBD_ID = #{obd_id} AND p.DELETE_FLAG = '0' AND p.CLIENT_ACQUISITION_TIME  =
+        (
+            select max(CLIENT_ACQUISITION_TIME)
+            from  t_data_truck_position
+            WHERE OBD_ID = #{obd_id}
+         )
+    </select>
+
+</mapper>

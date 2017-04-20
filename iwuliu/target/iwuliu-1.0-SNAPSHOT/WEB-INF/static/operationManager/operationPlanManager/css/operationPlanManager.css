@@ -1,0 +1,13 @@
+.fixed-table-body{
+    height:auto;
+}
+/*下拉*/
+.infoConditions .form-group .mainLine ul{
+    max-height:180px;
+    max-height:25rem;
+    overflow-y: auto;
+    width:160px;
+}
+td a{
+    cursor: pointer;
+}

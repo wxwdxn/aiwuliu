@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.DrivingRecordDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Driving_Record" type="com.cn.gazelle.logistics.pojo.T_Data_Driving_Record">
+
+        <id column="RECORD_ID" property="record_id"/>
+        <result column="TRUCK_ID" property="truck_id"/>
+        <result column="PERSON_INFO_ID" property="person_info_id"/>
+        <result column="START_DRIVING_TIME" property="start_driving_time"/>
+        <result column="FINISH_DRIVING_TIME" property="finish_driving_time"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据ID查询车辆驾驶记录信息-->
+    <select id="findDrivingRecordByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Driving_Record">
+        SELECT
+            *
+        FROM
+            T_Data_Driving_Record
+        WHERE
+            RECORD_ID = #{record_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据卡车ID查询车辆驾驶记录信息-->
+    <select id="findDrivingRecordByTruckID" resultMap="T_Data_Driving_Record">
+        SELECT
+            *
+        FROM
+            T_Data_Driving_Record
+        WHERE
+            TRUCK_ID = #{truck_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询所有车辆驾驶记录信息（默认查询所有车辆驾驶记录列表信息）-->
+    <select id="findAllDrivingRecord" resultMap="T_Data_Driving_Record">
+        SELECT
+            *
+        FROM
+            T_Data_Driving_Record t
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'person_info_id'">
+            AND t.${search_type} IN (
+            SELECT m.relevance_info_id FROM (SELECT relevance_info_id AS relevance_info_id FROM `t_data_member` WHERE member_name LIKE '%${name}%')AS m
+            )
+        </if>
+        <if test="search_type != ''and search_type=='truck_id'">
+            AND t.${search_type} IN (
+            SELECT m.truck_id FROM (SELECT truck_id AS truck_id FROM `t_data_truck` WHERE plate_number LIKE '%${name}%')AS m
+            )
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询符合条件的车辆驾驶记录信息总数-->
+    <select id="findAllDrivingRecordRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Data_Driving_Record
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--保存车辆驾驶记录信息-->
+    <insert id="saveDrivingRecord" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Driving_Record">
+         INSERT INTO
+                  T_Data_Driving_Record(
+                  RECORD_ID,
+                  TRUCK_ID,
+                  PERSON_INFO_ID,
+                  START_DRIVING_TIME,
+                  FINISH_DRIVING_TIME,
+                  DELETE_FLAG,
+                  LAST_UPDATE,
+                  LAST_UPDATE_USER_ID)
+         VALUES (
+                 #{record_id},
+                 #{truck_id},
+                 #{person_info_id},
+                 #{start_driving_time},
+                 #{finish_driving_time},
+                 0,
+                 #{last_update},
+                 #{last_update_user_id})
+    </insert>
+
+    <!--更新车辆驾驶记录信息-->
+    <update id="updateDrivingRecord" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Driving_Record">
+        UPDATE
+            T_Data_Driving_Record
+        SET
+            TRUCK_ID = #{truck_id},
+            PERSON_INFO_ID = #{person_info_id},
+            START_DRIVING_TIME = #{start_driving_time},
+            FINISH_DRIVING_TIME = #{finish_driving_time},
+            DELETE_FLAG = #{delete_flag},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            RECORD_ID = #{record_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--删除车辆驾驶记录信息-->
+    <delete id="delDrivingRecord" parameterType="String">
+        UPDATE
+            T_Data_Driving_Record
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            RECORD_ID = #{record_id} AND DELETE_FLAG = 0
+    </delete>
+</mapper>

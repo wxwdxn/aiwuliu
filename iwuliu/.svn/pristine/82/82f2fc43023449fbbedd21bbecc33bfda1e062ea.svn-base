@@ -1,0 +1,18 @@
+.iframeMain .infoConditions {
+  padding: 0;
+}
+.iframeMain .infoConditions .buttons {
+  margin: 0 25px;
+}
+/*表格显示*/
+.fixed-table-body{
+  height:auto;
+}
+
+/*派单页面的下拉*/
+.vehiclePlanManuallyAssign .form-group .tranPlan ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}

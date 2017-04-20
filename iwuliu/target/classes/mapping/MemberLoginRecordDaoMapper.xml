@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.MemberLoginRecordDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Member_Login_Record" type="com.cn.gazelle.logistics.pojo.T_Data_Member_Login_Record">
+
+        <id column="RECORD_ID" property="record_id"></id>
+        <result column="RECORD_NAME" property="record_name"></result>
+        <result column="MEMBER_ID" property="member_id"></result>
+        <result column="IP_ADDRESS" property="ip_address"></result>
+        <result column="PROVINCE_ID" property="province_id"></result>
+        <result column="CITY_ID" property="city_id"></result>
+        <result column="AREA_ID" property="area_id"></result>
+        <result column="APP_FLAG" property="app_flag"></result>
+        <result column="DEVICE_FLAG" property="device_flag"></result>
+        <result column="OS_FLAG" property="os_flag"></result>
+        <result column="BRAND" property="brand"></result>
+        <result column="MODEL" property="model"></result>
+        <result column="IMEI" property="imei"></result>
+        <result column="LOGIN_TIME" property="login_time"></result>
+        <result column="LAST_UPDATE" property="last_update"></result>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"></result>
+    </resultMap>
+
+    <!--根据ID查找会员登录记录信息-->
+    <select id="findRecordByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Login_Record">
+        SELECT * FROM T_Data_Member_Login_Record WHERE RECORD_ID=#{record_id}
+    </select>
+
+    <!--根据履历名称查询会员登录记录列表-->
+    <select id="findRecordByName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Login_Record">
+        SELECT * FROM T_Data_Member_Login_Record WHERE RECORD_NAME = '${record_name}'
+    </select>
+
+    <!--查询符合条件的会员登录记录列表信息（默认查询所有会员登录记录列表信息）-->
+    <select id="findAllRecord" resultMap="T_Data_Member_Login_Record">
+        SELECT * FROM T_Data_Member_Login_Record
+        <if test="record_name != ''">
+            WHERE RECORD_NAME LIKE '%${record_name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询符合条件的会员登录记录总数-->
+    <select id="findAllRecordRowsCount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM T_Data_Member_Login_Record
+        <if test="record_name !='' ">
+            WHERE RECORD_NAME LIKE '%${record_name}%'
+        </if>
+    </select>
+
+    <!--保存会员登录记录信息-->
+    <insert id="saveRecord" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Login_Record">
+        INSERT INTO T_Data_Member_Login_Record(
+        RECORD_ID,
+        RECORD_NAME,
+        MEMBER_ID,
+        IP_ADDRESS,
+        PROVINCE_ID,
+        CITY_ID,
+        AREA_ID,
+        APP_FLAG,
+        DEVICE_FLAG,
+        OS_FLAG,
+        BRAND,
+        MODEL,
+        IMEI,
+        LOGIN_TIME,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        ) VALUES (
+        #{record_id},
+        #{record_name},
+        #{member_id},
+        #{ip_address},
+        #{province_id},
+        #{city_id},
+        #{area_id},
+        #{app_flag},
+        #{device_flag},
+        #{os_flag},
+        #{brand},
+        #{model},
+        #{imei},
+        #{login_time},
+        #{last_update},
+        #{last_update_user_id}
+        )
+    </insert>
+
+    <!--更新会员登录记录信息-->
+    <update id="updateRecord" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Login_Record">
+        UPDATE T_Data_Member_Login_Record SET RECORD_NAME = #{record_name},
+        MEMBER_ID = #{member_id} ,
+        IP_ADDRESS = #{ip_address} ,
+        PROVINCE_ID = #{province_id} ,
+        CITY_ID = #{city_id} ,
+        AREA_ID = #{area_id} ,
+        APP_FLAG = #{app_flag} ,
+        DEVICE_FLAG = #{device_flag} ,
+        OS_FLAG = #{os_flag} ,
+        BRAND = #{brand} ,
+        MODEL = #{model} ,
+        IMEI = #{imei} ,
+        LOGIN_TIME = #{login_time} ,
+        LAST_UPDATE = #{last_update} ,
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+    </update>
+
+    <!--删除会员登录记录信息-->
+    <delete id="delRecord" parameterType="String">
+        DELETE FROM T_Data_Member_Login_Record WHERE RECORD_ID = #{record_id}
+    </delete>
+
+</mapper>

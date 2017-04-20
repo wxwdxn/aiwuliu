@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.DataRoleDaoMapper">
+    <resultMap id="T_Sys_DataRole" type="com.cn.gazelle.logistics.pojo.T_Sys_DataRole">
+        <id column="DATA_ROLE_ID" property="data_role_id"/>
+        <result column="DATA_ROLE_NAME" property="data_role_name"/>
+        <result column="DATA_ROLE_VALUE" property="data_role_value"/>
+        <result column="DATA_ROLE_DATE" property="data_role_date"/>
+        <result column="DELETE_STATES" property="delete_states"/>
+        <result column="DATA_ROLE_REMARK" property="data_role_remark"/>
+    </resultMap>
+
+    <!--根据ID查询数据角色信息-->
+    <select id="findDataRoleByID" parameterType="int" resultType="com.cn.gazelle.logistics.pojo.T_Sys_DataRole">
+        SELECT
+            *
+        FROM
+            T_Sys_DataRole
+        WHERE
+            DATA_ROLE_ID = #{data_role_id} AND DELETE_STATES = '0'
+    </select>
+
+    <!--查询所有数据角色信息-->
+    <select id="findAllDataRole" resultMap="T_Sys_DataRole">
+        SELECT
+        *
+        FROM
+        T_Sys_DataRole
+        WHERE
+        DELETE_STATES = '0'
+        <if test="data_role_name!='' ">
+            AND DATA_ROLE_NAME like '%${data_role_name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查找所有的数据角色-->
+    <select id="findAll" resultMap="T_Sys_DataRole">
+        SELECT
+            *
+        FROM
+            T_Sys_DataRole
+        WHERE
+             DELETE_STATES = '0'
+    </select>
+
+    <!--查询数据角色总记录数-->
+    <select id="findAllDataRoleRowsCount" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_DataRole
+        WHERE
+            DELETE_STATES = '0'
+    </select>
+
+    <!--查询符合条件的数据角色总记录数-->
+    <select id="findAllDataRoleSearchCount" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_DataRole
+        WHERE
+            DATA_ROLE_NAME like '%${data_role_name}%' AND DELETE_STATES = '0'
+    </select>
+
+    <!--保存数据角色信息-->
+    <insert id="saveDataRole" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_DataRole">
+        INSERT INTO
+                T_Sys_DataRole(DATA_ROLE_ID,
+                DATA_ROLE_NAME,
+                DATA_ROLE_VALUE,
+                DATA_ROLE_DATE,
+                DELETE_STATES,
+                DATA_ROLE_REMARK)
+        VALUES(
+               #{data_role_id},
+               #{data_role_name},
+               #{data_role_value},
+               #{data_role_date},
+               '0',
+               #{data_role_remark});
+    </insert>
+    <!--更新数据角色信息-->
+    <update id="updateDataRole" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_DataRole">
+        UPDATE
+            T_Sys_DataRole
+        SET
+            DATA_ROLE_NAME = #{data_role_name},
+            DATA_ROLE_VALUE = #{data_role_value},
+            DELETE_STATES = '0',
+            DATA_ROLE_REMARK = #{data_role_remark}
+        WHERE
+            DATA_ROLE_ID = #{data_role_id} AND DELETE_STATES =  '0'
+    </update>
+
+    <!--删除数据角色信息-->
+    <delete id="delDataRole" parameterType="String">
+     UPDATE
+        T_Sys_DataRole
+     SET
+        DELETE_STATES = '1'
+     WHERE
+        DATA_ROLE_ID = #{data_role_id} AND DELETE_STATES =  '0'
+    </delete>
+</mapper>

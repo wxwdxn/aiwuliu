@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+      http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+
+    <!-- Services发布 -->
+    <!--用户管理-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.UserServiceImpl" address="/userServiceImpl">
+        <!--进入web service之前用户验证的拦截器-->
+        <!--<jaxws:inInterceptors>-->
+        <!--<bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor" />-->
+        <!--<bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">-->
+        <!--<constructor-arg>-->
+        <!--<map>-->
+        <!--&lt;!&ndash; 设置加密类型 &ndash;&gt;-->
+        <!--<entry key="action" value="UsernameToken" />-->
+        <!--&lt;!&ndash; 设置密码类型为明文 &ndash;&gt;-->
+        <!--<entry key="passwordType" value="PasswordText" />-->
+        <!--&lt;!&ndash;<entry key="action" value="UsernameToken Timestamp" /> 设置密码类型为加密<entry-->
+        <!--key="passwordType" value="PasswordDigest" /> &ndash;&gt;-->
+        <!--<entry key="passwordCallbackClass" value="com.cn.gazelle.logistics.interceptor.WsAuthInterceptor" />-->
+        <!--</map>-->
+        <!--</constructor-arg>-->
+        <!--</bean>-->
+        <!--</jaxws:inInterceptors>-->
+    </jaxws:endpoint>
+
+
+    <!--YK-->
+    <!--会员管理-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.MemberServiceImpl" address="/memberServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--物流公司-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.CompanyServiceImpl"
+                    address="/companyServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--货场管理人员-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.CargoYardManagerServiceImpl"
+                    address="/cargoYardManagerServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--司机管理-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.PersonServiceImpl" address="/personServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--电子协议-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.ContentServiceImpl"
+                    address="/contentServiceImpl">
+    </jaxws:endpoint>
+
+    <!--客服电话-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.SysInfoServiceImpl"
+                    address="/sysInfoServiceImpl">
+    </jaxws:endpoint>
+
+    <!--协议指令-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.OrderServiceImpl" address="/orderServiceImpl">
+    </jaxws:endpoint>
+
+    <!--PID信息-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.PidServiceImpl" address="/pidServiceImpl">
+    </jaxws:endpoint>
+
+    <!--字典信息-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.DictionaryServiceImpl"
+                    address="/dictionaryServiceImpl">
+    </jaxws:endpoint>
+
+    <!--字典数据信息-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.DicdataServiceImpl"
+                    address="/dicdataServiceImpl">
+    </jaxws:endpoint>
+
+    <!--提现申请-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.WithdrawApplyServiceImpl"
+                    address="/withdrawApplyServiceImpl">
+    </jaxws:endpoint>
+    <!--YK-->
+
+    <!--QJ-->
+    <!--油气站-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.StationServiceImpl"
+                    address="/stationServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--卡车信息-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.TruckServiceImpl" address="/truckServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--车牌号归属地-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.AttributionServiceImpl"
+                    address="/attributionServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--车厢类型信息-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.TruckCarriageTypeServiceImpl"
+                    address="/TruckCarriageTypeServiceImpl">
+
+    </jaxws:endpoint>
+    <!--车辆常跑路线-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.TruckTransportLineServiceImpl"
+                    address="/TruckTransportLineServiceImpl">
+
+    </jaxws:endpoint>
+    <!--GPS位置-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.TruckPositionServiceImpl"
+                    address="/TruckPositionServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--会员定位信息-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.MemberPositionServiceImpl"
+                    address="/MemberPositionServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--会员备注信息-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.MemberRemarkServiceImpl"
+                    address="/MemberRemarkServiceImpl">
+
+    </jaxws:endpoint>
+
+    <!--QJ-->
+
+    <!--WXW-->
+    <!--货场基本信息-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.CargoServiceImpl" address="/cargoServiceImpl">
+    </jaxws:endpoint>
+    <!--运输合同信息管理-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.TransportationContractServiceImpl"
+                    address="/transportationContractServiceImpl">
+    </jaxws:endpoint>
+    <!--调度单-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.ScheduleSheetServiceImpl"
+                    address="/scheduleSheetServiceImpl">
+    </jaxws:endpoint>
+    <!--派车单-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.DispatchSheetServiceImpl"
+                    address="/dispatchSheetServiceImpl">
+    </jaxws:endpoint>
+    <!--订单-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.TransportationOrderServiceImpl"
+                    address="/transportationOrderServiceImpl">
+    </jaxws:endpoint>
+    <!--获取干线信息-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.CargoTypeLineServiceImpl"
+                    address="/cargoTypeLineServiceImpl">
+    </jaxws:endpoint>
+
+    <!--ZF-->
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.DebitCardPayServiceImpl"
+                    address="/debitCardPayServiceImpl">
+    </jaxws:endpoint>
+
+    <jaxws:endpoint implementor="com.cn.gazelle.logistics.service.impl.MemberPayServiceImpl"
+                    address="/memberPayServiceImpl">
+    </jaxws:endpoint>
+
+</beans>

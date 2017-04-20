@@ -1,0 +1,400 @@
+/*  
+  Document   : CSS样式初始化  
+  Created on : 2016. 8. 7,09:41:00  
+  Author :  
+  Description:  
+  CSS样式表的初始化，全局样式设置。部分样式属性请根据具体页面重置其属性  
+      导入方式：<link href="css/common.css" rel="stylesheet" type="text/css" /> */
+/* reset */
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+textarea,
+p,
+blockquote,
+th,
+td,
+input,
+select,
+textarea,
+button {
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-size: 62.5%;
+  /* 10÷16=62.5% */
+}
+body {
+  font-size: 12px;
+  font-size: 1.2rem;
+  /* 12÷10=1.2 */
+}
+p {
+  font-size: 14px;
+  font-size: 1.4rem;
+}
+/* 初始化标签在所有浏览器中的margin、padding值 */
+fieldset,
+img {
+  border: 0 none;
+}
+/* 重置fieldset（表单分组）、图片的边框为0*/
+dl,
+ul,
+ol,
+menu,
+li {
+  list-style: none;
+}
+/* 重置类表前导符号为onne,menu在HTML5中有效 */
+blockquote,
+q {
+  quotes: none;
+}
+/* 重置嵌套引用的引号类型 */
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+/* 重置嵌套引用*/
+input,
+select,
+textarea,
+button {
+  vertical-align: middle;
+}
+/* 重置表单控件垂直居中*/
+button {
+  border: 0 none;
+  background-color: transparent;
+  cursor: pointer;
+}
+/* 重置表单button按钮效果 */
+body,
+html {
+  background: #f1f1f1;
+  height: 100%;
+}
+body .eleHeight,
+html .eleHeight {
+  height: 100%;
+}
+/* 重置body 页面背景为白色 */
+body,
+th,
+td,
+input,
+select,
+textarea,
+button {
+  font-size: 1.2rem;
+  line-height: 1;
+  font-family: "微软雅黑";
+  color: #666;
+}
+/* 重置页面文字属性 */
+a {
+  color: #666;
+  text-decoration: none;
+}
+/* 重置链接a标签 */
+a:active,
+a:hover {
+  text-decoration: none;
+}
+/* 重置链接a标签的鼠标滑动效果 */
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+var {
+  font-style: normal;
+  font-weight: normal;
+}
+/* 重置样式标签的样式 */
+caption {
+  display: none;
+}
+/* 重置表格标题为隐藏 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+/* 重置table属性 */
+img {
+  vertical-align: top;
+}
+/* 图片在当前行内的垂直位置 */
+/* 页面设置 */
+/* 取消a标签点击后的虚线框 */
+a {
+  outline: none;
+}
+/* 设置页面文字等在拖动鼠标选中情况下的背景色与文字颜色 */
+/*   
+::selection {color: #fff;background-color: #4C6E78;}      
+::-moz-selection {color: #fff;background-color: #4C6E78;}   
+*/
+/*清除浮动*/
+.clear {
+  clear: both;
+}
+/*清除浮动--推荐使用*/
+.clearfix:before,
+.clearfix:after {
+  content: '';
+  display: table;
+}
+.clearfix:after {
+  clear: both;
+}
+body,
+html {
+  width: 100%;
+  height: 100%;
+  min-height: 663px;
+  min-width: 1300px;
+  background: #fff;
+}
+body .login_main,
+html .login_main {
+  width: 100%;
+  height: 85%;
+  min-height: 565px;
+  background: #0044CC;
+  position: relative;
+}
+body .login_main .login_back,
+html .login_main .login_back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+body .login_main .navbar,
+html .login_main .navbar {
+  background: none;
+  border: none;
+  margin-bottom: 0;
+}
+body .login_main .navbar .navbar-brand,
+html .login_main .navbar .navbar-brand {
+  height: auto;
+}
+body .login_main .login_title,
+html .login_main .login_title {
+  height: 100%;
+  vertical-align: middle;
+  text-align: right;
+  color: #fff;
+  padding-top: 7%;
+}
+body .login_main .login_title h1,
+html .login_main .login_title h1,
+body .login_main .login_title p,
+html .login_main .login_title p,
+body .login_main .login_title h3,
+html .login_main .login_title h3 {
+  vertical-align: middle;
+}
+body .login_main .login_title h1,
+html .login_main .login_title h1 {
+  line-height: 115px;
+  font-size: 60px;
+}
+body .login_main .login_title p,
+html .login_main .login_title p {
+  line-height: 28px;
+  font-size: 16px;
+}
+body .login_main .login_title h3,
+html .login_main .login_title h3 {
+  line-height: 60px;
+  font-size: 34px;
+}
+body .login_main .login_signIn,
+html .login_main .login_signIn {
+  height: 100%;
+  padding-top: 4%;
+}
+body .login_main .login_signIn .sign_in,
+html .login_main .login_signIn .sign_in {
+  text-align: center;
+  background: #2a3330;
+  padding: 18px 22px;
+  min-height: 350px;
+}
+body .login_main .login_signIn .sign_in h4,
+html .login_main .login_signIn .sign_in h4 {
+  color: #fff;
+  line-height: 50px;
+}
+body .login_main .login_signIn .sign_in .account .form-group,
+html .login_main .login_signIn .sign_in .account .form-group {
+  margin: 0;
+  width: 100%;
+}
+body .login_main .login_signIn .sign_in .account .form-group p,
+html .login_main .login_signIn .sign_in .account .form-group p {
+  line-height: 26px;
+  height: 26px;
+}
+body .login_main .login_signIn .sign_in .rememberPwd,
+html .login_main .login_signIn .sign_in .rememberPwd {
+  overflow: hidden;
+}
+body .login_main .login_signIn .sign_in .rememberPwd .remPwd,
+html .login_main .login_signIn .sign_in .rememberPwd .remPwd {
+  float: left;
+}
+body .login_main .login_signIn .sign_in .rememberPwd .remPwd span,
+html .login_main .login_signIn .sign_in .rememberPwd .remPwd span {
+  font-size: 16px;
+  cursor: pointer;
+}
+body .login_main .login_signIn .sign_in .rememberPwd .remPwd label,
+html .login_main .login_signIn .sign_in .rememberPwd .remPwd label {
+  color: #3e606d;
+}
+body .login_main .login_signIn .sign_in .rememberPwd .forgetPwd,
+html .login_main .login_signIn .sign_in .rememberPwd .forgetPwd {
+  float: right;
+}
+body .login_main .login_signIn .sign_in .rememberPwd .forgetPwd label,
+html .login_main .login_signIn .sign_in .rememberPwd .forgetPwd label {
+  color: #606468;
+  cursor: pointer;
+}
+body .login_main .login_signIn .sign_in .loginIn,
+html .login_main .login_signIn .sign_in .loginIn {
+  width: 100%;
+  background: #21455f;
+  font-size: 18px;
+  color: #fff;
+  margin: 20px 0;
+  margin: 1.8rem 0;
+}
+body .login_main .login_signIn .register .registerBtn,
+html .login_main .login_signIn .register .registerBtn {
+  width: 100%;
+  background: #21455f;
+  font-size: 18px;
+  color: #fff;
+  margin: 1px 0;
+}
+body .login_main .login_signIn .register i,
+html .login_main .login_signIn .register i {
+  font-style: normal ;
+}
+body .login_main .login_signIn .register .code,
+html .login_main .login_signIn .register .code {
+  cursor: pointer;
+}
+body .login_main .login_signIn .registerSuccess h3,
+html .login_main .login_signIn .registerSuccess h3 {
+  margin: 15px 0;
+  font-size: 20px;
+  line-height: 26px;
+  line-height: 2.6rem;
+  color: #fff;
+}
+body .login_main .login_signIn .registerSuccess .back_login,
+html .login_main .login_signIn .registerSuccess .back_login {
+  width: 100%;
+  margin: 20px 0;
+  margin: 1.8rem 0;
+  background: #21455f;
+  font-size: 18px;
+  color: #fff;
+}
+body .login_main .login_signIn .registerSuccess .selfChick,
+html .login_main .login_signIn .registerSuccess .selfChick {
+  font-style: normal;
+}
+body .logi_bottom,
+html .logi_bottom {
+  width: 100%;
+  height: 15%;
+}
+body .logi_bottom .about,
+html .logi_bottom .about {
+  padding-top: 20px;
+}
+body .logi_bottom .about p,
+html .logi_bottom .about p {
+  line-height: 20px;
+  color: #bbb;
+}
+body .logi_bottom .about p a,
+html .logi_bottom .about p a {
+  color: #bbb;
+  font-size: 12px;
+}
+body .logi_bottom .qrCode,
+html .logi_bottom .qrCode {
+  float: right;
+  padding-top: 5px;
+  padding-top: 0.5rem;
+}
+body .logi_bottom .qrCode img,
+html .logi_bottom .qrCode img {
+  float: left;
+  margin-top: 5px;
+}
+body .logi_bottom .qrCode .ardroid,
+html .logi_bottom .qrCode .ardroid,
+body .logi_bottom .qrCode .IOS,
+html .logi_bottom .qrCode .IOS {
+  width: 96px;
+  width: 9rem;
+  float: left;
+  margin-top: 5px;
+  margin-left: 5px;
+}
+@media (max-width: 1000px) {
+  .col-md-6 {
+    width: 50%;
+    float: left;
+  }
+}
+@media (max-width:1000px) {
+  body .logi_bottom .qrCode .ardroid {
+    width: 96px;
+    float: left;
+  }
+  body .logi_bottom .qrCode .IOS {
+    width: 96px;
+    float: left;
+  }
+}
+@media(min-width: 992px){
+  .col-md-5{
+    width: 41.66666667%;
+    min-width:312px;
+  }
+}

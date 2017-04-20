@@ -1,0 +1,54 @@
+package com.cn.gazelle.logistics.service;
+
+
+import com.cn.gazelle.logistics.pojo.T_Data_Company_Vehicle_Driver;
+import com.cn.gazelle.logistics.pojo.T_Data_Logistics_Vehicle;
+import com.cn.gazelle.logistics.pojo.T_Data_Person;
+import com.cn.gazelle.logistics.pojo.T_Data_Vehicle;
+
+import javax.jws.WebService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称: VehicleService
+ * 内容摘要: 车辆管理查询接口
+ * 方法描述：该类有2个方法：
+ * 01 findVehicleListCompany   根据条件查找车辆列表(物流公司)
+ * 02 findVehicleListDriver   根据条件查找车辆列表(司机)
+ *
+ * @author QJ
+ */
+@WebService
+public interface VehicleService {
+    // 根据条件查找车辆列表(物流公司)
+    List<T_Data_Vehicle> findVehicleListCompany(HashMap<String,String> conditions);
+
+    // 根据条件查找车辆列表(司机)
+    List<T_Data_Vehicle> findVehicleListDriver(HashMap<String,String> conditions);
+
+    // 根据条件查找物流公司车辆列表
+    List<T_Data_Logistics_Vehicle> findCompanyVehicleList(HashMap<String,String> conditions);
+
+    // 物流公司新增车辆信息（页面）
+    int saveTruckInfo(String truckInfo, String userName, HashMap picPathMap);
+
+    // 查询物流公司下无车辆的司机列表（去除车辆管理者）
+    List<T_Data_Company_Vehicle_Driver> findCompanyVehicleDriverList(HashMap<String,String> conditions);
+
+    // 查询物流公司下无车辆的司机和车辆管理者列表
+    List<T_Data_Company_Vehicle_Driver> findCompanyVehicleDriverAndManagerList(HashMap<String,String> conditions);
+
+    // 设定为车组成员
+    public void logisticsVehicleDriverSetUp(String person_mobile_phone, String plate_number, String username);
+
+    // 设定为车辆管理者
+    public void logisticsVehicleManagerSetUp(String person_mobile_phone, String plate_number, String username);
+
+    // 物流公司解绑车辆相关人员
+    int logisticsVehicleUnbound(String plate_number, String username);
+
+    // 解绑车辆管理者
+    int logisticsVehicleManagerUnbound(String plate_number, String username);
+}

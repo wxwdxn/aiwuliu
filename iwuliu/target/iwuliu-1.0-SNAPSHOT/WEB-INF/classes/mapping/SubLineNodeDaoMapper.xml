@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.SubLineNodeDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Master_Sub_Line_Detail" type="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Detail">
+
+        <id column="LINE_ID" property="line_id"/>
+        <result column="MAIN_LINE_INFO_ID" property="main_line_info_id"/>
+        <result column="NODE_NO" property="node_no"/>
+        <result column="NODE_NAME" property="node_name"/>
+        <result column="LONGITUDE" property="longitude"/>
+        <result column="LATITUDE" property="latitude"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据ID查询干线路线节点基础信息-->
+    <select id="findSubLineNodeById" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Detail">
+        SELECT
+            *
+        FROM
+            T_Master_Sub_Line_Detail
+        WHERE
+            LINE_ID = #{line_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据干线路线ID查询干线路线节点基础信息-->
+    <select id="findSubLineNodeByInfoID" resultMap="T_Master_Sub_Line_Detail">
+        SELECT
+            *
+        FROM
+            T_Master_Sub_Line_Detail
+        WHERE
+            MAIN_LINE_INFO_ID = #{main_line_info_id} AND DELETE_FLAG = 0 ORDER BY NODE_NO ASC
+    </select>
+
+    <!--根据节点编号查询干线路线节点基础信息-->
+    <select id="findSubLineNodeByNodeNo" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Detail">
+        SELECT
+        *
+        FROM
+        T_Master_Sub_Line_Detail
+        WHERE
+        NODE_NO = #{node_no} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据节点名称查询干线路线节点基础信息-->
+    <select id="findSubLineNodeByNodeName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Detail">
+        SELECT
+        *
+        FROM
+        T_Master_Sub_Line_Detail
+        WHERE
+        NODE_NAME = '${node_name}' AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的干线路线节点列表信息（默认查询干线路线节点列表信息）-->
+    <select id="findAllSubLineNode" resultMap="T_Master_Sub_Line_Detail">
+        SELECT
+            *
+        FROM
+        T_Master_Sub_Line_Detail
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'node_name'">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询干线路线节点基础信息总记录数-->
+    <select id="findAllSubLineNodeRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+        T_Master_Sub_Line_Detail
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--保存干线路线节点基础信息-->
+    <insert id="saveSubLineNode" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Detail">
+        INSERT INTO
+                T_Master_Sub_Line_Detail(LINE_ID,
+                MAIN_LINE_INFO_ID,
+                NODE_NO,
+                NODE_NAME,
+                LONGITUDE,
+                LATITUDE,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{line_id},
+                #{main_line_info_id},
+                #{node_no},
+                #{node_name},
+                #{longitude},
+                #{latitude},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新干线路线节点基础信息-->
+    <update id="updateSubLineNode" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Sub_Line_Detail">
+        UPDATE
+            T_Master_Sub_Line_Detail
+        SET
+            MAIN_LINE_INFO_ID = #{main_line_info_id},
+            NODE_NO = #{node_no},
+            NODE_NAME = #{node_name},
+            LONGITUDE = #{longitude},
+            LATITUDE = #{latitude},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            LINE_ID = #{line_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据ID删除干线路线节点基础信息-->
+    <delete id="delSubLineNode" parameterType="String">
+        UPDATE
+            T_Master_Sub_Line_Detail
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            LINE_ID = #{line_id} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--查询所有干线路线节点信息不分页-->
+    <select id="findSubLineNodeList" resultMap="T_Master_Sub_Line_Detail">
+        SELECT
+            *
+        FROM
+            T_Master_Sub_Line_Detail AND DELETE_FLAG = 0
+    </select>
+</mapper>

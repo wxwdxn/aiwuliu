@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.FunRoleDaoMapper">
+
+    <resultMap id="T_Sys_FunRole" type="com.cn.gazelle.logistics.pojo.T_Sys_FunRole">
+        <id column="FUN_ROLE_ID" property="role_id" />
+        <result column="ROLE_NAME" property="role_name" />
+        <result column="ROLE_DATE" property="role_date" />
+        <result column="DELETE_STATES" property="delete_states" />
+        <result column="ROLE_REMARK" property="role_remark" />
+    </resultMap>
+    
+    <!--查询所有，不分页-->
+    <select id="findAll" resultMap="T_Sys_FunRole">
+        SELECT
+        	*
+        FROM
+            t_sys_funrole
+        WHERE
+            DELETE_STATES = '0'
+    </select>
+    
+    <!--根据ID查找功能角色信息 -->
+    <select id="findFunRoleByID"  resultType="com.cn.gazelle.logistics.pojo.T_Sys_FunRole">
+        SELECT
+            *
+        FROM
+            T_Sys_FunRole
+        WHERE
+            FUN_ROLE_ID=#{role_id} AND DELETE_STATES = '0'
+    </select>
+
+    <!--查找所有功能角色信息有分页-->
+    <select id="findAllFunRole" resultMap="T_Sys_FunRole">
+        SELECT
+            *
+        FROM
+            T_Sys_FunRole
+        WHERE
+            DELETE_STATES = '0'
+        <if test="role_name !='' ">
+            AND ROLE_NAME LIKE '%${role_name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查找所有功能角色信息无分页-->
+    <select id="findAllFunRoleNoPage" resultMap="T_Sys_FunRole">
+        SELECT
+            *
+        FROM
+            T_Sys_FunRole
+        WHERE
+            DELETE_STATES = '0'
+    </select>
+
+    <!--查询功能角色总记录数-->
+    <select id="findAllFunRoleRowsCount" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_FunRole
+        WHERE
+            DELETE_STATES = '0'
+    </select>
+
+    <!--查询符合条件的总功能角色记录数-->
+    <select id="findAllFunRoleSearchCount" parameterType="String" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_FunRole
+        WHERE
+            ROLE_NAME LIKE '%${role_name}%' AND DELETE_STATES = '0'
+    </select>
+
+    <!--保存功能角色信息-->
+    <insert id="saveFunRole" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_FunRole">
+        INSERT INTO
+                T_Sys_FunRole (FUN_ROLE_ID,
+                ROLE_NAME,
+                ROLE_DATE,
+                DELETE_STATES,
+                ROLE_REMARK)
+        VALUES (
+                #{role_id},
+                #{role_name},
+                #{role_date},
+                '0',
+                #{role_remark});
+    </insert>
+
+    <!--更新功能角色信息-->
+    <update id="updateFunRole" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_FunRole">
+        UPDATE
+            T_Sys_FunRole
+        SET
+            ROLE_NAME = #{role_name},
+            DELETE_STATES = '0',
+            ROLE_REMARK = #{role_remark}
+        WHERE
+            FUN_ROLE_ID = #{role_id} AND DELETE_STATES = '0'
+    </update>
+
+    <!-- 根据角色ID删除功能角色信息 -->
+    <delete id="delFunRole" parameterType="String">
+        UPDATE
+            T_Sys_FunRole
+        SET
+            DELETE_STATES = '1'
+        WHERE
+            FUN_ROLE_ID = #{role_id} AND DELETE_STATES = '0'
+    </delete>
+
+</mapper>

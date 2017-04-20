@@ -1,0 +1,50 @@
+.QuerytheReset {
+  border: none;
+  padding: 0;
+}
+.QuerytheReset a {
+  margin: 0;
+  margin-left: 0 15px;
+}
+.glyphicon {
+  cursor: pointer;
+}
+.fixed-table-body{
+  height:auto;
+}
+
+.infoConditions .truckTypeSelect .form-group .logisticsCompany ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+/*
+详情编辑页面的下拉
+*/
+.matchGoodType ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+/*新增匹配页面下拉*/
+.addMatch .form-group .truckType ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+.addMatch .form-group .goodType ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+
+#ModalMatch label,
+#myNewAddModal label,
+#myModal label{
+  min-width: 104px;
+  text-align: right;
+}

@@ -1,0 +1,55 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：logisticsAccountManager.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2017-03-06
+ * 作    者: zf
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.controller.operationController;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * 类 名 称：logisticsAccountManager
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ *          01 
+ *          02
+ *@author zf
+ */
+@Controller
+@RequestMapping(value = "/logisticsAccountManager")
+public class LogisticsAccountController {
+
+    Logger logger = Logger.getLogger(LogisticsAccountController.class);
+    @Value("#{setting[baseUrl]}")
+    private String baseUrl;
+
+    /**
+     * 功能：物流公司账户管理主页
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "home")
+    public String accountManager_home(ModelMap model) {
+        return "operationManager/logisticsAccountManager/logisticsAccountManager";
+    }
+
+    public String accountList(){
+        return null;
+    }
+
+
+}
+
+
+

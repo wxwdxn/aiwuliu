@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Truck" type="com.cn.gazelle.logistics.pojo.T_Data_Truck">
+
+        <id column="TRUCK_ID" property="truck_id"/>
+        <result column="PLATE_NUMBER" property="plate_number"/>
+        <result column="TRUCK_MODEL_NO" property="truck_model_no"/>
+        <result column="TRUCK_LENGTH_ID" property="truck_length_id"/>
+        <result column="TRUCK_TYPE_ID" property="truck_type_id"/>
+        <result column="TRUCK_FUEL_TYPE_ID" property="truck_fuel_type_id"/>
+        <result column="TRUCK_CARRIAGE_TYPE_ID" property="truck_carriage_type_id"/>
+        <result column="DRIVING_LICENCE" property="driving_licence"/>
+        <result column="VEHICLE_IDENTIFY_NUMBER" property="vehicle_identify_number"/>
+        <result column="ENGINE_NUMBER" property="engine_number"/>
+        <result column="TRUCK_FIRST_PIC_SAVE_PATH" property="truck_first_pic_save_path"/>
+        <result column="TRUCK_SECOND_PIC_SAVE_PATH" property="truck_second_pic_save_path"/>
+        <result column="TRUCK_THIRD_PIC_SAVE_PATH" property="truck_third_pic_save_path"/>
+        <result column="DRIVING_LICENCE_FIRST_PAGE_SAVE_PATH" property="driving_licence_first_page_save_path"/>
+        <result column="DRIVING_LICENCE_SECOND_PAGE_SAVE_PATH" property="driving_licence_second_page_save_path"/>
+        <result column="INSURANCE_COMPANY_ID" property="insurance_company_id"/>
+        <result column="RESIDENT_PROVINCE_ID" property="resident_province_id"/>
+        <result column="RESIDENT_CITY_ID" property="resident_city_id"/>
+        <result column="RESIDENT_AREA_ID" property="resident_area_id"/>
+        <result column="OWNER_MEMBER_ID" property="owner_member_id"/>
+        <result column="DEPOSIT_MEMBER_ID" property="deposit_member_id"/>
+        <result column="MANAGER_MEMBER_ID" property="manager_member_id"/>
+        <result column="LOAD_WEIGHT" property="load_weight"/>
+        <result column="LOAD_VOLUME" property="load_volume"/>
+        <result column="OPERATE_STATUS" property="operate_status"/>
+        <result column="DENIED_SCHEDULE_COUNT" property="denied_schedule_count"/>
+        <result column="DENIED_SCHEDULE_LAST_TIME" property="denied_schedule_last_time"/>
+        <result column="OPERATE_STATUS_CHANGED_TIME" property="operate_status_changed_time"/>
+        <result column="SUBMIT_VERIFY_TIME" property="submit_verify_time"/>
+        <result column="VERIFY_STATUS" property="verify_status"/>
+        <result column="VERIFY_REFUSED_REASON" property="verify_refused_reason"/>
+        <result column="VERIFY_PASSED_TIME" property="verify_passed_time"/>
+        <result column="VERIFY_REFUSED_TIME" property="verify_refused_time"/>
+        <result column="PAYMENT_PASSWORD" property="payment_password"/>
+        <result column="CASH_AMOUNT" property="cash_amount"/>
+        <result column="CREDIT_TOTAL_AMOUNT" property="credit_total_amount"/>
+        <result column="CREDIT_USEABLE_AMOUNT" property="credit_useable_amount"/>
+        <result column="PAYMENT_PASSWORD_LOCK_FINISH_TIME" property="payment_password_lock_finish_time"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据绑定车辆id查询卡车信息-->
+    <select id="findTruckByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck">
+        SELECT
+        *
+        FROM
+        T_Data_Truck
+        WHERE
+        TRUCK_ID = #{truck_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据车牌号查询卡车信息-->
+    <select id="findTruckByPlateNumber" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck">
+        SELECT
+        *
+        FROM
+        T_Data_Truck
+        WHERE
+        PLATE_NUMBER = #{plate_number} AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的卡车列表信息（默认查询所有卡车列表信息）-->
+    <select id="findAllTruck" resultMap="T_Data_Truck">
+        SELECT
+        *
+        FROM
+        T_Data_Truck
+        WHERE
+        DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的卡车总数-->
+    <select id="findAllTruckRowsCount"  resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        T_Data_Truck
+        WHERE
+        DELETE_FLAG = 0
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--保存卡车信息-->
+    <insert id="saveTruck" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck">
+        INSERT INTO
+        T_Data_Truck(TRUCK_ID,
+        PLATE_NUMBER,
+        TRUCK_MODEL_NO,
+        TRUCK_LENGTH_ID,
+        TRUCK_TYPE_ID,
+        TRUCK_FUEL_TYPE_ID,
+        TRUCK_CARRIAGE_TYPE_ID,
+        DRIVING_LICENCE,
+        VEHICLE_IDENTIFY_NUMBER,
+        ENGINE_NUMBER,
+        TRUCK_FIRST_PIC_SAVE_PATH,
+        TRUCK_SECOND_PIC_SAVE_PATH,
+        TRUCK_THIRD_PIC_SAVE_PATH,
+        DRIVING_LICENCE_FIRST_PAGE_SAVE_PATH,
+        DRIVING_LICENCE_SECOND_PAGE_SAVE_PATH,
+        INSURANCE_COMPANY_ID,
+        RESIDENT_PROVINCE_ID,
+        RESIDENT_CITY_ID,
+        RESIDENT_AREA_ID,
+        OWNER_MEMBER_ID,
+        DEPOSIT_MEMBER_ID,
+        MANAGER_MEMBER_ID,
+        LOAD_WEIGHT,
+        LOAD_VOLUME,
+        OPERATE_STATUS,
+        DENIED_SCHEDULE_COUNT,
+        DENIED_SCHEDULE_LAST_TIME,
+        OPERATE_STATUS_CHANGED_TIME,
+        SUBMIT_VERIFY_TIME,
+        VERIFY_STATUS,
+        VERIFY_REFUSED_REASON,
+        VERIFY_PASSED_TIME,
+        VERIFY_REFUSED_TIME,
+        PAYMENT_PASSWORD,
+        CASH_AMOUNT,
+        CREDIT_TOTAL_AMOUNT,
+        CREDIT_USEABLE_AMOUNT,
+        PAYMENT_PASSWORD_LOCK_FINISH_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID)
+        SELECT
+        #{truck_id},
+        #{plate_number},
+        #{truck_model_no},
+        #{truck_length_id},
+        #{truck_type_id},
+        #{truck_fuel_type_id},
+        #{truck_carriage_type_id},
+        #{driving_licence},
+        #{vehicle_identify_number},
+        #{engine_number},
+        #{truck_first_pic_save_path},
+        #{truck_second_pic_save_path},
+        #{truck_third_pic_save_path},
+        #{driving_licence_first_page_save_path},
+        #{driving_licence_second_page_save_path},
+        #{insurance_company_id},
+        #{resident_province_id},
+        #{resident_city_id},
+        #{resident_area_id},
+        #{owner_member_id},
+        #{deposit_member_id},
+        #{manager_member_id},
+        #{load_weight},
+        #{load_volume},
+        #{operate_status},
+        #{denied_schedule_count},
+        #{denied_schedule_last_time},
+        #{operate_status_changed_time},
+        #{submit_verify_time},
+        #{verify_status},
+        #{verify_refused_reason},
+        #{verify_passed_time},
+        #{verify_refused_time},
+        #{payment_password},
+        #{cash_amount},
+        #{credit_total_amount},
+        #{credit_useable_amount},
+        #{payment_password_lock_finish_time},
+        0,
+        #{last_update},
+        #{last_update_user_id}
+        FROM DUAL WHERE NOT EXISTS(SELECT PLATE_NUMBER FROM T_Data_Truck WHERE PLATE_NUMBER=#{plate_number} AND DELETE_FLAG = 0)
+    </insert>
+
+    <!--更新卡车信息-->
+    <update id="updateTruck" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck">
+        UPDATE
+            T_Data_Truck
+        SET
+            PLATE_NUMBER = #{plate_number},
+            TRUCK_MODEL_NO = #{truck_model_no},
+            TRUCK_LENGTH_ID = #{truck_length_id},
+            TRUCK_TYPE_ID = #{truck_type_id},
+            TRUCK_FUEL_TYPE_ID = #{truck_fuel_type_id},
+            TRUCK_CARRIAGE_TYPE_ID = #{truck_carriage_type_id},
+            DRIVING_LICENCE = #{driving_licence},
+            VEHICLE_IDENTIFY_NUMBER = #{vehicle_identify_number},
+            ENGINE_NUMBER = #{engine_number},
+            TRUCK_FIRST_PIC_SAVE_PATH = #{truck_first_pic_save_path},
+            TRUCK_SECOND_PIC_SAVE_PATH = #{truck_second_pic_save_path},
+            TRUCK_THIRD_PIC_SAVE_PATH = #{truck_third_pic_save_path},
+            DRIVING_LICENCE_FIRST_PAGE_SAVE_PATH = #{driving_licence_first_page_save_path},
+            DRIVING_LICENCE_SECOND_PAGE_SAVE_PATH = #{driving_licence_second_page_save_path},
+            INSURANCE_COMPANY_ID = #{insurance_company_id},
+            RESIDENT_PROVINCE_ID= #{resident_province_id},
+            RESIDENT_CITY_ID = #{resident_city_id},
+            RESIDENT_AREA_ID = #{resident_area_id},
+            OWNER_MEMBER_ID = #{owner_member_id},
+            DEPOSIT_MEMBER_ID = #{deposit_member_id},
+            MANAGER_MEMBER_ID = #{manager_member_id},
+            LOAD_WEIGHT = #{load_weight},
+            LOAD_VOLUME = #{load_volume},
+            OPERATE_STATUS = #{operate_status},
+            DENIED_SCHEDULE_COUNT = #{denied_schedule_count},
+            DENIED_SCHEDULE_LAST_TIME = #{denied_schedule_last_time},
+            OPERATE_STATUS_CHANGED_TIME = #{operate_status_changed_time},
+            SUBMIT_VERIFY_TIME = #{submit_verify_time},
+            VERIFY_STATUS = #{verify_status},
+            VERIFY_REFUSED_REASON = #{verify_refused_reason},
+            VERIFY_PASSED_TIME = #{verify_passed_time},
+            VERIFY_REFUSED_TIME = #{verify_refused_time},
+            PAYMENT_PASSWORD = #{payment_password},
+            CASH_AMOUNT = #{cash_amount},
+            CREDIT_TOTAL_AMOUNT = #{credit_total_amount},
+            CREDIT_USEABLE_AMOUNT = #{credit_useable_amount},
+            PAYMENT_PASSWORD_LOCK_FINISH_TIME = #{payment_password_lock_finish_time},
+            DELETE_FLAG = #{delete_flag},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            TRUCK_ID = #{truck_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--审核车辆-->
+    <update id="examineTruck" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck">
+        UPDATE
+            T_Data_Truck
+        SET
+            PLATE_NUMBER = #{plate_number},
+            VERIFY_STATUS = #{verify_status},
+            VERIFY_REFUSED_REASON = #{verify_refused_reason},
+            VERIFY_PASSED_TIME = #{verify_passed_time},
+            VERIFY_REFUSED_TIME = #{verify_refused_time},
+            STATUS_UPDATE_TIME = #{status_update_time},
+            DELETE_FLAG = #{delete_flag},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            TRUCK_ID = #{truck_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--删除信息-->
+    <delete id="delTruck" parameterType="String">
+        UPDATE
+            T_Data_Truck
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            TRUCK_ID = #{truck_id} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--通过车主会员ID查询卡车信息列表-->
+    <select id="findTruckByOwnerMemberID" resultMap="T_Data_Truck">
+        SELECT
+            *
+        FROM
+            T_Data_Truck
+        WHERE
+            OWNER_MEMBER_ID = #{owner_member_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--通过托管对象会员ID查询卡车信息列表-->
+    <select id="findTruckByDepositMemberID" resultMap="T_Data_Truck">
+        SELECT
+            *
+        FROM
+            T_Data_Truck
+        WHERE
+            DEPOSIT_MEMBER_ID = #{deposit_member_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--通过车主会员ID查询去除与托管对象ID相同的车主ID信息列表-->
+    <select id="findTruckByOwnerMemberIDDepositMemberID" resultMap="T_Data_Truck">
+        SELECT
+            *
+        FROM
+            T_Data_Truck
+        WHERE
+            OWNER_MEMBER_ID = #{owner_member_id} AND DEPOSIT_MEMBER_ID != #{owner_member_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--通过车辆管理者会员ID查询卡车信息列表-->
+    <select id="findTruckByManagerMemberID" resultMap="T_Data_Truck">
+        SELECT
+            *
+        FROM
+            T_Data_Truck
+        WHERE
+            MANAGER_MEMBER_ID = #{manager_member_id}AND DELETE_FLAG = 0
+    </select>
+
+    <!--通过车主会员ID，车牌号模糊查询卡车信息列表-->
+    <select id="findTruckByOwnerMemberIdAndPlateNumber" resultMap="T_Data_Truck">
+        SELECT
+            *
+        FROM
+            T_Data_Truck
+        WHERE
+            OWNER_MEMBER_ID = #{owner_member_id} AND PLATE_NUMBER LIKE '%${plate_number}%' AND DELETE_FLAG = 0
+    </select>
+
+    <!--通过托管对象会员ID，车牌号模糊查询卡车信息列表-->
+    <select id="findTruckByDepositMemberIdAndPlateNumber" resultMap="T_Data_Truck">
+        SELECT
+            *
+        FROM
+            T_Data_Truck
+        WHERE
+            DEPOSIT_MEMBER_ID = #{deposit_member_id} AND PLATE_NUMBER LIKE '%${plate_number}%' AND DELETE_FLAG = 0
+    </select>
+
+    <!--通过车主会员ID，车牌号模糊查询去除与托管对象ID，车牌号模糊查询后相同的车主ID信息列表-->
+    <select id="findTruckByOwnerMemberIDDepositMemberIDAndPlateNumber" resultMap="T_Data_Truck">
+        SELECT
+            *
+        FROM
+            T_Data_Truck
+        WHERE
+            OWNER_MEMBER_ID = #{owner_member_id} AND DEPOSIT_MEMBER_ID != #{owner_member_id} AND PLATE_NUMBER LIKE '%${plate_number}%' AND DELETE_FLAG = 0
+    </select>
+
+    <!--通过车辆管理者会员ID，车牌号模糊查询卡车信息列表-->
+    <select id="findTruckByManagerMemberIdAndPlateNumber" resultMap="T_Data_Truck">
+        SELECT
+            *
+        FROM
+            T_Data_Truck
+        WHERE
+            MANAGER_MEMBER_ID = #{manager_member_id} AND PLATE_NUMBER LIKE '%${plate_number}%' AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的车辆列表信息不分页-->
+    <select id="findTruckList" resultMap="T_Data_Truck">
+        SELECT
+            *
+        FROM
+            T_Data_Truck WHERE DELETE_FLAG = 0
+    </select>
+
+    <!--根据车牌号查询卡车信息-->
+    <select id="findTruckByMuHuNumber" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck">
+        SELECT
+        *
+        FROM
+        T_Data_Truck
+        WHERE
+        PLATE_NUMBER LIKE '%${plate_number}%' AND DELETE_FLAG = 0
+    </select>
+
+    <!-- 查询删除或者没有删除的   根据绑定车辆id查询卡车信息2222222222-->
+    <select id="findTruckByID2" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck">
+        SELECT
+        *
+        FROM
+        T_Data_Truck
+        WHERE
+        TRUCK_ID = #{truck_id}
+    </select>
+
+    <!--通过车辆管理者会员ID查询查询删除或者没有删除的 卡车信息列表 wxw 222222222222222222222   -->
+    <select id="findTruckByManagerMemberID2" resultMap="T_Data_Truck">
+        SELECT
+        *
+        FROM
+        T_Data_Truck
+        WHERE
+        MANAGER_MEMBER_ID = #{manager_member_id}
+    </select>
+
+    <!--根据货物类型和干线查询可分配的车辆 wxw    -->
+    <select id="findByCargoTypeAndLineId" resultMap="T_Data_Truck">
+         SELECT
+            t.plate_number, t.truck_type_id ,t.TRUCK_CARRIAGE_TYPE_ID,t.TRUCK_LENGTH_ID
+         FROM `t_data_truck` t
+         LEFT JOIN
+            `t_data_truck_transport_line` line
+         ON line.truck_ID=t.TRUCK_ID
+         LEFT JOIN
+            `t_master_operate_main_line` ml
+         ON ml.start_province_id=line.START_PROVINCE_ID  AND ml.start_city_id=line.START_CITY_ID AND ml.finish_PROVINCE_ID=line.END_PROVINCE_ID AND ml.finish_city_ID=line.END_city_ID
+         LEFT JOIN
+            `t_master_cargo_truck_carriage_type_match` m
+         ON m.truck_carriage_type_ID=t.truck_carriage_type_id
+         WHERE
+            ml.operate_main_line_id=#{lineId}  AND m.cargo_type_id=#{cargoTypeId}
+    </select>
+
+    <!--根据车牌号车主会员不为空查询卡车信息 wxw-->
+    <select id="findTruckByMuHuNumberAndOwerNotNull" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck">
+        SELECT
+        *
+        FROM
+        T_Data_Truck
+        WHERE
+        PLATE_NUMBER LIKE '%${plate_number}%' AND DELETE_FLAG = 0 AND  OWNER_MEMBER_ID is not NULL
+    </select>
+
+    <!--查询车辆账户总额度-->
+    <select id="queryCashAmount" resultType="double">
+        SELECT
+            SUM(CASH_AMOUNT)
+        FROM
+        T_Data_Truck
+        WHERE
+        DELETE_FLAG = 0
+    </select>
+
+</mapper>

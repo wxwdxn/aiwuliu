@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.DicdataDaoMapper">
+
+    <resultMap id="T_Sys_Dicdata" type="com.cn.gazelle.logistics.pojo.T_Sys_Dicdata">
+        <id column="DICDATA_ID" property="dicdata_id"/>
+        <result column="DICTIONARY_TYPE" property="dictionary_type"/>
+        <result column="DICTIONARY_ID" property="dictionary_id"/>
+        <result column="DICDATA_NAME" property="dicdata_name"/>
+        <result column="DICDATA_CODE" property="dicdata_code"/>
+        <result column="DICDATA_DATE" property="dicdata_date"/>
+        <result column="DELETE_STATES" property="delete_states"/>
+        <result column="DICDATA_REMARK" property="dicdata_remark"/>
+    </resultMap>
+
+    <!--根据ID查询字典数据信息-->
+    <select id="findDicdataByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Dicdata">
+        SELECT
+            *
+        FROM
+            T_Sys_Dicdata
+        WHERE
+            DICDATA_ID = #{dicdata_id} AND  DELETE_STATES = '0'
+    </select>
+
+    <!--查询字典数据信息-->
+    <select id="findAllDicdata" resultMap="T_Sys_Dicdata">
+        SELECT
+            *
+        FROM
+            T_Sys_Dicdata
+        WHERE
+            DICTIONARY_ID = #{dictionary_id} AND  DELETE_STATES = '0'
+        ORDER BY
+            DICDATA_CODE
+        limit #{page},#{rows}
+    </select>
+
+    <!--根据字典id查找字典数据信息-->
+    <select id="findDicdataByDictionaryID" resultMap="T_Sys_Dicdata">
+        SELECT
+            *
+        FROM
+            T_Sys_Dicdata
+        WHERE
+            DICTIONARY_ID = #{dictionary_id} AND  DELETE_STATES = '0'
+        ORDER BY
+            DICDATA_CODE
+    </select>
+
+    <!--查询符合条件的字典数据信息-->
+    <select id="findAllDicdataByID" resultMap="T_Sys_Dicdata">
+        SELECT
+            *
+        FROM
+            T_Sys_Dicdata
+        WHERE DICTIONARY_ID = #{dictionary_id} AND DICDATA_CODE LIKE '${dicdata_code}' AND  DELETE_STATES = '0'
+        ORDER BY
+            DICDATA_CODE
+    </select>
+
+    <!--查询符合条件的字典数据信息2-->
+    <select id="findAllDicdataByID2" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Dicdata">
+        SELECT
+            *
+        FROM
+            T_Sys_Dicdata
+        WHERE DICTIONARY_ID = #{dictionary_id} AND DICDATA_NAME = #{dicdata_name} AND  DELETE_STATES = '0'
+    </select>
+
+    <!--根据字典数据名称查找字典数据信息-->
+    <select id="findDicdataByDicdataName" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Dicdata">
+        SELECT
+            *
+        FROM
+            T_Sys_Dicdata
+        WHERE
+            DICDATA_CODE LIKE "${dicdata_code}" AND DICTIONARY_ID=#{dictionary_id} AND DICDATA_NAME = #{dicdata_name} AND  DELETE_STATES='0'
+    </select>
+
+    <!--根据字典编码查询字典数据信息-->
+    <select id="findAllDicdataByCode" resultMap="T_Sys_Dicdata">
+        SELECT
+            *
+        FROM
+            T_Sys_Dicdata
+        WHERE
+        DICDATA_CODE LIKE "${dicdata_code}" AND DICTIONARY_ID=#{dictionary_id} AND  DELETE_STATES='0'
+        ORDER BY
+        DICDATA_CODE
+    </select>
+
+    <!--查询符合条件的字典数据总记录数-->
+    <select id="findAllDicdataSearchCount" parameterType="String" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_Dicdata
+        WHERE
+            DICTIONARY_ID=#{dictionary_id} AND  DELETE_STATES='0'
+    </select>
+
+    <!--保存字典数据信息-->
+    <insert id="saveDicdata" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Dicdata">
+        INSERT INTO
+                T_Sys_Dicdata (DICDATA_ID,
+                DICTIONARY_TYPE,
+                DICTIONARY_ID,
+                DICDATA_NAME,
+                DICDATA_CODE,
+                DICDATA_DATE,
+                DELETE_STATES,
+                DICDATA_REMARK)
+        SELECT
+                #{dicdata_id},
+                #{dictionary_type},
+                #{dictionary_id},
+                #{dicdata_name},
+                #{dicdata_code},
+                #{dicdata_date},
+                '0',
+                #{dicdata_remark}
+                FROM dual WHERE NOT EXISTS(SELECT DICTIONARY_ID FROM T_Sys_Dicdata WHERE DICTIONARY_ID = #{dicdata_id} AND DICDATA_NAME = #{dicdata_name} AND DICDATA_CODE = #{dicdata_code} AND DELETE_STATES = '0')
+
+    </insert>
+
+    <!--更新用户数据信息-->
+    <update id="updateDicdata" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Dicdata">
+        UPDATE
+            T_Sys_Dicdata
+        SET
+            DICTIONARY_TYPE = #{dictionary_type},
+            DICTIONARY_ID = #{dictionary_id},
+            DICDATA_NAME = #{dicdata_name},
+            DICDATA_CODE = #{dicdata_code},
+            DICDATA_REMARK = #{dicdata_remark}
+        WHERE
+            DICDATA_ID = #{dicdata_id} AND  DELETE_STATES='0'
+    </update>
+
+    <!--删除字典数据信息-->
+    <delete id="delDicdata" parameterType="String">
+        UPDATE
+            T_Sys_Dicdata
+        SET
+            DELETE_STATES='1'
+        WHERE
+            DICDATA_ID = #{dicdata_id} AND DELETE_STATES =  '0'
+    </delete>
+
+    <!--根据字典编码查询字典数据信息(车辆长度排序)-->
+    <select id="findAllDicdataTruckTypeLengthByCode" resultMap="T_Sys_Dicdata">
+        SELECT
+        *
+        FROM
+        T_Sys_Dicdata
+        WHERE
+        DICDATA_CODE LIKE "${dicdata_code}" AND DICTIONARY_ID=#{dictionary_id} AND  DELETE_STATES='0'
+        ORDER BY
+        DICDATA_CODE * 10
+    </select>
+
+    <!--查询字典数据信息-->
+    <select id="findDicdataList" resultMap="T_Sys_Dicdata">
+        SELECT
+        *
+        FROM
+        T_Sys_Dicdata
+        WHERE
+        DICTIONARY_ID = #{dictionary_id} AND  DELETE_STATES = '0'
+        ORDER BY
+        DICDATA_CODE
+    </select>
+</mapper>

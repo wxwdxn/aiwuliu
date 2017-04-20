@@ -1,0 +1,157 @@
+$(function(){
+	// 加载当前页面菜单
+	$(".leftMenu").load("/iwuliu/welcomeManager/home",function(){
+		$(".operationPlanManager").parents(".collapse").addClass("in");
+		$(".operationPlanManager").addClass("menuActive")
+	});
+
+})
+
+// 格式化“订单号”列
+function codeFormatter(value, row){
+	return '<a href="#transportationPlanTable2"  onclick="queryCode(this.parentElement.parentElement)">' +
+			'<span style="color: #FF0000" >'+value+'</span></a>';
+}
+// 点击“编号”
+function queryCode(value){
+	var _value = $(value).find(".htID").text();
+
+	$('#transportationPlanTable2').bootstrapTable('refresh',{'url':'/iwuliu/transportationOrderManager/transportationOrderListBelongNotNull?schedule_plan_number='+_value});
+}
+
+// table表格隔行变色
+function rowStyle(row, index) {
+	if (index % 2 === 0) {
+		return{};
+	}
+	return {
+		css: {"background-color": "#eefff9"}
+	};
+}
+
+//获取干线信息
+var _strValue = '';
+$.ajax({
+	type:'post',
+	url:'/iwuliu/operateMainLineManager/operateMainLines',
+	dataType:'json',
+	cache:'false',
+	success:function(data){
+
+		for (var i= 0;i<data.length;i++){
+			_strValue+="<li value="+ data[i].id +"><a href='javascript:;'>"+ data[i].name +"</a></li>"
+		}
+		$(".mainLine").find(".dropdown-menu").html(_strValue);
+		var mainLine = new customDropDown($(".mainLine"));
+	},
+	error:function(){
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+	}
+});
+
+//获取计划状态
+var Status = '';
+$.ajax({
+	type:'post',
+	url:'/iwuliu/dictionaryManager/orderJson',
+	dataType:'json',
+	cache:'false',
+	success:function(data){
+
+		for (var i= 0;i<data.length;i++){
+			Status+="<li value="+ data[i].id +"><a href='javascript:;'>"+ data[i].name +"</a></li>"
+		}
+		$(".planStatus").find(".dropdown-menu").html(Status);
+		var _strStatus = new customDropDown($(".planStatus"));
+	},
+	error:function(){
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+	}
+});
+//点击查询
+function  searchPlan(){
+	$('#transportationContractTable').bootstrapTable('refresh',{'url':'/iwuliu/transportationOrderManager/findPlanByConditions'});
+}
+//配置参数
+function transportationContractParams(params) {
+	var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+		pageSize: params.limit,   //页面大小
+		pageNumber: params.pageNumber,  //页码
+		code: $("#code").val(),
+		lineId:$(".mainLine").find(".placeHolder").attr("value"),
+		status:$(".planStatus").find(".placeHolder").attr("value"),
+		sort: params.sort,  //排序列名
+		sortOrder: params.order//排位命令（desc，asc）
+	};
+	return temp;
+}
+//重置
+function resetPlan(){
+	//重置
+	$("#code").val("");
+	$(".infoConditions").find(".placeHolder").attr("value");
+	$(".mainLine").find(".placeHolder").html("请选择");
+	$(".planStatus").find(".placeHolder").html("请选择");
+	$(".infoConditions").find(".placeHolder").removeAttr("value");
+	$(".infoConditions").find(".mainLine").find(".dropdown-menu").html(_strValue);
+	$(".infoConditions").find(".planStatus").find(".dropdown-menu").html(Status);
+	var _strValue = new customDropDown($(".mainLine"));
+	var Status = new customDropDown($(".planStatus"));
+	$('#transportationContractTable').bootstrapTable('removeAll');
+	$('#transportationPlanTable2').bootstrapTable('removeAll');
+}
+
+
+
+
+//goBtn按钮无数据时隐藏
+var webservice = $('#transportationContractTable').attr("data-url");
+$.ajax({
+	url:webservice,
+	success:function(data){
+		if(data.length == 0){
+			$(".form-inline").css("display","none");
+		}
+	}
+});
+var webservice2 = $('#transportationPlanTable2').attr("data-url");
+$.ajax({
+	url:webservice2,
+	success:function(data){
+		if(data.length == 0){
+			$(".form-inline").css("display","none");
+		}
+	}
+});
+
+$(function() {
+	var table = $('#transportationContractTable'),
+			page = $('#transportationContractTablepage'),
+			goBtn = $('#transportationContractTablegoBtn');
+	// 跳转到某页
+	goBtn.click(function () {
+		table.bootstrapTable('selectPage', +page.val());
+	});
+	var table2 = $('#transportationPlanTable2'),
+			page2 = $('#transportationPlanTablepage2'),
+			goBtn2 = $('#transportationPlanTablegoBtn2');
+	// 跳转到某页
+	goBtn2.click(function () {
+		table2.bootstrapTable('selectPage', +page2.val());
+	});
+	// 导出
+	$('#toolbar').find('select').change(function() {
+		table.bootstrapTable('refreshOptions', {
+			exportDataType: $(this).val()
+		});
+	});
+
+});

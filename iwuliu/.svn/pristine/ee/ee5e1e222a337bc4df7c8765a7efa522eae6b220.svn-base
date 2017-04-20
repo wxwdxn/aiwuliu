@@ -1,0 +1,79 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：T_Data_Transaction_Info.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2017-01-07
+ * 作    者: zf
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.pojo;
+
+/**
+ * 类 名 称：T_Data_Transaction_Info
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ *          01 
+ *          02
+ *@author zf
+ */
+public class T_Data_Transaction_Info {
+   private String account_type;       //账户类型
+    private String account_name;      //账户名
+    private String car_num;           //车牌号
+    private String person_name;       //个人姓名
+    private String account_money;     //余额
+    private String phone_num;         //手机号
+
+    public String getAccount_type() {
+        return account_type;
+    }
+
+    public void setAccount_type(String account_type) {
+        this.account_type = account_type;
+    }
+
+    public String getAccount_name() {
+        return account_name;
+    }
+
+    public void setAccount_name(String account_name) {
+        this.account_name = account_name;
+    }
+
+    public String getCar_num() {
+        return car_num;
+    }
+
+    public void setCar_num(String car_num) {
+        this.car_num = car_num;
+    }
+
+    public String getPerson_name() {
+        return person_name;
+    }
+
+    public void setPerson_name(String person_name) {
+        this.person_name = person_name;
+    }
+
+    public String getAccount_money() {
+        return account_money;
+    }
+
+    public void setAccount_money(String account_money) {
+        this.account_money = account_money;
+    }
+
+    public String getPhone_num() {
+        return phone_num;
+    }
+
+    public void setPhone_num(String phone_num) {
+        this.phone_num = phone_num;
+    }
+}
+

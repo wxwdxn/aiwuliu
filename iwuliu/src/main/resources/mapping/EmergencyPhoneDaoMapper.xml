@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.EmergencyPhoneDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Emergency_Telephone" type="com.cn.gazelle.logistics.pojo.T_Data_Emergency_Telephone">
+
+        <id column="EMERGENCY_TELEPHONE_ID" property="emergency_telephone_id"/>
+        <result column="EMERGENCY_TELEPHONE_TYPE" property="emergency_telephone_type"/>
+        <result column="PROVINCE_ID" property="province_id"/>
+        <result column="CITY_ID" property="city_id"/>
+        <result column="TELEPHONE" property="telephone"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据ID查找紧急电话信息-->
+    <select id="findEmergencyPhoneByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Emergency_Telephone">
+        SELECT
+            *
+        FROM
+            T_Data_Emergency_Telephone
+        WHERE
+            EMERGENCY_TELEPHONE_ID = #{emergency_telephone_id} AND DELETE_FLAG = '0'
+    </select>
+
+    <!--根据紧急电话类型查找信息-->
+    <select id="findEmergencyPhoneByType" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Emergency_Telephone">
+        SELECT
+            *
+        FROM
+            T_Data_Emergency_Telephone
+        WHERE
+            EMERGENCY_TELEPHONE_TYPE = #{emergency_telephone_type} AND DELETE_FLAG = '0'
+    </select>
+
+     <!--根据紧急电话类型查找信息-->
+    <select id="findAllEmergencyPhone"  resultMap="T_Data_Emergency_Telephone">
+        SELECT
+            *
+        FROM
+            T_Data_Emergency_Telephone
+        WHERE
+             DELETE_FLAG = '0'
+        <if test="emergency_telephone_type !='' ">
+            AND EMERGENCY_TELEPHONE_TYPE LIKE '%${emergency_telephone_type}%'
+        </if>
+        limit #{page},#{rows}
+
+    </select>
+
+    <!--查找符合条件的紧急电话总记录数-->
+    <select id="findAllEmergencyPhoneSearchCount" parameterType="String" resultType="int">
+         SELECT
+            COUNT(*)
+        FROM
+            T_Data_Emergency_Telephone
+        WHERE
+            EMERGENCY_TELEPHONE_TYPE LIKE '%${emergency_telephone_type}%' AND DELETE_FLAG = '0'
+    </select>
+
+    <!--保存紧急电话信息-->
+    <insert id="saveEmergencyPhone" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Emergency_Telephone">
+        INSERT INTO
+        T_Data_Emergency_Telephone (EMERGENCY_TELEPHONE_ID,
+        EMERGENCY_TELEPHONE_TYPE,
+        PROVINCE_ID,
+        CITY_ID,
+        TELEPHONE,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        )
+        VALUES (
+        #{emergency_telephone_id},
+        #{emergency_telephone_type},
+        #{province_id},
+        #{city_id},
+        #{telephone},
+        '0',
+        #{last_update},
+        #{last_update_user_id});
+    </insert>
+
+
+    <!--更新紧急电话信息-->
+    <update id="updateEmergencyPhone" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Emergency_Telephone">
+        UPDATE
+        T_Data_Emergency_Telephone
+        SET
+        EMERGENCY_TELEPHONE_TYPE = #{emergency_telephone_type},
+        PROVINCE_ID = #{province_id},
+        CITY_ID = #{city_id},
+        TELEPHONE = #{telephone},
+        DELETE_FLAG ='0',
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+        EMERGENCY_TELEPHONE_ID = #{emergency_telephone_id}
+    </update>
+
+    <!-- 删除紧急电话信息 -->
+    <delete id="delEmergencyPhone" parameterType="String">
+        UPDATE
+        T_Data_Emergency_Telephone
+        SET
+        DELETE_FLAG = '1'
+        WHERE
+        EMERGENCY_TELEPHONE_ID = #{emergency_telephone_id}
+    </delete>
+
+
+
+
+</mapper>

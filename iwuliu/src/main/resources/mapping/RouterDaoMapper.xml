@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.RouterDaoMapper">
+
+    <!--根据条件查找线路列表-->
+    <select id="findRouterList" resultType="com.cn.gazelle.logistics.pojo.T_Data_Router">
+        SELECT
+        *
+        FROM
+        (SELECT
+        oml.`OPERATE_MAIN_LINE_NAME` AS operate_main_line_name,
+        dds.`DICDATA_NAME` AS start_city,
+        ddf.`DICDATA_NAME` AS finish_city,
+        sli.`LINE_ID` AS line_id,
+        sli.`LINE_NO` AS line_no,
+        sli.`AVERAGE_GAS_CONSUMPTION` AS average_gas_consumption,
+        sli.`AVERAGE_DIESEL_FUEL_CONSUMPTION` AS average_diesel_fuel_consumption,
+        sli.`AVERAGE_HIGHWAY_TOLLS` AS average_highway_tolls,
+        sli.`AVERAGE_NATIONAL_ROAD_TOLLS` AS average_national_road_tolls,
+        sli.`AVERAGE_NATIONAL_ROAD_FINE` AS average_national_road_fine
+        FROM
+        t_master_operate_main_line oml
+        LEFT JOIN
+        t_master_sub_line_info sli ON oml.`OPERATE_MAIN_LINE_ID`=sli.`OPERATE_MAIN_LINE_ID` AND sli.`DELETE_FLAG`=0
+        LEFT JOIN
+        t_sys_dicdata dds ON dds.`DICTIONARY_ID`='66029BA5DC964A15B29852FA077327C0' AND dds.`DICDATA_CODE`=oml.`START_CITY_ID` AND dds.`DELETE_STATES`=0
+        LEFT JOIN
+        t_sys_dicdata ddf ON ddf.`DICTIONARY_ID`='66029BA5DC964A15B29852FA077327C0' AND ddf.`DICDATA_CODE`=oml.`FINISH_CITY_ID` AND ddf.`DELETE_STATES`=0
+        WHERE
+        oml.`DELETE_FLAG`=0
+        ORDER BY sli.LAST_UPDATE DESC) AS Router
+        WHERE
+        Router.`operate_main_line_name` != ""
+        <if test="start_city != null and start_city != ''">
+            AND Router.`START_CITY` LIKE '%${start_city}%'
+        </if>
+        <if test="finish_city != null and finish_city != ''">
+            AND Router.`FINISH_CITY` LIKE '%${finish_city}%'
+        </if>
+        <if test="line_no != null and line_no != ''">
+            AND Router.`LINE_NO` LIKE '%${line_no}%'
+        </if>
+        <if test="line_id != null and line_id != ''">
+            AND Router.`LINE_ID` LIKE '%${line_id}%'
+        </if>
+    </select>
+
+    <!--运营干线ID查询干线、线路、节点信息-->
+    <select id="findRouterDetailList" resultType="com.cn.gazelle.logistics.pojo.T_Data_Router_Detail">
+        SELECT
+        oml.`OPERATE_MAIN_LINE_ID` AS operate_main_line_id,
+        oml.`START_PROVINCE_ID` AS start_province_id,
+        oml.`START_CITY_ID` AS start_city_id,
+        oml.`FINISH_PROVINCE_ID` AS finish_province_id,
+        oml.`FINISH_CITY_ID` AS finish_city_id,
+        d.`DICDATA_NAME` AS start_province_name,
+        dd.`DICDATA_NAME` AS start_city_name,
+        ddd.`DICDATA_NAME` AS finish_province_name,
+        dddd.`DICDATA_NAME` AS finish_city_name,
+        sli.`LINE_ID` AS sub_line_info_id,
+        sli.`REMARK` AS sub_line_info_name,
+        sld.`LINE_ID` AS sub_line_detail_id,
+        sld.`NODE_NO` AS node_no,
+        sld.`NODE_NAME` AS node_name,
+        sld.`LONGITUDE` AS longitude,
+        sld.`LATITUDE` AS latitude
+        FROM
+        `t_master_operate_main_line` oml
+        LEFT JOIN
+        `t_sys_dicdata` d ON d.`DICTIONARY_ID`='2EE02FDAE3BE4F06B8CFDF4425BA74BF' AND d.`DICDATA_CODE`=oml.`START_PROVINCE_ID` AND d.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` dd ON dd.`DICTIONARY_ID`='66029BA5DC964A15B29852FA077327C0' AND dd.`DICDATA_CODE`=oml.`START_CITY_ID` AND dd.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` ddd ON ddd.`DICTIONARY_ID`='2EE02FDAE3BE4F06B8CFDF4425BA74BF' AND ddd.`DICDATA_CODE`=oml.`FINISH_PROVINCE_ID` AND ddd.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_sys_dicdata` dddd ON dddd.`DICTIONARY_ID`='66029BA5DC964A15B29852FA077327C0' AND dddd.`DICDATA_CODE`=oml.`FINISH_CITY_ID` AND dddd.`DELETE_STATES`=0
+        LEFT JOIN
+        `t_master_sub_line_info` sli ON sli.`OPERATE_MAIN_LINE_ID`=oml.`OPERATE_MAIN_LINE_ID` AND sli.`DELETE_FLAG`=0
+        LEFT JOIN
+        `t_master_sub_line_detail` sld ON sld.`MAIN_LINE_INFO_ID`=sli.`LINE_ID` AND sld.`DELETE_FLAG`=0
+        WHERE
+        oml.`DELETE_FLAG`=0 AND oml.`OPERATE_MAIN_LINE_ID`=#{operate_main_line_id}
+    </select>
+</mapper>

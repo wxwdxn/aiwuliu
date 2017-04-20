@@ -1,0 +1,345 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：OBDequipmentServiceImpl.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2016-08-22
+ * 作    者: WXW
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.service.impl;
+
+import com.cn.gazelle.logistics.dao.OBDEquipmentTruckBindingDaoMapper;
+import com.cn.gazelle.logistics.dao.OBDequipmentDaoMapper;
+import com.cn.gazelle.logistics.dao.TruckDaoMapper;
+import com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment;
+import com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment_Truck_Binding;
+import com.cn.gazelle.logistics.pojo.T_Data_Truck;
+import com.cn.gazelle.logistics.service.OBDequipmentService;
+import com.cn.gazelle.logistics.util.DateUtil;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.UUIDUtil;
+import com.cn.gazelle.logistics.util.message.base.MessageUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.jws.WebService;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 类 名 称：OBDequipmentServiceImpl
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ * 01
+ * 02
+ *
+ * @authot WXW
+ */
+@Service
+@WebService(endpointInterface = "com.cn.gazelle.logistics.service.OBDequipmentService", targetNamespace = "http://service.logistics.gazelle.cn.com/")
+public class OBDequipmentServiceImpl implements OBDequipmentService {
+
+    Logger logger = Logger.getLogger(OBDequipmentServiceImpl.class);
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    @Resource
+    private OBDequipmentDaoMapper obDequipmentDaoMapper;
+    @Resource
+    private TruckDaoMapper truckDaoMapper;
+    @Resource
+    private OBDEquipmentTruckBindingDaoMapper obdEquipmentTruckBindingDaoMapper;
+
+    /**
+     * 方法名称：saveOBDEquipment
+     * 内容摘要：添加obd设备
+     *
+     * @param obdEquipment 设备信息
+     * @return int
+     */
+    public int saveOBDEquipment(T_Data_OBD_Equipment obdEquipment) {
+        int i = 0;
+        try {
+            i = obDequipmentDaoMapper.saveOBDEquipment(obdEquipment);
+            if (i == 1) {
+                logger.info(MessageUtil.saveInfo);
+            } else if (i == 0) {
+                logger.info(MessageUtil.saveInfoError);
+            }
+        } catch (Exception e) {
+            i = -1;
+            logger.error(MessageUtil.saveInfoError + e.getMessage());
+        }
+        return i;
+    }
+
+    /**
+     * 方法名称：delOBDTruckBindingInfo
+     * 内容摘要：删除设备
+     *
+     * @param equipment_id 设备id
+     */
+    public void OBDInfoDel(String equipment_id) {
+        try {
+            obDequipmentDaoMapper.OBDInfoDel(equipment_id);
+            logger.info(MessageUtil.delInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.delInfoError + e.getMessage());
+        }
+    }
+
+    /**
+     * 方法名称：updateOBDInfo
+     * 内容摘要：更新OBD设备卡车绑定信息
+     *
+     * @param obdEquipment 设备信息
+     * @return boolean
+     */
+    public boolean updateOBDInfo(T_Data_OBD_Equipment obdEquipment) {
+        boolean b = new Boolean(true);
+        try {
+            obDequipmentDaoMapper.updateOBDInfo(obdEquipment);
+        } catch (Exception e) {
+            b = false;
+            logger.error(e.getMessage());
+        }
+        return b;
+    }
+
+    /**
+     * 方法名称：findById
+     * 内容摘要：根据设备id查询
+     *
+     * @param equipment_id 设备id
+     * @return boolean
+     */
+    public T_Data_OBD_Equipment findById(String equipment_id) {
+        T_Data_OBD_Equipment equipment = null;
+        try {
+            equipment = obDequipmentDaoMapper.findById(equipment_id);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError);
+        }
+        return equipment;
+    }
+
+    /**
+     * 方法名称：findByObdId
+     * 内容摘要：根据obdid获取
+     *
+     * @param obd_id
+     * @return T_Data_OBD_Equipment 设备信息
+     */
+    public T_Data_OBD_Equipment findByObdId(String obd_id) {
+        T_Data_OBD_Equipment equipment = null;
+        try {
+            equipment = obDequipmentDaoMapper.findByObdId(obd_id);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError);
+        }
+        return equipment;
+    }
+
+    /**
+     * 方法名称：findAllOBDList
+     * 内容摘要：查询不分页
+     *
+     * @return List<T_Data_OBD_Equipment>
+     */
+    public List<T_Data_OBD_Equipment> findAllOBDList() {
+        List<T_Data_OBD_Equipment> allOBDList = null;
+        try {
+            allOBDList = obDequipmentDaoMapper.findAllOBDList();
+        } catch (Exception e) {
+            logger.error(e.getMessage() + MessageUtil.seacheInfoError);
+        }
+        return allOBDList;
+    }
+
+    /**
+     * 方法名称：saveEquipmentInfo
+     * 内容摘要：新增设备信息
+     *
+     * @return int
+     */
+    @Transactional
+    public int saveEquipmentInfo(String info, String userName) {
+        Gson gson = new Gson();
+        Map<String, String> data = gson.fromJson(info, new TypeToken<Map<String, String>>() {
+        }.getType());
+        logger.info("data=" + JSONUtil.toJSONString(data));
+        T_Data_OBD_Equipment obdEquipment = new T_Data_OBD_Equipment();
+        T_Data_OBD_Equipment_Truck_Binding obdEquipmentTruckBinding = new T_Data_OBD_Equipment_Truck_Binding();
+        T_Data_Truck truck = null;
+        int count_obDequipment = 0;
+        int count_obDequipmentBinding = 0;
+        int flag = 0;
+        truck = this.truckDaoMapper.findTruckByPlateNumber(data.get("plate_number"));
+        // 判断输入的车牌号是否存在
+        if (truck != null) {
+            // 判断该车牌号是否绑定过obd设备
+            if (this.obdEquipmentTruckBindingDaoMapper.findOBDTruckBindingInfoByTruckID(truck.getTruck_id()) != null) {
+                flag = 3; // 该车已绑定obd设备
+            } else {
+                try {
+                    // 判断obd_id是否绑定车牌
+                    T_Data_OBD_Equipment equipment = this.obDequipmentDaoMapper.findByObdId(data.get("obd_id"));
+                    if (equipment!=null){
+                        List<T_Data_OBD_Equipment_Truck_Binding> bindingList =
+                                this.obdEquipmentTruckBindingDaoMapper.findByEquipmentId(equipment.getEquipment_id());
+                        for (T_Data_OBD_Equipment_Truck_Binding binding : bindingList) {
+                            if (binding.getUnbinding_time() == null||binding.getUnbinding_time().equals("")) {
+                                flag = 4; // obd已绑定车辆
+                                throw new RuntimeException(flag + "");
+                            }
+                        }
+                    }
+                    // 保存到OBD设备信息表
+                    obdEquipment.setEquipment_id(UUIDUtil.getUUID());
+                    obdEquipment.setBrand_id(data.get("obd_brand"));
+                    obdEquipment.setObd_id(data.get("obd_id"));
+                    obdEquipment.setEquipment_phone_number(data.get("equipment_phone_number"));
+                    obdEquipment.setRegister_time(sdf.parse(data.get("register_time")));
+                    obdEquipment.setDelete_flag("0");
+                    obdEquipment.setLast_update(DateUtil.getDate());
+                    obdEquipment.setLast_update_user_id("U:" + userName);
+                    count_obDequipment = this.obDequipmentDaoMapper.saveOBDEquipment(obdEquipment);
+                    // 保存到obd设备卡车绑定信息表
+                    if (count_obDequipment == 0){
+                        obdEquipmentTruckBinding.setEquipment_id(equipment.getEquipment_id());
+                    }else {
+                        obdEquipmentTruckBinding.setEquipment_id(obdEquipment.getEquipment_id());
+                    }
+                    obdEquipmentTruckBinding.setTruck_id(truck.getTruck_id());
+                    obdEquipmentTruckBinding.setBinding_time(DateUtil.getDate());
+                    obdEquipmentTruckBinding.setDelete_flag("0");
+                    obdEquipmentTruckBinding.setLast_update(DateUtil.getDate());
+                    obdEquipmentTruckBinding.setLast_update_user_id("U:" + userName);
+                    count_obDequipmentBinding = this.obdEquipmentTruckBindingDaoMapper.saveOBDTruckBindingInfo(obdEquipmentTruckBinding);
+                } catch (Exception e) {
+                    if(e.getMessage().equals("4")){
+                        flag = 4; // obd已绑定车辆，请选择其他obd
+                    } else {
+                        flag = -1; // sql异常
+                    }
+                    throw new RuntimeException(flag + "");
+                }
+                if (count_obDequipment == 1 && count_obDequipmentBinding == 1) {
+                    flag = 1; // 两条数据都插入成功
+                } else {
+                    flag = 0; // obd设备信息已存在，绑定信息保存成功（主要是解绑信息的干扰）
+                }
+            }
+        } else {
+            flag = 2; // 车牌号不存在
+        }
+        return flag;
+    }
+
+    /**
+     * 方法名称：delEquipmentInfo
+     * 内容摘要：web页面删除obd设备车辆信息
+     *
+     * @return int
+     */
+    @Transactional
+    public int delEquipmentInfo(String binding_number) {
+        int flag = 0;
+        T_Data_OBD_Equipment_Truck_Binding obdEquipmentTruckBinding = null;
+        List<T_Data_OBD_Equipment_Truck_Binding> obdEquipmentTruckBindingList = null;
+        T_Data_OBD_Equipment obdEquipment = null;
+        String equipment_id = null; // 设备id
+        String bindingNumber[] = binding_number.split(",");
+        try {
+            for (int i = 0; i < bindingNumber.length; i++){
+                // OBD设备卡车绑定信息表中的信息
+                obdEquipmentTruckBinding = this.obdEquipmentTruckBindingDaoMapper.findByBindingNumber(bindingNumber[i]);
+                equipment_id = obdEquipmentTruckBinding.getEquipment_id();
+                // 通过equipment_id查找 OBD设备卡车绑定信息
+                obdEquipmentTruckBindingList = this.obdEquipmentTruckBindingDaoMapper.findByEquipmentId(equipment_id);
+                // 判断obd设备是否没有历史解绑信息
+                if (obdEquipmentTruckBindingList.size() == 1) {
+                    // 删除OBD设备信息表
+                    this.obDequipmentDaoMapper.OBDInfoDel(equipment_id);
+                }
+                // 根据binding_number删除OBD设备卡车绑定信息表中的信息
+                this.obdEquipmentTruckBindingDaoMapper.delOBDTruckBindingInfo(bindingNumber[i]);
+                flag = 1; // 删除成功
+            }
+
+        } catch (Exception e) {
+            flag = -1;
+            logger.error(e.getMessage() + MessageUtil.delInfoError);
+            throw new RuntimeException(flag + "");
+        }
+        return flag;
+    }
+
+    /**
+     * 方法名称：editEquipmentInfo
+     * 内容摘要：编辑设备信息
+     *
+     * @return int
+     */
+    @Transactional
+    public int editEquipmentInfo(String binding_number, String info, String username) {
+        int flag = 0;
+        Gson gson = new Gson();
+        Map<String, String> data = gson.fromJson(info, new TypeToken<Map<String, String>>() {
+        }.getType());
+        T_Data_OBD_Equipment_Truck_Binding obdEquipmentTruckBinding = null;
+        T_Data_OBD_Equipment obdEquipment = null;
+        try {
+            obdEquipmentTruckBinding = this.obdEquipmentTruckBindingDaoMapper.findByBindingNumber(binding_number);
+            if (obdEquipmentTruckBinding != null) {
+                obdEquipment = this.obDequipmentDaoMapper.findById(obdEquipmentTruckBinding.getEquipment_id());
+                if (obdEquipment != null) {
+                    if (this.obDequipmentDaoMapper.findByObdId(data.get("obd_id")) != null) {
+                        // 判断设备id是否未作修改
+                        if (data.get("obd_id").equals(obdEquipment.getObd_id())){
+                            obdEquipment.setBrand_id(data.get("obd_brand"));
+                            obdEquipment.setObd_id(data.get("obd_id"));
+                            obdEquipment.setEquipment_phone_number(data.get("equipment_phone_number"));
+                            obdEquipment.setRegister_time(sdf.parse(data.get("register_time")));
+                            obdEquipment.setLast_update(DateUtil.getDate());
+                            obdEquipment.setLast_update_user_id("U:" + username);
+                            this.obDequipmentDaoMapper.updateOBDInfo(obdEquipment);
+                        } else {
+                            flag = 2; // 设备编号已存在
+                            throw new RuntimeException(flag + "");
+                        }
+                    } else {
+                        obdEquipment.setBrand_id(data.get("obd_brand"));
+                        obdEquipment.setObd_id(data.get("obd_id"));
+                        obdEquipment.setEquipment_phone_number(data.get("equipment_phone_number"));
+                        obdEquipment.setRegister_time(sdf.parse(data.get("register_time")));
+                        obdEquipment.setLast_update(DateUtil.getDate());
+                        obdEquipment.setLast_update_user_id("U:" + username);
+                        this.obDequipmentDaoMapper.updateOBDInfo(obdEquipment);
+                    }
+                }
+            }
+            flag = 1;
+        } catch (Exception e) {
+            if (Integer.parseInt(e.getMessage()) == 2) {
+                flag = 2;
+            } else {
+                flag = -1;
+            }
+            logger.error(e.getMessage());
+            throw new RuntimeException(flag + "");
+        }
+        return flag;
+    }
+}

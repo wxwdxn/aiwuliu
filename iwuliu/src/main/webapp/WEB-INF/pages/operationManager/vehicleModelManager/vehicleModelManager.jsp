@@ -1,0 +1,263 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <title></title>
+</head>
+<link rel="stylesheet" type="text/css"
+      href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap.min.css"/>
+<%--Bootstrap-table CSS文件--%>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-table.min.css">
+<%--Bootstrap-Datetimepicker CSS文件--%>
+<link rel="stylesheet"
+      href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/css/common.css"/>
+<link rel="stylesheet" type="text/css"
+      href="<%=request.getContextPath()%>/static/operationManager/vehicleModelManager/css/vehicleModelManager.css"/>
+<script src="<%=request.getContextPath()%>/static/common/js/jquery-1.11.0.js" type="text/javascript"
+        charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap.min.js" type="text/javascript"
+        charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/operationManager/vehicleModelManager/js/vehicleModelManager.js"
+        type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/js/common.js" type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/js/commonNav.js" type="text/javascript" charset="utf-8"></script>
+<!--[if lt IE 9]>
+<script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+<script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<body>
+<!--*********导航条开始***********-->
+<nav class="navbar navbar-default" role="navigation">
+</nav>
+<!--*********导航条结束***********-->
+<div class="container-fluid eleHeight">
+    <div class="row eleHeight">
+        <div class="col-md-2 leftMenu eleHeight"></div>
+
+        <div class="iframeMain">
+            <h4>
+                车辆型号管理
+            </h4>
+
+            <div class="infoConditions">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label>车辆品牌：</label>
+
+                        <div class="display_inlineBlcok vehicleModelManager_truckBrand">
+                            <button class="btn form-control btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">全部</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu"></ul>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="QuerytheReset form-group">
+                        <div class="display_inlineBlcok">
+                            <a type="button" class="btn query" onclick="vehicleModelManagerQuery();">匹配车辆型号</a>
+                            <a type="button" class="btn reset" onclick="vehicleModelManagerQueryReset();">重置</a>
+                        </div>
+                    </div>
+                </form>
+                <div class="buttons">
+                    <a type="button" class="btn btn_export">
+                        导出
+                    </a>
+                    <a type="button" class="btn btn_detail" onclick="btn_ModalDetail()">
+                        详情/编辑
+                    </a>
+                    <a type="button" class="btn" onclick="btn_ModalNewAdd()">
+                        新增车辆型号
+                    </a>
+                    <a type="button" class="btn" onclick="vehicleModelDel()">
+                        删除
+                    </a>
+                </div>
+                <div class="col-md-12">
+                    <table data-toggle="table" class="table table-striped table-bordered table-hover"
+                           id="vehicleModelManagerTable"
+                           data-query-params="vehicleModelManagerQueryParams"
+                           data-query-params-type="limit"
+                           data-pagination="true"
+                           data-pagination-first-text="首页"
+                           data-pagination-pre-text="上一页"
+                           data-pagination-next-text="下一页"
+                           data-pagination-last-text="末页"
+                           data-row-style="rowStyle"
+                           data-page-list="[10,20,30]"
+                           data-smart-display="false"
+                    >
+                        <thead style="background-color:#dbfff2;">
+                        <tr>
+                            <th data-field="state" data-checkbox="true" data-width="100px"></th>
+                            <th class="hidden" data-field="truck_model_no" data-align="center" data-valign="middle" width="0">
+                                车辆型号编号
+                            </th>
+                            <th class="hidden" data-field="truck_brand_code" data-align="center" data-valign="middle" width="0">
+                                车辆品牌code
+                            </th>
+                            <th data-field="truck_brand_name" data-align="center" data-valign="middle">车辆品牌</th>
+                            <th data-field="truck_model_name" data-align="center" data-valign="middle">车辆型号</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="form-inline" align="center" style="margin: -45px auto 17px;">
+                        <input id="vehicleModelManager_page" class="form-control" style="width: 60px;" type="number" value="1"
+                               min="1">
+                        <button id="vehicleModelManager_goBtn" class="btn btn-success">GO</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal 详情-->
+<div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modalDialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close closeLeft" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">详情</h4>
+                <a type="button" isClick=true class="btn edit" onclick="detail_edit(this)">编辑</a>
+            </div>
+            <div class="modal-body">
+                <h4>
+                    车辆信息
+                </h4>
+
+                <form class="form-inline" id="truckModelEditForm" method="post">
+                    <div class="form-group uneditable">
+                        <label>车辆品牌：</label>
+
+                        <div class="display_inlineBlcok detail_truck_brand">
+                            <button disabled class="btn form-control btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder truck_brand_name">全部</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu ulHeight" aria-labelledby="dropdownMenu1">
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group uneditable">
+                        <label>车辆型号：</label>
+
+                        <div class="display_inlineBlcok uneditable">
+                            <input disabled type="text" class="form-control truck_model_name"/>
+
+                            <p></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer modalFooter">
+                <a type="button" class="btn hold" onclick="truckModelEditSave()">保存</a>
+                <a type="button" class="btn cancel" data-dismiss="modal">取消</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 新增-->
+<div class="modal fade bs-example-modal-lg" id="myNewAddModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modalDialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" >新增车辆类型</h4>
+            </div>
+            <div class="modal-body">
+                <h4>
+                    车辆信息
+                </h4>
+
+                <form id="truckModelNewAddForm" class="form-inline" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>车辆品牌：</label>
+
+                        <div class="display_inlineBlcok add_truckBrand">
+                            <button class="btn form-control btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">请选择</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                            </ul>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>车辆型号：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" name="add_truck_model_name" id="add_truck_model_name"/>
+
+                            <p></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer modalFooter">
+                <a type="button" class="btn hold" id="truckModelNewAddSave" onclick="truckModelNewAddSave()">保存</a>
+                <a type="button" class="btn cancel" data-dismiss="modal">取消</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal 小提示框删除-->
+<div class="modal fade bs-example-modal-sm" id="smallModalInfoDelet" tabindex="-1" role="dialog"
+     aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">提示信息</h4>
+            </div>
+            <div class="modal-body text-center">
+                <h2 class="titleInfoDelet">
+
+                </h2>
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn btn-default confirmDelet" data-dismiss="modal">确定</button>
+                <button type="button" class="btn btn-default cancel" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal 小提示框-->
+<div class="modal fade bs-example-modal-sm" id="smallModalInfo" tabindex="-1" role="dialog"
+     aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">提示信息</h4>
+            </div>
+            <div class="modal-body text-center">
+                <h2 class="titleInfo">
+
+                </h2>
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="<%=request.getContextPath()%>/static/common/js/jquery.form.js" type="text/javascript" charset="utf-8">
+</script>
+<%--Bootstrap-table JavaScript 文件以及汉化文件--%>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table.min.js"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table-zh-CN.js"></script>
+</html>

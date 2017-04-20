@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckModelDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Truck_Model" type="com.cn.gazelle.logistics.pojo.T_Data_Truck_Model">
+
+        <id column="TRUCK_MODEL_NO" property="truck_model_no"/>
+        <result column="TRUCK_BRAND_ID" property="truck_brand_id"/>
+        <result column="TRUCK_MODEL_NAME" property="truck_model_name"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据编号查询卡车型号-->
+    <select id="findTruckModelByNo" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Model">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Model
+        WHERE
+            TRUCK_MODEL_NO = #{truck_model_no} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据车辆品牌ID查询车辆型号列表-->
+    <select id="findTruckModelByBrandId" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Model">
+        SELECT
+        *
+        FROM
+        T_Data_Truck_Model
+        WHERE
+        TRUCK_BRAND_ID=#{truck_brand_id} AND DELETE_FLAG=0
+    </select>
+
+    <!--查询所有的卡车型号列表不分页用于下拉的回显操作-->
+    <select id="findTruckModelLists" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Model">
+        SELECT
+        *
+        FROM
+        T_Data_Truck_Model
+        WHERE
+        DELETE_FLAG=0
+    </select>
+
+    <!--保存卡车型号信息-->
+    <insert id="saveTruckModel" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Model">
+        INSERT INTO
+        T_Data_Truck_Model(TRUCK_MODEL_NO,
+        TRUCK_BRAND_ID,
+        TRUCK_MODEL_NAME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID)
+        VALUES (
+        #{truck_model_no},
+        #{truck_brand_id},
+        #{truck_model_name},
+        0,
+        #{last_update},
+        #{last_update_user_id})
+    </insert>
+
+    <!--更新卡车型号信息-->
+    <update id="updateTruckModel" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Model">
+        UPDATE
+        T_Data_Truck_Model
+        SET
+        TRUCK_BRAND_ID = #{truck_brand_id},
+        TRUCK_MODEL_NAME = #{truck_model_name},
+        DELETE_FLAG = #{delete_flag},
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+        TRUCK_MODEL_NO = #{truck_model_no} AND DELETE_FLAG = 0
+    </update>
+
+    <!--删除卡车型号信息-->
+    <delete id="delTruckModel" parameterType="String">
+        UPDATE
+        T_Data_Truck_Model
+        SET
+        DELETE_FLAG = 1
+        WHERE
+        TRUCK_MODEL_NO = #{truck_model_no} AND DELETE_FLAG = 0
+    </delete>
+</mapper>

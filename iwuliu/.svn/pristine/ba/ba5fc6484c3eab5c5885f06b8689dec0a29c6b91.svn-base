@@ -1,0 +1,52 @@
+.infoConditions .display_inlineBlcok {
+  margin-bottom: 15px;
+}
+.form-inline h3 {
+  margin-bottom: 7px;
+}
+.form-inline .btnIffline {
+  padding-right: 30px;
+}
+.form-inline .btnIffline a {
+  color: #fff;
+  background: #69a2b5;
+  margin-bottom: 15px;
+}
+.btnOffHold a {
+  color: #fff;
+  background: #69a2b5;
+  margin-bottom: 15px;
+  margin: 15px 15px;
+}
+#ModalPwd .form-group {
+  margin-bottom: 0;
+}
+#ModalPwd .form-group label {
+  font-size: 14px;
+  font-size: 1.4rem;
+}
+#ModalPwd .btn_pwdType {
+  padding-bottom: 15px;
+}
+#ModalPwd .btn_pwdType .clickActive {
+  background: #69a2b5;
+  color: #fff;
+}
+#ModalPwd .modalDialog_pwd {
+  width: 380px;
+}
+.modalMap {
+  height: 300px;
+  height: 25rem;
+}
+.formgroupImg_erweima .display_inlineBlcok {
+  width: 200px;
+  height: 200px;
+}
+.formgroupImg_erweima label{
+  vertical-align: top;
+}
+.formgroupImg_erweima .display_inlineBlcok img {
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,558 @@
+
+var goodTypeIdTions=[];//货物类型Id
+var goodTypeNameTions=[];//货物类型Id
+$(function(){
+
+	// 加载当前页面菜单
+	$(".leftMenu").load("/iwuliu/welcomeManager/home",function(){
+		$(".carTypeManager").parents(".collapse").addClass("in");
+		$(".carTypeManager").addClass("menuActive")
+	})
+	//点击详情编辑按钮
+	$(".edit").bind("click",function(){
+		var _matchGoodType = $(".matchGoodType");
+		if(_matchGoodType.length == 1){
+			$(".glyphicon-plus").removeClass("hidden");
+		}else{
+			$(".glyphicon").removeClass("hidden");
+		}
+		//编辑时获取货物类型
+		$.ajax({
+			type: 'post',
+			url: '/iwuliu/goodTypeManager/cargoTypeLists',
+			data:{"truckTypeId":commonCarTypeId},
+			dataType: 'json',
+			cache: 'false',
+			success: function (data) {
+				var goodTypeValue = '';
+				for (var i= 0;i<data.length;i++){
+					goodTypeValue+="<li value="+ data[i].id +"><a href='javascript:;'>"+ data[i].name +"</a></li>"
+				}
+				for (var k = 0;k<$(".matchGoodType").length;k++){
+					$($(".matchGoodType")[k]).find(".placeHolder").val(goodTypeNameTions[k]);
+					$($(".matchGoodType")[k]).find(".placeHolder").attr("value",goodTypeIdTions[k]);
+					//cargoName变成下拉
+					$($(".matchGoodType")[k]).find(".dropdown-menu").html(goodTypeValue);
+					var goodTypeList=new customDropDown($($(".matchGoodType")[k]));
+					$($(".matchGoodType")[k]).find(".dropdown-menu>li>a").bind("click",function(){
+						$($(".matchGoodType")[k]).find(".placeHolder").val($(this).text())
+					})
+				}
+			},
+			error: function () {
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+				});
+				return false;
+			}
+		});
+
+	})
+	//新增模态框消失
+	$("#myNewAddModal").on("hidden.bs.modal",function(){
+		$("#myNewAddModal").find("input").val("");
+		$("#myNewAddModal").find("p").html("");
+		$("#myNewAddModal").find(".placeHolder").html("请选择");
+
+	})
+	//详情模态框消失
+	$("#myModal").on("hidden.bs.modal",function(){
+		$("#myModal").find(".form-group").addClass("uneditable");
+		$("#myModal").find("input").attr("disabled","true");
+		$("#myModal").find(".form-group").find("button").attr("disabled","true");
+		$("#myModal").find(".edit").attr("isClick","true");
+		$("#myModal").find(".edit").removeAttr("disabled");
+		$("#myModal").find(".edit").css("background","#69a2b5");
+		$(".matchGoodType").remove();
+		$("#myModal").find(".modalFooter").addClass("elementDisplayNone")
+	})
+	//新增匹配模态框消失
+	$("#ModalMatch").on("hidden.bs.modal",function(){
+		$("#ModalMatch").find("input").val("");
+		$("#ModalMatch").find("p").html("");
+		$("#ModalMatch").find(".placeHolder").html("请选择");
+		$(".newMatchGoodType").remove()
+	})
+})
+//点击详情按钮
+var _listLength=0;//货物的匹配个数
+var commonCarTypeId;//详情时的车厢类型id
+function btn_ModalDetail(){
+	var selects = $('#carTypeTable').bootstrapTable('getSelections'); //获取表选择的行
+	if (selects.length == 1) {
+		var newSelects = $.parseJSON(JSON.stringify(selects));//将获取的行转化为json对象，注意selects，而不是selects[0]
+		commonCarTypeId= newSelects[0].carTypeId;
+		goodTypeIdTions.length=0;
+		goodTypeNameTions.length=0;
+		$.ajax({
+			type:"post",
+			url:"/iwuliu/goodAndCarMatchManager/getCargoTypeByCarTypeId",
+			data: {"carTypeId": commonCarTypeId},
+			success:function(data){
+				var JsonData =JSON.parse(data);
+				var _append='';
+				$("#carTypeDesc").val(JsonData.carTypeDesc);
+				$("#carType").val(JsonData.carType);
+				$("#userable").val(JsonData.userable);
+				 _listLength = JsonData.list.length;
+				for(var i = 0;i<_listLength ;i++){
+					goodTypeIdTions.push(JsonData.list[i].cargoTypeId);
+					goodTypeNameTions.push(JsonData.list[i].cargoTypeName)
+					var num = i;
+					num++;
+					_append  +='<div class="form-group uneditable matchGoodType">'+
+					'<label>匹配货物类型'+num+':'+'</label>'+
+					'<div class="display_inlineBlcok">'+
+					'<button disabled class="btn form-control btn-default dropdown-toggle goods" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+					'<span class="placeHolder">'+JsonData.list[i].cargoTypeName+'</span>'+
+					'<span class="caret"></span>'+
+					'</button>'+
+					'<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">'+
+					'</ul>'+
+					'<p></p>'+
+					'</div>'+
+					'<span onclick="addcarType(this)" class="glyphicon glyphicon-plus hidden margin-right"></span>'+
+					'<span onclick="removecarType(this)" class="glyphicon glyphicon-minus hidden"></span>'+
+					'</div>'
+				}
+				$("#myModal").find("form").append(_append)
+			}
+		});
+		$("#myModal").modal();
+	} else {
+		//bootstrap提示框
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("请选择一条信息！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		})
+		return false;
+	}
+}
+//点击添加匹配货物类型
+function addcarType(ele){
+	var _parent = $(ele).parents(".matchGoodType");
+	var _matchGoodType = $(".matchGoodType");
+	_parent.after('<div class="form-group matchGoodType">'+ _parent.html() +'</div>');
+	if(_matchGoodType.length>=1){
+		$(".glyphicon").removeClass("hidden");
+	}
+}
+//点击删除匹配货物类型
+function removecarType(ele){
+	var _matchGoodType = $(".matchGoodType");
+	var _parent = $(ele).parents(".matchGoodType");
+	if(_matchGoodType.length == 2){
+		_parent.remove();
+		$(".glyphicon-minus").addClass("hidden");
+	}else{
+		_parent.remove();
+	}
+}
+
+//点击新增按钮
+function btn_ModalNewAdd(){
+	$("#myNewAddModal").modal();
+}
+//保存车厢类型
+function saveAdd(){
+	var plateNumber= $("#plateNumber").val();
+	var plateDesc= $("#plateDesc").val();
+	var _goodTypeInfo = {};
+	_goodTypeInfo["carTypeName"] = plateNumber;
+	_goodTypeInfo["carTypeDesc"] = plateDesc;
+	var  stringObj=JSON.stringify(_goodTypeInfo);
+	if (checkNotNull($("#plateNumber"))){
+		$.ajax({
+			type:"post",
+			url:"/iwuliu/carTypeManager/saveCarType",
+			data:{"list":stringObj},
+			async:true,
+			success:function(data){
+				var obj = eval(data);
+				if(obj.result==1){
+					//bootstrap提示框
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("保存成功！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+						$('#myNewAddModal').modal('hide');
+					})
+				}else if (obj.result==0){
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("重复添加！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+					});
+					return false;
+				}else{
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("保存失败！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+					});
+					return false;
+				}
+			},
+			error:function(){
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+				});
+				return false;
+			}
+		});
+	}else {
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("请填写车厢类型！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		})
+	}
+}
+//详情编辑时保存
+function saveEdit(){
+	var _goodTypeInfo = {};
+	var _goodType_matchCar = [];
+	_goodTypeInfo["carTypeId"]=commonCarTypeId;
+	var goodTypeLength=$(".matchGoodType").find(".goods").length;
+	for (var i=0;i<goodTypeLength;i++){
+		_goodType_matchCar.push($($(".matchGoodType").find(".goods").find(".placeHolder")[i]).attr("value"));
+	}
+	//后台判断flag为1时匹配新增操作 为0时更新操作方便后台共用方法
+	_goodTypeInfo["flag"]="0";
+	_goodTypeInfo["_goodType_matchCar"] = _goodType_matchCar;
+	var  stringObj=JSON.stringify(_goodTypeInfo);
+	$.ajax({
+		type:"post",
+		url:"/iwuliu/goodAndCarMatchManager/updateMatchByTruckId",
+		data:{"list":stringObj},
+		async:true,
+		success:function(data){
+			var obj = eval(data);
+			if(obj.result==1){
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("保存成功！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+					$('#myModal').modal('hide')
+				});
+			}else if (obj.result==0){
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("保存重复！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+				});
+			}else{
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("保存失败！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+				});
+			}
+		},
+		error: function () {
+			$("#smallModalInfo").modal();
+			$("#smallModalInfo").find(".titleInfo").html("保存失败！")
+			$("#smallModalInfo").on("hidden.bs.modal",function(e){
+				$("body").addClass("modal-open");
+			});
+		}
+	});
+}
+//新增匹配页面
+function btn_ModalMatch(){
+	$("#ModalMatch").modal();
+	var matchCarType = new customDropDown($(".matchCarType"));
+}
+//根据车厢类型新增货物匹配
+function newAddMatch(ele){
+	var _matchCarType = $(ele).parents(".matchCarType");
+	_matchCarType.after('<div class="form-group matchCarType  newMatchGoodType">'+ _matchCarType.html() +'</div>');
+	var matchCarType = $(".matchCarType")
+	for(var i = 0;i<matchCarType.length;i++){
+		new customDropDown($($(".matchCarType")[i]));
+	}
+}
+var goodType;//获取货物类型
+var str="";
+//获取货物类型
+$.ajax({
+	type:'post',
+	url:'/iwuliu/goodTypeManager/cargoTypeList',
+	dataType:'json',
+	cache:'false',
+	success:function(data){
+		for (var i= 0;i<data.length;i++){
+			str+="<li value="+ data[i].id +"><a href='javascript:;'>"+ data[i].name +"</a></li>"
+		}
+		$(".logisticsCompany").find(".dropdown-menu").html(str);
+		//
+		goodType = new customDropDown($(".logisticsCompany"));
+	},
+	error:function(){
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+		return false;
+	}
+});
+//重置
+function resetCarType(){
+	$(".logisticsCompany").find(".placeHolder").html("请选择")
+	$(".logisticsCompany").find(".placeHolder").removeAttr("value")
+	$(".logisticsCompany").find(".dropdown-menu").html(str);
+	goodType = new customDropDown($(".logisticsCompany"));
+	$('#carTypeTable').bootstrapTable('removeAll');
+
+}
+//点击匹配车厢
+function match(){
+	var _value =$(".logisticsCompany").find(".placeHolder").attr("value");
+	if (_value!="") {
+		$('#carTypeTable').bootstrapTable('refresh',{'url':'/iwuliu/goodAndCarMatchManager/findTruckMatchListByCargoType?cargoTypeId='+_value});
+	}
+}
+//保存车厢类型匹配
+function  saveTruckGoodMatch(){
+	//获取车厢类型的value
+	var truck=$(".truckType").find(".placeHolder").attr("value");
+	if (truck!="" && truck!=undefined){
+		var truckTypeDesc=$("#truckTypeDesc").val();
+		var _goodTypeInfo = {};
+		var _goodType_matchCar = [];
+		_goodTypeInfo["carTypeId"]=truck;
+		//获取货物类型的长度
+		var goodTypeLength=$(".matchCarType").find(".goodType").length;
+		for (var i=0;i<goodTypeLength;i++){
+			_goodType_matchCar.push($($(".matchCarType").find(".goodType").find(".placeHolder")[i]).attr("value"));
+		}
+		//后台判断flag 为1时匹配新增操作 为0时更新操作方便后台共用方法
+		_goodTypeInfo["flag"]="1";
+		_goodTypeInfo["carTypeDesc"]=truckTypeDesc;
+		_goodTypeInfo["_goodType_matchCar"] = _goodType_matchCar;
+		var stringObj = JSON.stringify(_goodTypeInfo);
+		$.ajax({
+			type: "post",
+			url: "/iwuliu/goodAndCarMatchManager/saveCarGoodMatch",
+			data: {"list": stringObj},
+			async: true,
+			success:function(data){
+				var obj = eval(data);
+				if(obj.result==1){
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("保存成功！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+						$('#ModalMatch').modal('hide')
+					});
+				}else if (obj.result==0){
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("保存重复！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+					});
+				}else{
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("保存失败！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+					});
+				}
+			},
+			error: function () {
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("保存失败！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+				});
+			}
+		});
+	}else {
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("请填写货物类型！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+		return false;
+	}
+
+
+}
+$(function () {
+	//新增匹配获取车厢类型
+	$.ajax({
+		type:'post',
+		url:"/iwuliu/truckCarriageTypeManager/truck_carriage_type_idJson",
+		dataType:'json',
+		cache:false,
+		success:function(data){
+			var truckTypeList="";
+			for (var i= 0;i<data.length;i++){
+				truckTypeList+="<li value="+ data[i].id +"><a href='javascript:;'>"+ data[i].name +"</a></li>"
+			}
+			$('.truckType').find(".dropdown-menu").html(truckTypeList);
+			//赋值后生成下拉菜单
+			var truckTypeSelect = new customDropDown($(".truckType"));
+			$(".truckType").find(".dropdown-menu li").bind("click",function(){
+				var truckTypeName=$(this).attr("value");
+				if (truckTypeName!=""&&truckTypeName!='undefined'){
+					$.ajax({
+						type: "POST",
+						url: "/iwuliu/carTypeManager/findTruckTypeById",
+						data:{"truckTypeId":truckTypeName},
+						cache: false,
+						dataType: "json",
+						success: function (data) {
+							$("#truckTypeDesc").val(data.truckType.carTypeDesc);
+						}
+					});
+					//获取货物类型
+					$.ajax({
+						type: 'post',
+						url: '/iwuliu/goodTypeManager/cargoTypeLists',
+						data:{"truckTypeId":truckTypeName},
+						dataType: 'json',
+						cache: 'false',
+						success: function (data) {
+							var goodTypeValue = '';
+							for (var i= 0;i<data.length;i++){
+								goodTypeValue+="<li value="+ data[i].id +"><a href='javascript:;'>"+ data[i].name +"</a></li>"
+							}
+							$(".goodType").find(".dropdown-menu").html(goodTypeValue);
+							var goodTypeList=new customDropDown($(".goodType"))
+							$(".goodType").find(".dropdown-menu>li>a").bind("click",function(){
+								$(".goodType").find(".placeHolder").val($(this).text())
+							})
+						},
+						error: function () {
+							$("#smallModalInfo").modal();
+							$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+							$("#smallModalInfo").on("hidden.bs.modal",function(e){
+								$("body").addClass("modal-open");
+							});
+							return false;
+						}
+					});
+				}
+			})
+
+		},
+		error:function(){
+			$("#smallModalInfo").modal();
+			$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+			$("#smallModalInfo").on("hidden.bs.modal",function(e){
+				$("body").addClass("modal-open");
+			});
+			return false;
+		}
+	});
+
+//翻页
+	var table = $('#cargoTypeTable'),
+			page = $('#cargoTypeTablePage'),
+			goBtn = $('#cargoTypeTablegoBtn');
+//go按钮加载
+	goBtn.click(function () {
+		table.bootstrapTable('selectPage', +page.val());
+
+	});
+	$(".th-inner").eq(0).append('<span>全选</span>');
+});
+// table表格隔行变色
+function rowStyle(row, index) {
+	if (index % 2 === 0) {
+		return{};
+	}
+	return {
+		css: {"background-color": "#eefff9"}
+	};
+}
+
+//删除勾选的车厢类型
+function deleteTruckType(){
+	var selectTions = $('#carTypeTable').bootstrapTable('getSelections'); //获取表选择的行
+	if (selectTions.length !=0) {
+		var truckTypeID = "";//存储多个删除的id
+		for (var i = 0; i < selectTions.length; i++) {
+			if (i == 0) {
+				truckTypeID = selectTions[i].carTypeId;
+			} else {
+				truckTypeID += "," + selectTions[i].carTypeId;
+			}
+		}
+		$("#smallModalInfoDelete").modal();
+		$("#smallModalInfoDelete").find(".titleInfoDelete").html("确定删除车厢类型及匹配关系？")
+		//点击确定删除
+		$(".deleteTruckType").click(function () {
+			//发送请求
+			$.ajax({
+				type: "post",
+				url: "/iwuliu/carTypeManager/truckCarriageTypeDel" ,
+				data: {"temID": truckTypeID},
+				dataType:"json",
+				cache:'false',
+				success: function (data) {
+					// json 类型的专为对象
+					var obj = eval(data);
+					if (obj.result == 0) {
+						$("#smallModalInfo").modal();
+						$("#smallModalInfo").find(".titleInfo").html("删除成功！")
+						$("#smallModalInfo").on("hidden.bs.modal",function(e){
+							$("body").addClass("modal-open");
+						});
+						$('#carTypeTable').bootstrapTable('refresh');
+					} else {
+						$("#smallModalInfo").modal();
+						$("#smallModalInfo").find(".titleInfo").html("删除失败！")
+						$("#smallModalInfo").on("hidden.bs.modal",function(e){
+							$("body").addClass("modal-open");
+						});
+
+					}
+				},
+				error: function () {
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+					});
+				}
+			})
+		});
+	}else {
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("请选择数据！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+	}
+}
+
+//goBtn按钮无数据时隐藏
+var webservice = $('#cargoTypeTable').attr("data-url");
+$.ajax({
+	url:webservice,
+	success:function(data){
+		if(data.length == 0){
+			$(".form-inline").css("display","none");
+		}
+	}
+});
+
+// 不能为空的校验
+function  checkNotNull(inp){
+	var _value = inp.val();
+	if (_value == ''||_value == undefined){
+		inp.css("border","1px solid red");
+		return false;
+	}else{
+		inp.css("border","none");
+		return true;
+	}
+}

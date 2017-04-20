@@ -1,0 +1,10 @@
+.iframeMain .infoConditions {
+  padding: 0;
+}
+.iframeMain .infoConditions .buttons {
+  margin: 0 25px;
+}
+/*表格显示*/
+.fixed-table-body{
+  height:auto;
+}

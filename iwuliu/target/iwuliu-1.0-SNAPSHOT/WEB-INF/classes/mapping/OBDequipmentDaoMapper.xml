@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.OBDequipmentDaoMapper">
+    <resultMap id="T_Data_OBD_Equipment" type="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment">
+        <id column="EQUIPMENT_ID" property="equipment_id"></id>
+        <result column="BRAND_ID" property="brand_id"></result>
+        <result column="OBD_ID" property="obd_id"></result>
+        <result column="EQUIPMENT_PHONE_NUMBER" property="equipment_phone_number"></result>
+        <result column="REGISTER_TIME" property="register_time"></result>
+        <result column="DELETE_FLAG" property="delete_flag"></result>
+        <result column="LAST_UPDATE" property="last_update"></result>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"></result>
+    </resultMap>
+
+    <!--根据设备id查询设备-->
+    <select id="findById" resultType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment">
+        SELECT
+        EQUIPMENT_ID,
+        BRAND_ID,
+        OBD_ID,
+        EQUIPMENT_PHONE_NUMBER,
+        REGISTER_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        FROM
+          t_data_obd_equipment
+        WHERE DELETE_FLAG=0 AND EQUIPMENT_ID=#{equipment_id}
+    </select>
+
+    <!--根据obdId查询设备-->
+    <select id="findByObdId" resultType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment">
+        select
+          *
+        FROM
+          t_data_obd_equipment
+        WHERE DELETE_FLAG=0 AND OBD_ID=#{obd_id}
+    </select>
+
+    <!--保存设备信息-->
+    <insert id="saveOBDEquipment" parameterType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment">
+      INSERT INTO
+        t_data_obd_equipment(
+        EQUIPMENT_ID,
+        BRAND_ID,
+        OBD_ID,
+        EQUIPMENT_PHONE_NUMBER,
+        REGISTER_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID)
+      SELECT
+          #{equipment_id},
+          #{brand_id},
+          #{obd_id},
+          #{equipment_phone_number},
+          #{register_time},
+          0,
+          #{last_update},
+          #{last_update_user_id}
+      FROM dual WHERE NOT EXISTS (
+        SELECT OBD_ID
+        FROM t_data_obd_equipment
+        WHERE OBD_ID=#{obd_id} AND DELETE_FLAG=0
+      )
+    </insert>
+    <!--更新信息-->
+    <update id="updateOBDInfo" parameterType="com.cn.gazelle.logistics.pojo.T_Data_OBD_Equipment">
+      UPDATE
+          t_data_obd_equipment
+      SET
+          BRAND_ID= #{brand_id},
+          OBD_ID= #{obd_id},
+          EQUIPMENT_PHONE_NUMBER= #{equipment_phone_number},
+          REGISTER_TIME= #{register_time},
+          DELETE_FLAG=0,
+          LAST_UPDATE= #{last_update},
+          LAST_UPDATE_USER_ID=#{last_update_user_id}
+      WHERE
+          EQUIPMENT_ID= #{equipment_id} AND DELETE_FLAG=0
+
+    </update>
+
+    <!--删除信息-->
+    <update id="OBDInfoDel" parameterType="String">
+        UPDATE
+          t_data_obd_equipment
+        SET
+          DELETE_FLAG=1
+        WHERE
+           EQUIPMENT_ID= #{equipment_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--查询所有的不分页-->
+    <select id="findOBDList">
+        SELECT *
+        FROM t_data_obd_equipment
+        WHERE  DELETE_FLAG = 0
+    </select>
+
+</mapper>

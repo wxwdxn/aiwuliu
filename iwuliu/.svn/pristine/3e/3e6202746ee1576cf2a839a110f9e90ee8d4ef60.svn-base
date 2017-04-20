@@ -1,0 +1,88 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称: PersonService.Java
+ * 系统编号：Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：02
+ * 模块名称：个人信息查询接口声明
+ * 设计文件：
+ * 完成日期：2016-02-19
+ * 作    者：YK
+ * 内容摘要：个人信息查询
+ */
+package com.cn.gazelle.logistics.service;
+
+import com.cn.gazelle.logistics.pojo.T_Data_Logistics_Drivers_Manager;
+import com.cn.gazelle.logistics.pojo.T_Data_Operation_Drivers_Manager;
+import com.cn.gazelle.logistics.pojo.T_Data_Person;
+
+import javax.jws.WebService;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * 类 名 称: PersonService
+ * 内容摘要: 个人信息查询接口
+ * 方法描述：该类有9个方法：
+ *         01 findPersonByID                 根据个人id查询个人信息
+ *         02 findPersonByName               根据个人名查询个人信息
+ *         03 findAllPerson                  查询所有个人信息
+ *         04 findAllPersonRowsCount         查询个人总记录数
+ *         05 savePerson                     管车版个人信息的录入验证
+ *         06 findPersonByMemberName         根据会员名称检索个人信息
+ *         07 editPerson                     司机版个人信息的验证与修改
+ *         08 updatePerson                   更新个人信息
+ *         09 delPerson                      删除个人信息
+ * @author YK
+ */
+@WebService
+public interface PersonService {
+
+    // 根据个人id查询个人信息
+    T_Data_Person findPersonByID(String person_id);
+
+    // 根据个人名查询个人信息
+    T_Data_Person findPersonByName(String person_name,String id_card_number,String person_type);
+
+    // 根据手机号查询个人信息
+    T_Data_Person findPersonByPhone(String person_mobile_phone,String person_type);
+
+    // 查询所有个人信息
+    List<T_Data_Person> findAllPerson(String search_type, String name, Integer page, Integer rows, String person_type);
+
+    // 查询个人总记录数
+    Integer findAllPersonRowsCount(String search_type, String name, String person_type);
+
+    // 个人信息的录入
+    boolean savePerson(T_Data_Person person);
+
+    // 根据会员名称检索个人信息
+    String findPersonByMemberName(String member_name);
+
+    // 司机版个人信息的验证与修改
+    String  editPerson(String member_name, String personJson);
+
+    // 更新个人信息
+    boolean updatePerson(T_Data_Person person);
+
+    // 删除个人信息
+    void delPerson(String person_id);
+
+    // 联合查询会员、个人和车的信息
+    List<HashMap<String,String>> queryDrivingBehaviorInfo(String person_name, String plate_number);
+
+    // 查询运营司机管理列表
+    List<T_Data_Operation_Drivers_Manager> findOperationDriversManagerList(HashMap<String,String> conditions);
+
+    // 查找所有的个人货主
+    List<T_Data_Person> findPersonShippers();
+
+    //======================>>>web页面物流公司司机管理
+    // 物流司机管理添加司机
+    int saveDriverInfo(String info,String userName,HashMap pathMap);
+
+    // 物流司机管理刷新列表
+    List<T_Data_Logistics_Drivers_Manager> findDriversList(HashMap<String,String> conditions);
+
+
+}

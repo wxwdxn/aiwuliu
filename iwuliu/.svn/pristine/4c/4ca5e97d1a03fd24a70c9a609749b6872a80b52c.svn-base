@@ -1,0 +1,169 @@
+$(function(){
+	$(".leftMenu").load("/iwuliu/welcomeManager/home",function(){
+		$(".transactionRecords").parents(".collapse").addClass("in");
+		$(".transactionRecords").addClass("menuActive")
+	})
+	//账户类型下拉
+	var accountType = new customDropDown($(".accountType"));
+
+	var transactionName = new customDropDown($(".transactionName"));
+
+	$(".accountType").find(".dropdown-menu li").bind("click",function(){
+		var _text = $(this).text();
+		var _value = $(this).val();
+		console.log(_text)
+		console.log(_value)
+		switch(_text){
+			case "全部":
+				$(".cars").removeClass("hidden");
+				$(".individual").removeClass("hidden");
+				$(".carsAndindividual").removeClass("hidden");
+				break;
+			case "车主账户":
+				$(".transactionName").addClass("display","block")
+				$(".cars").removeClass("hidden");
+				$(".individual").addClass("hidden");
+				$(".carsAndindividual").addClass("hidden");
+				break;
+			case "车辆账户":
+				$(".cars").addClass("hidden");
+				$(".individual").removeClass("hidden");
+				$(".carsAndindividual").addClass("hidden");
+				break;
+		}
+	})
+
+	var transactionType = new customDropDown($(".transactionType"));
+
+	$(".transaction_type").find(".dropdown-menu li").bind("click",function(){
+		var _text = $(this).text();
+		console.log(_text)
+		if(_text == "扫码支付" || _text == "全部"){
+
+			$(".transactionName").css("display","block")
+		}else{
+			$(".transactionName").css("display","none")
+		}
+	})
+})
+
+$(function(){
+	$("#smallModalInfo").on("hidden.bs.modal",function(e){
+		$("body").addClass("modal-open");
+	});
+})
+
+$(function() {
+	// 时间查询日历框
+	$('.form_datetime').datetimepicker({
+		minView: "month", //选择日期后，不会再跳转去选择时分秒
+		language: 'zh-CN',
+		format: 'yyyy-mm-dd',
+		todayBtn: 1,
+		autoclose: 1
+	});
+})
+
+//配置参数
+function transactionManagerQueryParams(params) {
+	var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+		pageSize: params.limit,   //页面大小
+		pageNumber: params.pageNumber,  //页码
+		account_dept:$(".accountDept").find(".placeHolder").attr("value"),
+		account_type:$(".accountType").find(".placeHolder").text(),//$("#accountType option:selected").text(),
+		account_name: $("#accountName").val(),
+		account_no: $("#accountNo").val(),
+		transaction_money: $("#transactionMoney").val(),
+		transaction_type:$(".transactionType").find(".placeHolder").text(),//$("#accountType option:selected").text(),
+		transaction_name:$(".transactionName").find(".placeHolder").text(),//$("#accountType option:selected").text(),
+		order_no: $("#orderNo").val(),
+		start_time: $("#start_time").val(),//$("#accountType option:selected").text(),
+		end_time: $("#end_time").val(),
+		sort: params.sort,  //排序列名
+		sortOrder: params.order//排位命令（desc，asc）
+	};
+	return temp;
+}
+
+//交易记录查询
+function queryTransaction(){
+	$('#transactionManagerTable').bootstrapTable('refresh', {'url': '/iwuliu/transactionManager/transactionRecordsList'});
+}
+
+//条件重置
+function queryReset(){
+	//var account_type =   $(".accountDept").find(".placeHolder").text();
+	//var account_value = $(".accountDept").find(".placeHolder").attr("value");
+	var company_id = sessionStorage.getItem("company_id");
+	//alert(company_id);
+	if(company_id == "742C9E4DFC6940689A5D0F7CF6A69649" ){
+			$(".accountDept").find(".placeHolder").text("全部");
+			$(".accountDept").find(".placeHolder").attr("value","0");
+			$(".accountType").find(".placeHolder").text("请选择");//$("#accountType option:selected").text(),
+			$("#accountName").val("");
+			$("#accountNo").val("");
+			$("#transactionMoney").val("");
+			$(".transactionType").find(".placeHolder").text("请选择");//$("#accountType option:selected").text(),
+			$(".transactionName").find(".placeHolder").text("请选择");//$("#accountType option:selected").text(),
+			$("#orderNo").val("");
+			$("#start_time").val("");//$("#accountType option:selected").text(),
+			$("#end_time").val("");
+			$('#transactionManagerTable').bootstrapTable('removeAll');
+		}
+	else {
+		$(".accountType").find(".placeHolder").text("请选择");//$("#accountType option:selected").text(),
+		$("#accountName").val("");
+		$("#accountNo").val("");
+		$("#transactionMoney").val("");
+		$(".transactionType").find(".placeHolder").text("请选择");//$("#accountType option:selected").text(),
+		$(".transactionName").find(".placeHolder").text("请选择");//$("#accountType option:selected").text(),
+		$("#orderNo").val("");
+		$("#start_time").val("");//$("#accountType option:selected").text(),
+		$("#end_time").val("");
+		$('#transactionManagerTable').bootstrapTable('removeAll');
+	}
+
+}
+
+//获取公司名
+$(function(){
+	$.ajax({
+		type:"post",
+		url:"/iwuliu/accountCenterManager/searchCompanyName",
+		cache:"false",
+		success:function(object){
+			var obj = eval(object);
+			var account_name = obj.company_name;
+			var account_id = obj.company_id;
+			sessionStorage.setItem("company_id",account_id);
+			console.log(account_name);
+			console.log(account_id);
+			if(account_id == '742C9E4DFC6940689A5D0F7CF6A69649'){
+				$(".accountDept").find(".placeHolder").text("全部");
+				$(".accountDept").find(".placeHolder").attr("value","0");
+			}else{
+				$(".accountDept").find(".placeHolder").text(account_name);
+				$(".accountDept").find(".placeHolder").attr("value",account_id);
+			}
+			if(account_id == '742C9E4DFC6940689A5D0F7CF6A69649'){
+				$.ajax({                                          ////获取物流公司列表
+					type: 'post',
+					url: '/iwuliu/accountCenterManager/searchCompanyList',
+					dataType: 'json',
+					cache: 'false',
+					success: function (data) {
+						var str = "<li value=" +"0"+ "><a href='javascript:;'>" + "全部" + "</a></li>";
+						for (var i = 0; i < data.length; i++) {
+							str += "<li value=" + data[i].company_id + "><a href='javascript:;'>" + data[i].company_name + "</a></li>"
+						}
+						$(".accountDept").find(".dropdown-menu").html(str);
+						var  accountDept = new customDropDown($(".accountDept"));
+					}
+				})
+			}
+		},
+		error:function(){
+			alert('There are some errors happened');
+		}
+	})
+})

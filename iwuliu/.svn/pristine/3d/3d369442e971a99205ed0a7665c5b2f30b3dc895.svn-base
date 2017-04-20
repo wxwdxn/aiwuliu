@@ -1,0 +1,120 @@
+$(function(){
+	$(".leftMenu").load("/iwuliu/welcomeManager/home", function () {
+		$(".logisticsVehicleManager").parents(".collapse").addClass("in");
+		$(".logisticsVehicleManager").addClass("menuActive")
+	});
+	//有无司机管理者
+	new customDropDown($(".ownerMember"));
+	$(".ownerMember").find(".dropdown-menu").find("li").bind("click",function(){
+		console.log($(this).index());
+		var _index = $(this).index();
+		switch(_index){
+			case 0:
+				$(".manager").removeClass("hidden");
+				break;
+			case 1:
+				$(".manager").removeClass("hidden");
+				break;
+			case 2:
+				$(".manager").addClass("hidden");
+				break;
+		}
+	})
+
+	// 获取车辆品牌
+	$.ajax({
+		type: 'post',
+		url: "/iwuliu/vehicleManager/truckBrandJson",
+		dataType: 'json',
+		cache: false,
+		success: function (data) {
+			var str = "<li value=''><a href='javascript:;'>全部</a></li>";
+			for (var i = 0; i < data.length; i++) {
+				str += "<li value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+			}
+			$(".vehicleManager_truckBrand").find(".dropdown-menu").html(str);
+			var truckBrand = new customDropDown($(".vehicleManager_truckBrand"));
+			// 根据品牌获取型号
+			$(".vehicleManager_truckBrand").find(".dropdown-menu li").bind("click", function () {
+				var truckBrand = $(this).attr("value");
+				if (truckBrand != '' && truckBrand != 'undefined') {
+					$.ajax({
+						type: "POST",
+						url: "/iwuliu/vehicleManager/truckModelList?truck_brand_id=" + truckBrand,
+						cache: false,
+						dataType: "json",
+						success: function (data) {
+							var str = "<li value=''><a href='javascript:;'>全部</a></li>";
+							for (var i = 0; i < data.length; i++) {
+								str += "<li value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+							}
+							// 型号
+							$(".vehicleManager_truckModel").find(".dropdown-menu").html("");
+							$(".vehicleManager_truckModel").find(".placeHolder").html("全部");
+							$(".vehicleManager_truckModel").find(".dropdown-menu").html(str);
+							//型号
+							var city = new customDropDown($(".vehicleManager_truckModel"));
+						}
+					});
+				}
+			})
+		},
+	});
+
+	// 获取车类型
+	$.ajax({
+		type: 'post',
+		url: "/iwuliu/truckCarriageTypeManager/truck_carriage_type_idJson",
+		dataType: 'json',
+		cache: false,
+		success: function (data) {
+			var str = "<li value=''><a href='javascript:;'>全部</a></li>";
+			for (var i = 0; i < data.length; i++) {
+				str += "<li value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+			}
+			$(".vehicleManager_truckCarriageType").find(".dropdown-menu").html(str);
+			var truckType = new customDropDown($(".vehicleManager_truckCarriageType"));
+		}
+	});
+})
+
+//配置参数
+function logisticsVehicleQueryParams(params) {
+	var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+		pageSize: params.limit,   //页面大小
+		pageNumber: params.pageNumber,  //页码
+		plate_number: $("#vehicleManager_plateNumber").val(),
+		truck_carriage_type: $(".vehicleManager_truckCarriageType").find(".placeHolder").attr("value"),
+		truck_brand: $(".vehicleManager_truckBrand").find(".placeHolder").attr("value"),
+		truck_model: $(".vehicleManager_truckModel").find(".placeHolder").attr("value"),
+		owner_member: $(".ownerMember").find(".placeHolder").attr("value"),
+		owner_name: $("#vehicleManager_ownerName").val(),
+		owner_phone: $("#vehicleManager_ownerPhone").val(),
+		owner_id: $("#vehicleManager_ownerID").val(),
+		sort: params.sort,  //排序列名
+		sortOrder: params.order//排位命令（desc，asc）
+	};
+	return temp;
+}
+
+// 查询线下加盟服务商管理列表
+function logisticsVehicleQuery() {
+	$('#logisticsVehicleTable').bootstrapTable('refresh', {'url': '/iwuliu/logisticsVehicleManager/vehicleList'});
+}
+
+//点击详情编辑
+function btn_detail(){
+	$("#myModalDetail").modal()
+}
+//点击新增按钮
+function btn_ModalNewAdd(){
+	$("#myModalNewAdd").modal()
+}
+//点击车组成员
+function btn_ModalMemberofVehicle(){
+	$("#myModalMemberOfvehicle").modal();
+}
+//点击车辆管理者
+function btn_ModalVehicleManager(){
+	$("#myModalVehicleManager").modal();
+}

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.CargoYardManagerMatchDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Cargo_Yard_Manager_Match" type="com.cn.gazelle.logistics.pojo.T_Data_Cargo_Yard_Manager_Match">
+        <id column="MANAGER_ID" property="manager_id"/>
+        <result column="MANAGER_MEMBER_ID" property="manager_member_id"/>
+        <result column="YARD_ID" property="yard_id"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+    <resultMap id="T_Data_Cargo_Yard_Manager_Match2" type="com.cn.gazelle.logistics.pojo.T_Data_Cargo_Yard_Manager_Match" extends="T_Data_Cargo_Yard_Manager_Match">
+        <association property="yard" javaType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Yard">
+            <id property="cargo_id" column="CARGO_ID"/>
+            <result property="cargo_name" column="CARGO_NAME"/>
+        </association>
+        <association property="member" javaType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+            <id property="member_id" column="MEMBER_ID"/>
+            <result property="member_name" column="MEMBER_NAME"/>
+        </association>
+    </resultMap>
+
+    <!--根据ID查询-->
+    <select id="findById" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Cargo_Yard_Manager_Match">
+        SELECT
+            *
+        FROM
+            T_Data_Cargo_Yard_Manager_Match
+        WHERE
+            MANAGER_ID=#{manager_id}
+    </select>
+
+    <!--查询货场调度人员会员匹配信息（默认查询所有货站管理人员信息）-->
+    <select id="findAllCargoYardManagerMatch" resultMap="T_Data_Cargo_Yard_Manager_Match2">
+        SELECT
+            *
+        FROM
+            T_Data_Cargo_Yard_Manager_Match AS a
+        LEFT JOIN
+            T_Master_Cargo_Yard  AS b
+        ON
+            a.YARD_ID = b.CARGO_ID
+        LEFT JOIN
+            T_Data_Member AS c
+        ON
+            a.MANAGER_MEMBER_ID = c.MEMBER_ID
+        <if test="searchType != ''">
+            WHERE  ${searchType} LIKE '%${name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询货站管理人员总记录数-->
+    <select id="findAllCargoYardManagerMatchRowsCount" parameterType="String" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            T_Data_Cargo_Yard_Manager_Match AS a
+        LEFT JOIN
+            T_Master_Cargo_Yard  AS b
+        ON
+            a.YARD_ID = b.CARGO_ID
+        LEFT JOIN
+        T_Data_Member AS c
+        ON
+            a.MANAGER_MEMBER_ID = c.MEMBER_ID
+        <if test="searchType !='' ">
+            WHERE ${searchType} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--增加货场调度人员会员匹配信息-->
+    <insert id="saveCargoYardManagerMatch" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Cargo_Yard_Manager_Match">
+        INSERT INTO
+                T_Data_Cargo_Yard_Manager_Match(MANAGER_ID,
+                MANAGER_MEMBER_ID,
+                YARD_ID,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{manager_id},
+                #{manager_member_id},
+                #{yard_id},
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新货场调度人员会员匹配信息-->
+    <update id="updateCargoYardManagerMatch" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Cargo_Yard_Manager_Match">
+        UPDATE
+            T_Data_Cargo_Yard_Manager_Match
+        SET
+            MANAGER_MEMBER_ID = #{manager_member_id},
+            YARD_ID = #{yard_id} ,
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            MANAGER_ID = #{manager_id}
+    </update>
+
+    <!--删除货场调度人员会员匹配信息-->
+    <delete id="cargoYardManagerMatchDel" parameterType="String">
+        DELETE FROM
+            T_Data_Cargo_Yard_Manager_Match
+        WHERE
+            MANAGER_ID = #{manager_id}
+    </delete>
+
+</mapper>

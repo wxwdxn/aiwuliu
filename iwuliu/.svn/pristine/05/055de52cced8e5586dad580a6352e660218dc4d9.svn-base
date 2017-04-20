@@ -1,0 +1,177 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称: VehicleServiceImpl.Java
+ * 系统编号：Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：02
+ * 模块名称：车辆管理查询接口实现
+ * 设计文件：
+ * 完成日期：2016-11-10
+ * 作    者：QJ
+ * 内容摘要：车辆管理查询
+ */
+
+package com.cn.gazelle.logistics.service.impl;
+
+
+import com.cn.gazelle.logistics.dao.MemberDaoMapper;
+import com.cn.gazelle.logistics.dao.TruckDaoMapper;
+import com.cn.gazelle.logistics.dao.VehicleDaoMapper;
+import com.cn.gazelle.logistics.pojo.*;
+import com.cn.gazelle.logistics.service.VehicleService;
+import com.cn.gazelle.logistics.util.DateUtil;
+import com.cn.gazelle.logistics.util.UUIDUtil;
+import com.cn.gazelle.logistics.util.message.TruckManager_Message;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.jws.WebService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称: VehicleServiceImpl
+ * 内容摘要: 车辆管理查询接口
+ * 方法描述：该类有2个方法：
+ * 01 findVehicleListCompany   根据条件查找车辆列表(物流公司)
+ * 02 findVehicleListDriver   根据条件查找车辆列表(司机)
+ *
+ * @author QJ
+ */
+@Service
+@WebService(endpointInterface = "com.cn.gazelle.logistics.service.VehicleService", targetNamespace = "http://service.logistics.gazelle.cn.com/")
+public class VehicleServiceImpl implements VehicleService {
+    public static String code;                                 // 全局变量
+    // Log初始化
+    Logger logger = Logger.getLogger(VehicleServiceImpl.class);
+
+    @Resource
+    private VehicleDaoMapper vehicleDaoMapper;          // 数据访问层
+    @Resource
+    private TruckDaoMapper truckDaoMapper;              // 数据访问层
+    @Resource
+    private MemberDaoMapper memberDaoMapper;            // 数据访问层
+
+    /**
+     * 方法名称：findVehicleListCompany
+     * 内容摘要：根据条件查找车辆列表(物流公司)
+     *
+     * @return findVehicleListCompany 车辆列表（物流公司）
+     */
+    public List<T_Data_Vehicle> findVehicleListCompany(HashMap<String, String> conditions) {
+        List<T_Data_Vehicle> findVehicleListCompany = null;
+        try {
+            findVehicleListCompany = this.vehicleDaoMapper.findVehicleListCompany(conditions);
+            logger.info(TruckManager_Message.seacheInfo);
+        } catch (Exception e) {
+            logger.error(TruckManager_Message.seacheInfoError + e.getMessage());
+        }
+        return findVehicleListCompany;
+    }
+
+    /**
+     * 方法名称：findVehicleListDriver
+     * 内容摘要：根据条件查找车辆列表(司机)
+     *
+     * @return findVehicleListDriver 车辆列表（司机）
+     */
+    public List<T_Data_Vehicle> findVehicleListDriver(HashMap<String, String> conditions) {
+        List<T_Data_Vehicle> findVehicleListDriver = null;
+        try {
+            findVehicleListDriver = this.vehicleDaoMapper.findVehicleListDriver(conditions);
+            logger.info(TruckManager_Message.seacheInfo);
+        } catch (Exception e) {
+            logger.error(TruckManager_Message.seacheInfoError + e.getMessage());
+        }
+        return findVehicleListDriver;
+    }
+
+    /**
+     * 方法名称：findCompanyVehicleList
+     * 内容摘要：根据条件查找物流公司车辆列表
+     *
+     * @return companyVehicleList 车辆列表（司机）
+     */
+    public List<T_Data_Logistics_Vehicle> findCompanyVehicleList(HashMap<String, String> conditions) {
+        List<T_Data_Logistics_Vehicle> companyVehicleList = null;
+        try {
+            companyVehicleList = this.vehicleDaoMapper.findCompanyVehicleList(conditions);
+            logger.info(TruckManager_Message.seacheInfo);
+        } catch (Exception e) {
+            logger.error(TruckManager_Message.seacheInfoError + e.getMessage());
+        }
+        return companyVehicleList;
+    }
+
+    /**
+     * 方法名称：saveTruckInfo
+     * 内容摘要：物流公司新增车辆信息（页面）
+     */
+    public int saveTruckInfo(String truckInfo, String userName, HashMap picPathMap) {
+        Gson gson = new Gson();
+        int flag = 0;
+        T_Data_Member member = null;
+        try {
+            member = memberDaoMapper.findMemberByName(userName);
+            if (member != null) {
+                String company_id = member.getRelevance_info_id();
+                T_Data_Truck truck = gson.fromJson(truckInfo, new TypeToken<T_Data_Truck>() {
+                }.getType());
+                truck.setDriving_licence_first_page_save_path((String) picPathMap.get("driving_licence_first_page_save_path"));
+                truck.setDriving_licence_second_page_save_path((String) picPathMap.get("driving_licence_second_page_save_path"));
+                truck.setTruck_first_pic_save_path((String) picPathMap.get("truck_first_pic_save_path"));
+                truck.setTruck_second_pic_save_path((String) picPathMap.get("truck_second_pic_save_path"));
+                truck.setTruck_third_pic_save_path((String) picPathMap.get("truck_third_pic_save_path"));
+                truck.setTruck_id(UUIDUtil.getUUID());              // 绑定车辆ID,司机和车辆id关联
+                truck.setOwner_member_id(company_id);               // 默认为none
+                truck.setOperate_status("0");                       // 车辆运营状态
+                truck.setVerify_status("2");                        // 车辆审核状态
+                truck.setManager_member_id("none");                 // 默认为none
+                truck.setDeposit_member_id(company_id);             // 默认为none
+                truck.setSubmit_verify_time(DateUtil.getDate());    // 新增提交审核时间
+                truck.setDelete_flag(0);                            // 新建删除标识符，0：未删除
+                truck.setLast_update(DateUtil.getDate());           // 新增最终更新日
+                truck.setLast_update_user_id("U:" + userName);      // 新增最终更新者
+                flag = this.truckDaoMapper.saveTruck(truck);
+            } else {
+                flag = 2;
+            }
+            if (flag == 1) {//保存成功
+            } else if (flag == 0) {//重复
+                throw new RuntimeException(String.valueOf(flag));
+            } else if (flag == -1) {
+                throw new RuntimeException(String.valueOf(flag));
+            }
+        } catch (RuntimeException e) {
+            if (e.getMessage().equals("0")) {
+                flag = 0;
+            } else {
+                flag = -1;
+            }
+            throw new RuntimeException(flag + "");
+        }
+        return flag;
+    }
+
+    /**
+     * 方法名称：findCompanyVehicleDriverList
+     * 内容摘要：查询物流公司下无车辆的司机列表
+     *
+     * @return findCompanyVehicleDriverList 当前物流公司下无车辆司机列表
+     */
+    public List<T_Data_Company_Vehicle_Driver> findCompanyVehicleDriverList(HashMap<String, String> conditions) {
+        List<T_Data_Company_Vehicle_Driver> companyVehicleDriverList = null;
+        T_Data_Member member = null;
+        try {
+            companyVehicleDriverList = this.vehicleDaoMapper.findCompanyVehicleDriverList(conditions);
+            logger.info(TruckManager_Message.seacheInfo);
+        } catch (Exception e) {
+            logger.error(TruckManager_Message.seacheInfoError + e.getMessage());
+        }
+        return companyVehicleDriverList;
+    }
+}

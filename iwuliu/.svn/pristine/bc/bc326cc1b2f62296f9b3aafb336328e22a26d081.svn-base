@@ -1,0 +1,50 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：WelcomController.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2017-02-22
+ * 作    者: YK
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.controller.operationController;
+
+import com.cn.gazelle.logistics.util.message.base.MessageUtil;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+/**
+ * 类 名 称：WelcomeController
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ *          01 
+ *          02
+ *@authot YK
+ */
+@Controller
+@RequestMapping(value = "/welcomeManager")
+public class WelcomeController {
+    Logger logger = Logger.getLogger(WelcomeController.class);
+
+    /**
+     * 方法名称：home
+     * 内容摘要：系统主页。
+     *
+     * @return string 系统主页
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "home")
+    public String home() {
+        try {
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.saveInfoError);
+        }
+        return "mainMenu/commonMenu";
+    }
+}
+

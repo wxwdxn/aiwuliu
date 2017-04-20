@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.ScheduleSheetDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Transportation_Schedule_Sheet" type="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        <id column="SCHEDULE_SHEET_ID" property="scheduleSheetId"></id>
+        <result column="SCHEDULE_PLAN_NUMBER" property="schedule_plan_number"></result>
+        <result column="BELONG_SCHEDULE_SHEET_ID" property="belongScheduleSheetId"></result>
+        <result column="SEND_MEMBER_ID" property="sendMemberId"></result>
+        <result column="RECEIVE_MEMBER_ID" property="receiveMemberId"></result>
+        <result column="SELECTED_LINE_NO" property="selectedLineNo"></result>
+        <result column="ALLOCATE_TOTAL" property="allocateTotal"></result>
+        <result column="CREATE_TIME" property="createTime"></result>
+        <result column="ACCEPT_TIME" property="acceptTime"></result>
+        <result column="REFUSE_TIME" property="refuseTime"></result>
+        <result column="SET_OFF_TIME" property="setOffTime"></result>
+        <result column="SCHEDULE_TRUCK_ID" property="scheduleTruckId"></result>
+        <result column="LOADING_CARGO_AMOUNT" property="loadingCargoAmount"></result>
+        <result column="LOADING_START_TIME" property="loadingStartTime"></result>
+        <result column="LOADING_END_TIME" property="loadingEndTime"></result>
+        <result column="LOADING_PROOF_IMAGE_SAVE_PATH" property="loadingProofPath"></result>
+        <result column="LOADING_LONGITUDE" property="loadLongitude"></result>
+        <result column="LOADING_LATITUDE" property="loadLatitude"></result>
+        <result column="UNLOADING_CARGO_AMOUNT" property="unLoadingCargoAmount"></result>
+        <result column="UNLOADING_START_TIME" property="unloadingStartTime"></result>
+        <result column="UNLOADING_END_TIME" property="unloadingEndTime"></result>
+        <result column="UNLOADING_PROOF_IMAGE_SAVE_PATH" property="unloadingProofPath"></result>
+        <result column="UNLOADING_LONGITUDE" property="unloadLongitude"></result>
+        <result column="UNLOADING_LATITUDE" property="unloadingProofPath"></result>
+        <result column="TRANSPORT_UNIT_PRICE" property="transportUnitPrice"></result>
+        <result column="STATUS" property="status"></result>
+        <result column="PAYED_TIME" property="payedTime"></result>
+        <result column="DELETE_FLAG" property="deleteFlag"></result>
+        <result column="LAST_UPDATE" property="lastUpdate"></result>
+        <result column="LAST_UPDATE_USER_ID" property="lastUpdateUserId"></result>
+        <result column="CODE" property="code"></result>
+    </resultMap>
+
+
+    <!--根据id查询的调度单列表信息-->
+    <select id="findScheduleSheetById" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code,
+        LOADING_LONGITUDE as loadLongitude,
+        LOADING_LATITUDE as loadLatitude,
+        UNLOADING_LONGITUDE as unloadLongitude,
+        UNLOADING_LATITUDE as unloadLatitude
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        SCHEDULE_SHEET_ID=#{scheduleSheetId}
+        AND
+        DELETE_FLAG=0
+    </select>
+
+    <!--保存调度单信息-->
+    <insert id="saveScheduleSheet" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        INSERT INTO
+        t_data_transportation_schedule_sheet( SCHEDULE_SHEET_ID,
+        SCHEDULE_PLAN_NUMBER,
+        BELONG_SCHEDULE_SHEET_ID,
+        SEND_MEMBER_ID,
+        RECEIVE_MEMBER_ID,
+        SELECTED_LINE_NO,
+        ALLOCATE_TOTAL,
+        CREATE_TIME,
+        ACCEPT_TIME ,
+        REFUSE_TIME ,
+        SET_OFF_TIME,
+        SCHEDULE_TRUCK_ID,
+        LOADING_CARGO_AMOUNT,
+        LOADING_START_TIME,
+        LOADING_END_TIME,
+        LOADING_PROOF_IMAGE_SAVE_PATH,
+        UNLOADING_CARGO_AMOUNT,
+        UNLOADING_START_TIME,
+        UNLOADING_END_TIME ,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH,
+        PAYED_TIME,
+        TRANSPORT_UNIT_PRICE,
+        STATUS,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID,
+        CODE )
+        VALUES (
+        #{scheduleSheetId},
+        #{schedule_plan_number,},
+        #{belongScheduleSheetId},
+        #{sendMemberId},
+        #{receiveMemberId},
+        #{selectedLineNo},
+        #{allocateTotal},
+        #{createTime},
+        #{acceptTime},
+        #{refuseTime},
+        #{setOffTime},
+        #{scheduleTruckId},
+        #{loadingCargoAmount},
+        #{loadingStartTime},
+        #{loadingEndTime},
+        #{loadingProofPath},
+        #{unLoadingCargoAmount},
+        #{unloadingStartTime},
+        #{unloadingEndTime},
+        #{unloadingProofPath},
+        #{payedTime},
+        #{transportUnitPrice},
+        #{status},
+        0,
+        #{lastUpdate},
+        #{lastUpdateUserId},
+        #{code} );
+    </insert>
+    <!--更新调度单信息-->
+    <update id="updateScheduleSheet" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        UPDATE
+        t_data_transportation_schedule_sheet
+        SET
+        SCHEDULE_PLAN_NUMBER = #{schedule_plan_number},
+        BELONG_SCHEDULE_SHEET_ID = #{belongScheduleSheetId} ,
+        SEND_MEMBER_ID = #{sendMemberId} ,
+        RECEIVE_MEMBER_ID = #{receiveMemberId} ,
+        SELECTED_LINE_NO=#{selectedLineNo},
+        ALLOCATE_TOTAL = #{allocateTotal} ,
+        CREATE_TIME=#{createTime},
+        ACCEPT_TIME=#{acceptTime},
+        REFUSE_TIME=#{refuseTime},
+        SET_OFF_TIME=#{setOffTime},
+        SCHEDULE_TRUCK_ID = #{scheduleTruckId} ,
+        LOADING_CARGO_AMOUNT = #{loadingCargoAmount} ,
+        LOADING_START_TIME = #{loadingStartTime} ,
+        LOADING_END_TIME = #{loadingEndTime} ,
+        LOADING_PROOF_IMAGE_SAVE_PATH=#{loadingProofPath},
+        LOADING_LONGITUDE=#{loadLongitude},
+        LOADING_LATITUDE=#{loadLatitude},
+        UNLOADING_CARGO_AMOUNT = #{unLoadingCargoAmount} ,
+        UNLOADING_START_TIME = #{unloadingStartTime} ,
+        UNLOADING_END_TIME = #{unloadingEndTime} ,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH=#{unloadingProofPath},
+        UNLOADING_LONGITUDE=#{unloadLongitude},
+        UNLOADING_LATITUDE=#{unloadLatitude},
+        PAYED_TIME=#{payedTime},
+        TRANSPORT_UNIT_PRICE=#{transportUnitPrice},
+        STATUS = #{status} ,
+        DELETE_FLAG=0,
+        LAST_UPDATE = #{lastUpdate} ,
+        LAST_UPDATE_USER_ID=#{lastUpdateUserId}
+        WHERE
+        SCHEDULE_SHEET_ID=#{scheduleSheetId}AND DELETE_FLAG=0
+    </update>
+
+    <!--删除调度单信息-->
+    <delete id="delScheduleSheet" parameterType="String">
+        UPDATE
+        t_data_transportation_schedule_sheet
+        SET
+        DELETE_FLAG=1
+        WHERE
+        SCHEDULE_SHEET_ID=#{scheduleSheetId}AND DELETE_FLAG=0
+    </delete>
+    <!--根据调度车辆ID查询调度单信息表_QJ-->
+    <select id="findScheduleSheetByScheduleTruckID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        SCHEDULE_TRUCK_ID = #{scheduleTruckId}AND DELETE_FLAG=0
+    </select>
+    <select id="findUnFinishSheetByTruckID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        SCHEDULE_TRUCK_ID = #{scheduleTruckId}AND DELETE_FLAG=0 AND STATUS &lt; 5
+    </select>
+    <!--根据用户名和状态查询未完成调度单个数-->
+    <select id="findScheduleUnFinishedByTruckIdAndStatusCount" resultType="Integer">
+        SELECT
+        COUNT(*)
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        STATUS  &lt;5
+        AND
+        DELETE_FLAG=0
+    </select>
+    <!--根据调度单的车辆关联id查询状态的最小值222222222-->
+    <select id="findMinStatusByTruckId" resultType="String">
+        SELECT
+        MIN(STATUS)
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        DELETE_FLAG=0
+    </select>
+
+    <!-- 管理者查询一年的调度单22222 -->
+    <select id="yearFinshedRecord" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        YEAR(LAST_UPDATE)=#{time}
+        AND
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        STATUS>4
+        AND
+        DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+    <!--管理者查询最近一周的调度单2222222-->
+    <select id="oneWeekFinshedRecord" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt; DATE(LAST_UPDATE)
+        AND
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        STATUS>4
+        AND
+        DELETE_FLAG=0
+    </select>
+    <!--管理者查询按月查询的调度单22222-->
+    <select id="monthFinshedRecord" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        MONTH(LAST_UPDATE)=#{time}
+        AND
+        YEAR(LAST_UPDATE)=YEAR(NOW())
+        AND
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        STATUS>4
+        AND
+        DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+
+    <!--管理者查询所有的调度单22222-->
+    <select id="allFinshedRecord" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        STATUS>4
+        AND
+        DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+    <!-- 管理者查询一年的调度单22222 -->
+    <select id="yearUnfinshedRecord" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        YEAR(LAST_UPDATE)=#{time}
+        AND
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        STATUS  &lt; 5
+        AND
+        DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+    <!--管理者查询最近一周的调度单2222222-->
+    <select id="oneWeekUnfinshedRecord" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt; DATE(LAST_UPDATE)
+        AND
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        STATUS  &lt;  5
+        AND
+        DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+    <!--管理者查询按月查询的调度单22222-->
+    <select id="monthUnfinshedRecord" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        MONTH(LAST_UPDATE)=#{time}
+        AND
+        YEAR(LAST_UPDATE)=YEAR(NOW())
+        AND
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        STATUS  &lt; 5
+        AND
+        DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+
+    <!--管理者 查询所有的调度单22222-->
+    <select id="allUnfinshedRecord" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        BELONG_SCHEDULE_SHEET_ID as belongScheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        SELECTED_LINE_NO as selectedLineNo,
+        ALLOCATE_TOTAL as allocateTotal,
+        CREATE_TIME AS  createTime,
+        ACCEPT_TIME as acceptTime,
+        REFUSE_TIME as refuseTime,
+        SET_OFF_TIME as setOffTime,
+        SCHEDULE_TRUCK_ID as scheduleTruckId,
+        LOADING_CARGO_AMOUNT as loadingCargoAmount,
+        LOADING_START_TIME as loadingStartTime,
+        LOADING_END_TIME as loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT as unLoadingCargoAmount,
+        UNLOADING_START_TIME as unloadingStartTime,
+        UNLOADING_END_TIME as unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME as payedTime,
+        TRANSPORT_UNIT_PRICE as transportUnitPrice,
+        STATUS as status,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        CODE as code
+        FROM
+        t_data_transportation_schedule_sheet
+        WHERE
+        SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+        AND
+        STATUS &lt; 5
+        AND
+        DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+
+
+    <!--根据多个条件条件查找调度单信息-->
+    <select id="findScheduleByConditions" resultType="com.cn.gazelle.logistics.pojo.T_Data_SchedingSheet">
+        SELECT s.`SCHEDULE_SHEET_ID` as schedulingSheetId,s.`SCHEDULE_PLAN_NUMBER` as planName,t.`PLATE_NUMBER` as plateNumber ,m.`TRUCK_MODEL_NAME` as modelName,
+        s.`ALLOCATE_TOTAL` as total,s.`ACCEPT_TIME` as  acceptTime,o.`OPERATE_MAIN_LINE_NAME` as lineName
+        FROM `t_data_transportation_schedule_sheet` s
+        LEFT JOIN `t_data_truck`t
+        ON s.`SCHEDULE_TRUCK_ID` =t.`TRUCK_ID`
+        LEFT JOIN `t_data_truck_model` m
+        ON m.`TRUCK_MODEL_NO`=t.`TRUCK_MODEL_NO`
+        LEFT JOIN `t_data_transportation_plan` p
+        ON s.`SCHEDULE_PLAN_NUMBER`=p.`SCHEDULE_PLAN_NUMBER`
+        LEFT JOIN `t_master_operate_main_line`o
+        ON o.`OPERATE_MAIN_LINE_ID` =p.`OPERATE_MAIN_LINE_ID`
+        WHERE t.`DELETE_FLAG`='0' AND o.`DELETE_FLAG`='0' AND m.`DELETE_FLAG`='0'AND p.`DELETE_FLAG`='0'
+        <if test="plateNumber != null and plateNumber != ''">
+            AND t.`PLATE_NUMBER` LIKE '%${plateNumber}%'
+        </if>
+        <if test="planNumber != null and planNumber != ''">
+            AND s.`SCHEDULE_PLAN_NUMBER` LIKE '%${planNumber}%'
+        </if>
+        <if test="lineName != null and lineName != ''">
+            AND o.`OPERATE_MAIN_LINE_ID` LIKE '%${lineName}%'
+        </if>
+        <if test="modelName != null and modelName != ''">
+            AND m.`TRUCK_MODEL_NO` LIKE '%${modelName}%'
+        </if>
+        <if test="receveEnd != null and receveEnd != '' and receveStart != null and receveStart != ''">
+            AND  s.`ACCEPT_TIME`   between #{receveStart} and #{receveEnd}
+        </if>
+        order BY s.`ACCEPT_TIME` DESC
+    </select>
+
+    <!--  司机     完成的           查询一年的调度单22222 -->
+    <select id="yearFinshedRecordByReceviceMember" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        s.BELONG_SCHEDULE_SHEET_ID AS belongScheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.SELECTED_LINE_NO AS selectedLineNo,
+        s.ALLOCATE_TOTAL AS allocateTotal,
+        s.CREATE_TIME AS  createTime,
+        s.ACCEPT_TIME AS acceptTime,
+        s.REFUSE_TIME AS refuseTime,
+        s.SET_OFF_TIME AS setOffTime,
+        s.SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        s.LOADING_CARGO_AMOUNT AS loadingCargoAmount,
+        LOADING_START_TIME AS loadingStartTime,
+        LOADING_END_TIME AS loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT AS unLoadingCargoAmount,
+        UNLOADING_START_TIME AS unloadingStartTime,
+        UNLOADING_END_TIME AS unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME AS payedTime,
+        TRANSPORT_UNIT_PRICE AS transportUnitPrice,
+        STATUS AS STATUS,
+        s.LAST_UPDATE AS lastUpdate,
+        s.LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.CODE AS CODE
+        FROM
+        t_data_transportation_schedule_sheet s
+        LEFT JOIN
+        t_data_transportation_dispatch_sheet t
+        ON t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        YEAR(s.LAST_UPDATE)=#{time}
+        AND
+        t.`RECEIVE_MEMBER_ID`=#{receviceMember}
+        AND
+        STATUS>4
+        AND
+        s.DELETE_FLAG=0
+        ORDER BY  UNLOADING_END_TIME  DESC
+    </select>
+    <!--查询最近一周的调度单2222222-->
+    <select id="oneWeekFinshedRecordByReceviceMember" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        s.BELONG_SCHEDULE_SHEET_ID AS belongScheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.SELECTED_LINE_NO AS selectedLineNo,
+        s.ALLOCATE_TOTAL AS allocateTotal,
+        s.CREATE_TIME AS  createTime,
+        s.ACCEPT_TIME AS acceptTime,
+        s.REFUSE_TIME AS refuseTime,
+        s.SET_OFF_TIME AS setOffTime,
+        s.SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        s.LOADING_CARGO_AMOUNT AS loadingCargoAmount,
+        LOADING_START_TIME AS loadingStartTime,
+        LOADING_END_TIME AS loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT AS unLoadingCargoAmount,
+        UNLOADING_START_TIME AS unloadingStartTime,
+        UNLOADING_END_TIME AS unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME AS payedTime,
+        TRANSPORT_UNIT_PRICE AS transportUnitPrice,
+        STATUS AS STATUS,
+        s.LAST_UPDATE AS lastUpdate,
+        s.LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.CODE AS CODE
+        FROM
+        t_data_transportation_schedule_sheet s
+        LEFT JOIN
+        t_data_transportation_dispatch_sheet t
+        ON t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt; DATE(s.LAST_UPDATE)
+        AND
+        t.`RECEIVE_MEMBER_ID`=#{receviceMember}
+        AND
+        STATUS>4
+        AND
+        s.DELETE_FLAG=0
+        ORDER BY  UNLOADING_END_TIME  DESC
+    </select>
+    <!--查询按月查询的调度单22222-->
+    <select id="monthFinshedRecordByReceviceMember" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        s.BELONG_SCHEDULE_SHEET_ID AS belongScheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.SELECTED_LINE_NO AS selectedLineNo,
+        s.ALLOCATE_TOTAL AS allocateTotal,
+        s.CREATE_TIME AS  createTime,
+        s.ACCEPT_TIME AS acceptTime,
+        s.REFUSE_TIME AS refuseTime,
+        s.SET_OFF_TIME AS setOffTime,
+        s.SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        s.LOADING_CARGO_AMOUNT AS loadingCargoAmount,
+        LOADING_START_TIME AS loadingStartTime,
+        LOADING_END_TIME AS loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT AS unLoadingCargoAmount,
+        UNLOADING_START_TIME AS unloadingStartTime,
+        UNLOADING_END_TIME AS unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME AS payedTime,
+        TRANSPORT_UNIT_PRICE AS transportUnitPrice,
+        STATUS AS STATUS,
+        s.LAST_UPDATE AS lastUpdate,
+        s.LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.CODE AS CODE
+        FROM
+        t_data_transportation_schedule_sheet s
+        LEFT JOIN
+        t_data_transportation_dispatch_sheet t
+        ON t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        MONTH(s.LAST_UPDATE)=#{time}
+        AND
+        YEAR(s.LAST_UPDATE)=YEAR(NOW())
+        AND
+        t.`RECEIVE_MEMBER_ID`=#{receviceMember}
+        AND
+        STATUS>4
+        AND
+        s.DELETE_FLAG=0
+        ORDER BY  UNLOADING_END_TIME  DESC
+    </select>
+
+    <!--查询所有的调度单22222-->
+    <select id="allFinshedRecordByReceviceMember" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+       SELECT
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        s.BELONG_SCHEDULE_SHEET_ID AS belongScheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.SELECTED_LINE_NO AS selectedLineNo,
+        s.ALLOCATE_TOTAL AS allocateTotal,
+        s.CREATE_TIME AS  createTime,
+        s.ACCEPT_TIME AS acceptTime,
+        s.REFUSE_TIME AS refuseTime,
+        s.SET_OFF_TIME AS setOffTime,
+        s.SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        s.LOADING_CARGO_AMOUNT AS loadingCargoAmount,
+        LOADING_START_TIME AS loadingStartTime,
+        LOADING_END_TIME AS loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT AS unLoadingCargoAmount,
+        UNLOADING_START_TIME AS unloadingStartTime,
+        UNLOADING_END_TIME AS unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME AS payedTime,
+        TRANSPORT_UNIT_PRICE AS transportUnitPrice,
+        STATUS AS STATUS,
+        s.LAST_UPDATE AS lastUpdate,
+        s.LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.CODE AS CODE
+        FROM
+        t_data_transportation_schedule_sheet s
+        LEFT JOIN
+        t_data_transportation_dispatch_sheet t
+        ON t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        t.`RECEIVE_MEMBER_ID`=#{receviceMember}
+        AND
+        STATUS>4
+        AND
+        s.DELETE_FLAG=0
+        ORDER BY  UNLOADING_END_TIME  DESC
+    </select>
+
+
+
+    <!--  司机     未完成的           查询一年的调度单22222 -->
+    <select id="yearUnfinshedRecordByReceviceMember" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        s.BELONG_SCHEDULE_SHEET_ID AS belongScheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.SELECTED_LINE_NO AS selectedLineNo,
+        s.ALLOCATE_TOTAL AS allocateTotal,
+        s.CREATE_TIME AS  createTime,
+        s.ACCEPT_TIME AS acceptTime,
+        s.REFUSE_TIME AS refuseTime,
+        s.SET_OFF_TIME AS setOffTime,
+        s.SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        s.LOADING_CARGO_AMOUNT AS loadingCargoAmount,
+        LOADING_START_TIME AS loadingStartTime,
+        LOADING_END_TIME AS loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT AS unLoadingCargoAmount,
+        UNLOADING_START_TIME AS unloadingStartTime,
+        UNLOADING_END_TIME AS unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME AS payedTime,
+        TRANSPORT_UNIT_PRICE AS transportUnitPrice,
+        STATUS AS STATUS,
+        s.LAST_UPDATE AS lastUpdate,
+        s.LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.CODE AS CODE
+        FROM
+        t_data_transportation_schedule_sheet s
+        LEFT JOIN
+        t_data_transportation_dispatch_sheet t
+        ON t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        YEAR(s.LAST_UPDATE)=#{time}
+        AND
+        t.`RECEIVE_MEMBER_ID`=#{receviceMember}
+        AND
+        STATUS &lt; 5
+        AND
+        s.DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+    <!-- 司机 未完成 查询最近一周的调度单2222222-->
+    <select id="oneWeekUnfinshedRecordByReceviceMember" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        s.BELONG_SCHEDULE_SHEET_ID AS belongScheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.SELECTED_LINE_NO AS selectedLineNo,
+        s.ALLOCATE_TOTAL AS allocateTotal,
+        s.CREATE_TIME AS  createTime,
+        s.ACCEPT_TIME AS acceptTime,
+        s.REFUSE_TIME AS refuseTime,
+        s.SET_OFF_TIME AS setOffTime,
+        s.SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        s.LOADING_CARGO_AMOUNT AS loadingCargoAmount,
+        LOADING_START_TIME AS loadingStartTime,
+        LOADING_END_TIME AS loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT AS unLoadingCargoAmount,
+        UNLOADING_START_TIME AS unloadingStartTime,
+        UNLOADING_END_TIME AS unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME AS payedTime,
+        TRANSPORT_UNIT_PRICE AS transportUnitPrice,
+        STATUS AS STATUS,
+        s.LAST_UPDATE AS lastUpdate,
+        s.LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.CODE AS CODE
+        FROM
+        t_data_transportation_schedule_sheet s
+        LEFT JOIN
+        t_data_transportation_dispatch_sheet t
+        ON t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt; DATE(s.LAST_UPDATE)
+        AND
+        t.`RECEIVE_MEMBER_ID`=#{receviceMember}
+        AND
+        STATUS &lt; 5
+        AND
+        s.DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+    <!-- 司机 未完成查询按月查询的调度单22222-->
+    <select id="monthUnfinshedRecordByReceviceMember" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        s.BELONG_SCHEDULE_SHEET_ID AS belongScheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.SELECTED_LINE_NO AS selectedLineNo,
+        s.ALLOCATE_TOTAL AS allocateTotal,
+        s.CREATE_TIME AS  createTime,
+        s.ACCEPT_TIME AS acceptTime,
+        s.REFUSE_TIME AS refuseTime,
+        s.SET_OFF_TIME AS setOffTime,
+        s.SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        s.LOADING_CARGO_AMOUNT AS loadingCargoAmount,
+        LOADING_START_TIME AS loadingStartTime,
+        LOADING_END_TIME AS loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT AS unLoadingCargoAmount,
+        UNLOADING_START_TIME AS unloadingStartTime,
+        UNLOADING_END_TIME AS unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME AS payedTime,
+        TRANSPORT_UNIT_PRICE AS transportUnitPrice,
+        STATUS AS STATUS,
+        s.LAST_UPDATE AS lastUpdate,
+        s.LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.CODE AS CODE
+        FROM
+        t_data_transportation_schedule_sheet s
+        LEFT JOIN
+        t_data_transportation_dispatch_sheet t
+        ON t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        MONTH(s.LAST_UPDATE)=#{time}
+        AND
+        YEAR(s.LAST_UPDATE)=YEAR(NOW())
+        AND
+        t.`RECEIVE_MEMBER_ID`=#{receviceMember}
+        AND
+        STATUS &lt; 5
+        AND
+       s.DELETE_FLAG=0
+       ORDER BY  CREATE_TIME  DESC
+    </select>
+
+    <!--司机 未完成  查询所有的调度单22222-->
+    <select id="allUnfinshedRecordByReceviceMember" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet">
+        SELECT
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        s.BELONG_SCHEDULE_SHEET_ID AS belongScheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.SELECTED_LINE_NO AS selectedLineNo,
+        s.ALLOCATE_TOTAL AS allocateTotal,
+        s.CREATE_TIME AS  createTime,
+        s.ACCEPT_TIME AS acceptTime,
+        s.REFUSE_TIME AS refuseTime,
+        s.SET_OFF_TIME AS setOffTime,
+        s.SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        s.LOADING_CARGO_AMOUNT AS loadingCargoAmount,
+        LOADING_START_TIME AS loadingStartTime,
+        LOADING_END_TIME AS loadingEndTime,
+        LOADING_PROOF_IMAGE_SAVE_PATH AS loadingProofPath,
+        UNLOADING_CARGO_AMOUNT AS unLoadingCargoAmount,
+        UNLOADING_START_TIME AS unloadingStartTime,
+        UNLOADING_END_TIME AS unloadingEndTime,
+        UNLOADING_PROOF_IMAGE_SAVE_PATH AS unloadingProofPath,
+        PAYED_TIME AS payedTime,
+        TRANSPORT_UNIT_PRICE AS transportUnitPrice,
+        STATUS AS STATUS,
+        s.LAST_UPDATE AS lastUpdate,
+        s.LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.CODE AS CODE
+        FROM
+        t_data_transportation_schedule_sheet s
+        LEFT JOIN
+        t_data_transportation_dispatch_sheet t
+        ON t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        t.`RECEIVE_MEMBER_ID`=#{receviceMember}
+        AND
+        STATUS &lt; 5
+        AND
+        s.DELETE_FLAG=0
+        ORDER BY  CREATE_TIME  DESC
+    </select>
+
+</mapper>
+

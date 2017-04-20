@@ -1,0 +1,195 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：logisticsDriverManagerController.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2017-03-03
+ * 作    者: YK
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.controller.operationController;
+
+import com.cn.gazelle.logistics.pojo.T_Data_JsonResult;
+import com.cn.gazelle.logistics.pojo.T_Data_Logistics_Drivers_Manager;
+import com.cn.gazelle.logistics.service.PersonService;
+import com.cn.gazelle.logistics.util.RadomUtil;
+import com.cn.gazelle.logistics.util.message.base.MessageUtil;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * 类 名 称：logisticsDriverManagerController
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ * 01
+ * 02
+ *
+ * @authot YK
+ */
+@Controller
+@RequestMapping(value = "/logisticsDriverManager")
+public class LogisticsDriverManagerController {
+    Logger logger = Logger.getLogger(LogisticsDriverManagerController.class);
+    @Value("#{setting[baseUrl]}")
+    private String baseUrl;
+    @Resource
+    private PersonService personService;
+
+    /**
+     * 方法名称：companyManager_home
+     * 内容摘要：物流公司管理页面。
+     *
+     * @param model model
+     * @return string 物流公司管理页面
+     */
+    @RequestMapping(value = "home")
+    public String driverManager_home(ModelMap model) {
+        return "operationManager/logisticsDriverManager/logisticsDriverManager";
+    }
+
+    /**
+     * 方法名称: 保存物流公司司机信息
+     * 方法描述：saveDriverInfo
+     *
+     * @param request
+     * @param response
+     * @param model
+     * @return T_Data_JsonResult
+     */
+    @RequestMapping(value = "saveDriverInfo")
+    @ResponseBody
+    public T_Data_JsonResult saveDriverInfo(@RequestParam("add_id_card_front_pic_id") MultipartFile id_card_front_pic,
+                                            @RequestParam("add_id_card_back_pic_id") MultipartFile id_card_back_pic,
+                                            @RequestParam("add_driver_licence_main_pic_id") MultipartFile driver_licence_main_pic,
+                                            @RequestParam("add_driver_licence_sub_pic_id") MultipartFile driver_licence_sub_pic,
+                                            @RequestParam("add_qualification_certificate_number_pic_id") MultipartFile qualification_certificate_number_pic,
+                                            HttpServletRequest request,
+                                            HttpServletResponse response, HttpSession session,
+                                            ModelMap model) {
+        T_Data_JsonResult jsonResult = new T_Data_JsonResult();
+        // 页面传递的数据
+        String driverInfo = request.getParameter("driverInfo");
+        logger.info("driverInfo===" + driverInfo);
+        String domainPath = request.getSession().getServletContext().getRealPath("/");
+        domainPath = domainPath.substring(0, domainPath.lastIndexOf(File.separator));
+        domainPath = domainPath.substring(0, domainPath.lastIndexOf(File.separator));
+        String baseUrl = domainPath + File.separator + this.baseUrl;
+        // 图片格式类型jsp、png等
+        String id_card_front_Type = null;
+        String id_card_back_Type = null;
+        String driver_licence_main_Type = null;
+        String driver_licence_sub_Type = null;
+        String qualification_certificate_number_Type = null;
+        // 图片保存相对路径
+        String id_card_front_path = null;
+        String id_card_back_path = null;
+        String driver_licence_main_path = null;
+        String driver_licence_sub_path = null;
+        String qualification_certificate_number_path = null;
+        // 将图片路径封装到HashMap中
+        HashMap pathMap = new HashMap();
+        int flag = 0;
+        try {
+            File fileUp = new File(baseUrl + "/PersonPic");
+            if (!id_card_front_pic.isEmpty() && !id_card_back_pic.isEmpty()&&!driver_licence_main_pic.isEmpty()
+                    &&!driver_licence_sub_pic.isEmpty()&&!qualification_certificate_number_pic.isEmpty()) {
+                String[] splitIdCardFront = (id_card_front_pic.getOriginalFilename()).split("\\.");
+                String[] splitIdCardBack = (id_card_back_pic.getOriginalFilename()).split("\\.");
+                String[] splitDriverLicenceMain = (driver_licence_main_pic.getOriginalFilename()).split("\\.");
+                String[] splitDriverLicenceSub = (driver_licence_sub_pic.getOriginalFilename()).split("\\.");
+                String[] splitQualificationCertificateNum = (qualification_certificate_number_pic.getOriginalFilename()).split("\\.");
+                id_card_front_Type = splitIdCardFront[1];
+                id_card_back_Type = splitIdCardBack[1];
+                driver_licence_main_Type = splitDriverLicenceMain[1];
+                driver_licence_sub_Type = splitDriverLicenceSub[1];
+                qualification_certificate_number_Type = splitQualificationCertificateNum[1];
+                if (!fileUp.exists()) {
+                    fileUp.mkdirs();
+                } else {
+                    id_card_front_path = "/PersonPic/" + RadomUtil.getOrderNo() + "." + id_card_front_Type;
+                    id_card_back_path = "/PersonPic/" + RadomUtil.getOrderNo() + "." + id_card_back_Type;
+                    driver_licence_main_path = "/PersonPic/" + RadomUtil.getOrderNo() + "." + driver_licence_main_Type;
+                    driver_licence_sub_path = "/PersonPic/" + RadomUtil.getOrderNo() + "." + driver_licence_sub_Type;
+                    qualification_certificate_number_path = "/PersonPic/" + RadomUtil.getOrderNo() + "." + qualification_certificate_number_Type;
+                    // 保存路径到pathMap中
+                    pathMap.put("id_card_front_path",id_card_front_path);
+                    pathMap.put("id_card_back_path",id_card_back_path);
+                    pathMap.put("driver_licence_main_path",driver_licence_main_path);
+                    pathMap.put("driver_licence_sub_path",driver_licence_sub_path);
+                    pathMap.put("qualification_certificate_number_path",qualification_certificate_number_path);
+                    // 上传
+                    id_card_front_pic.transferTo(new File(baseUrl + id_card_front_path));
+                    id_card_back_pic.transferTo(new File(baseUrl + id_card_back_path));
+                    driver_licence_main_pic.transferTo(new File(baseUrl + driver_licence_main_path));
+                    driver_licence_sub_pic.transferTo(new File(baseUrl + driver_licence_sub_path));
+                    qualification_certificate_number_pic.transferTo(new File(baseUrl + qualification_certificate_number_path));
+                }
+            }
+            flag = this.personService.saveDriverInfo(driverInfo, "U:" + request.getSession().getAttribute("username"),
+                    pathMap);
+            jsonResult.setResult(flag);
+        } catch (Exception e) {
+            logger.info(MessageUtil.saveInfoError + e.getMessage());
+            flag = Integer.parseInt(e.getMessage());
+            jsonResult.setResult(flag);
+        }
+        logger.info("flag=" + flag);
+        return jsonResult;
+    }
+
+    /**
+     * 方法名称：driverManagerList
+     * 内容摘要：物流公司司机管理页面列表。
+     *
+     * @param model model
+     * @return string 司机管理页面列表
+     */
+    @ResponseBody
+    @RequestMapping(value = "driverManagerList")
+    public List<T_Data_Logistics_Drivers_Manager> driverManagerList(@RequestParam(required = false, defaultValue = "") String person_name,
+                                                                    @RequestParam(required = false, defaultValue = "") String plate_number,
+                                                                    @RequestParam(required = false, defaultValue = "") String ID_type,
+                                                                    @RequestParam(required = false, defaultValue = "") String ID_num,
+                                                                    HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+        logger.info("person_name=" + person_name + ";" +
+                "plate_number=" + plate_number + ";" +
+                "ID_type=" + ID_type + ";" +
+                "ID_num=" + ID_num + ";"
+        );
+        HashMap<String, String> conditions = new HashMap<String, String>();
+        conditions.put("person_name", person_name);              // 姓名
+        conditions.put("plate_number", plate_number);            // 车牌号
+        conditions.put("ID_type", ID_type);                      // 类型
+        conditions.put("ID_num", ID_num);                        // 证件号
+        List<T_Data_Logistics_Drivers_Manager> driversManagerList = null;
+        try {
+            conditions.put("userName",request.getSession().getAttribute("username").toString());
+            driversManagerList = this.personService.findDriversList(conditions);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info(MessageUtil.seacheInfoError);
+        }
+        return driversManagerList;
+    }
+
+
+}
+

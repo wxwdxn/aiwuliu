@@ -1,0 +1,28 @@
+.getMap {
+  cursor: pointer;
+}
+.modalMap {
+  height: 300px;
+  height: 25rem;
+}
+.modal-content .modalFooter a {
+  margin: 0;
+}
+.fixed-table-body{
+  height:auto;
+}
+/*查询下拉*/
+.infoConditions .form-group .provinceJson ul,.cityJson ul,.areaJson ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+
+  /*新增下拉*/
+.myModalNewAdd .form-group .provinceJsons ul,.cityJsons ul,.areaJsons ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}

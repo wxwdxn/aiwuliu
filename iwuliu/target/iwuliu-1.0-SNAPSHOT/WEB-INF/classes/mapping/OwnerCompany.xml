@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.OwnerCompanyDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Company" type="com.cn.gazelle.logistics.pojo.T_Data_Company">
+        <id column="COMPANY_ID" property="company_id"/>
+        <result column="COMPANY_NAME" property="company_name"/>
+        <result column="BUSINESS_LICENCE" property="business_licence"/>
+        <result column="BUSINESS_LICENCE_PIC_ID" property="business_licence_pic_id"/>
+        <result column="COMPANY_FIXED_PHONE" property="company_fixed_phone"/>
+        <result column="CONTACT_NAME" property="contact_name"/>
+        <result column="CONTACT_SEX" property="contact_sex"/>
+        <result column="CONTACT_MOBILE_PHONE" property="contact_mobile_phone"/>
+        <result column="COMPANY_TYPE" property="company_type"/>
+        <result column="PROVINCE_ID" property="province_id"/>
+        <result column="CITY_ID" property="city_id"/>
+        <result column="AREA_ID" property="area_id"/>
+        <result column="TOWN_STREET" property="town_street"/>
+        <result column="STORE_PIC_ID" property="store_pic_id"/>
+        <result column="REGISTER_TIME" property="register_time"/>
+        <result column="BANK_ACCOUNT" property="bank_account"/>
+        <result column="STATUS" property="status"/>
+        <result column="REFUSED_REASON" property="refused_reason"/>
+        <result column="STATUS_UPDATE_TIME" property="status_update_time"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+
+    <!--查询货主-->
+    <select id="findOwnerCompanyList" resultType="com.cn.gazelle.logistics.pojo.T_Data_Company">
+        SELECT
+        *
+        FROM
+        T_Data_Company AS p
+        WHERE
+        COMPANY_TYPE=2 AND DELETE_FLAG=0
+        <if test="contact_name != null and contact_name != ''">
+            AND p.`CONTACT_NAME` LIKE '%${contact_name}%'
+        </if>
+        <if test="company_name != null and company_name != ''">
+            AND p.`COMPANY_NAME` LIKE '%${company_name}%'
+        </if>
+        <if test="contact_mobile_phone != null and contact_mobile_phone != ''">
+            AND p.`CONTACT_MOBILE_PHONE` LIKE '%${contact_mobile_phone}%'
+        </if>
+        order BY p.`LAST_UPDATE` ASC
+    </select>
+
+
+
+    <!--保存企业 货主信息-->
+    <insert id="saveOwner" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Company">
+        INSERT INTO
+        T_Data_Company(COMPANY_ID,
+        COMPANY_NAME,
+        BUSINESS_LICENCE,
+        BUSINESS_LICENCE_PIC_ID,
+        COMPANY_FIXED_PHONE,
+        CONTACT_NAME,
+        CONTACT_SEX,
+        CONTACT_MOBILE_PHONE,
+        COMPANY_TYPE,
+        PROVINCE_ID,
+        CITY_ID,
+        AREA_ID,
+        TOWN_STREET,
+        STORE_PIC_ID,
+        REGISTER_TIME,
+        BANK_ACCOUNT,
+        STATUS,
+        REFUSED_REASON,
+        STATUS_UPDATE_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID)
+        SELECT
+        #{company_id},
+        #{company_name},
+        #{business_licence},
+        #{business_licence_pic_id},
+        #{company_fixed_phone},
+        #{contact_name},
+        #{contact_sex},
+        #{contact_mobile_phone},
+        2,
+        #{province_id},
+        #{city_id},
+        #{area_id},
+        #{town_street},
+        #{store_pic_id},
+        #{register_time},
+        #{bank_account},
+        #{status},
+        #{refused_reason},
+        #{status_update_time},
+        0,
+        #{last_update},
+        #{last_update_user_id}
+        FROM dual WHERE not EXISTS (
+        SELECT  *
+        from T_Data_Company
+        WHERE BUSINESS_LICENCE=#{business_licence} AND COMPANY_TYPE=2 AND DELETE_FLAG=0
+        )
+    </insert>
+
+
+    <!--根据ID查找企业货主信息-->
+    <select id="findCompanyShipperByID" parameterType="String"
+            resultType="com.cn.gazelle.logistics.pojo.T_Data_Company">
+        SELECT
+        *
+        FROM
+        T_Data_Company
+        WHERE
+        COMPANY_ID=#{company_id} AND   COMPANY_TYPE=2 AND DELETE_FLAG=0
+    </select>
+</mapper>

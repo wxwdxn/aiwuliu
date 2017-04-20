@@ -1,0 +1,12 @@
+.main {
+  margin: 0 auto;
+  width: 90%;
+}
+.main .drivingBehaviorManagerHeader,
+.main .drivingBehaviorManager,
+.main .drivingBehaviorManagerQuery {
+  background: none;
+}
+.main .outBorder {
+  background: #eefff9;
+}

@@ -1,0 +1,79 @@
+
+   /*--------财务金融，虚拟账目查看开始-------------*/
+  .virtualAccountAll{
+      font-size: 16px;
+      font-size: 1.6rem;
+      border-bottom: 1px dashed #d2d2d2;
+      text-align: center;
+      padding: 53px 0 18px;
+      padding: 4rem 0 1rem;
+      span{
+          color: #fcb86f;
+      }
+  }
+  .virtualAccountAlgorithm{
+      border-bottom: 1px dashed #d2d2d2;
+      padding: 15px 0;
+      .algorithm{
+          position: relative;
+          margin: 0 auto;
+          width: 758px;
+          height: 82px;
+          background: url(../../../common/images/tuopan.png);
+          .personalAccount{
+              position: absolute;
+              left:50px;
+              left: 5rem;
+              top: 14px;
+              top: 1.4rem;
+              span{
+                  color: #fcb86f;
+              }
+              .personalAccountDetailClick{
+                  min-width: auto;
+                  padding-top: 2px;
+                  padding-bottom:2px;
+              }
+          }
+          .vehicleAccount{
+              position: absolute;
+              right: 50px;
+              right: 5rem;
+              top: 14px;
+              top: 1.4rem;
+              span{
+                  color: #fcb86f;
+              }
+              .vehicleAccountDetailClick{
+                  min-width: auto;
+                  padding-top: 2px;
+                  padding-bottom:2px;
+              }
+          }
+      }
+      .platform{
+          padding-top: 20px;
+          text-align: center;
+          span{
+              color: #fcb86f;
+          }
+      }
+      .tip{
+          text-indent: 30px;
+          text-indent:3rem ;
+      }
+  }
+  .virtualAccountAlgorithmDetail,.personalAccountDetail{
+     padding-top: 15px;
+      .gOut{
+          padding:10px 0;
+      }
+  }
+  .virtualAccountAlgorithmDetail{
+      border-right: 1px dashed #d2d2d2;
+  }
+  .btn{
+      background: #69a2b5;
+      color: #fff;
+  }
+   /*--------财务金融，虚拟账目查看结束-------------*/

@@ -1,0 +1,565 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% String username = request.getSession().getAttribute("username").toString();%>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="renderer" content="webkit|ie-comp|ie-stand"> 
+		<title></title>
+	</head>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap.min.css"/>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/operationManager/logisticsApprovaList/css/logisticsApprovaList.css"/>
+	<%--Bootstrap-table CSS文件--%>
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-table.min.css">
+	<script src="<%=request.getContextPath()%>/static/common/js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/common/js/common.js" type="text/javascript" charset="utf-8"></script>
+	<%--Bootstrap-table JavaScript 文件以及汉化文件--%>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table.min.js"></script>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table-zh-CN.js"></script>
+	<%--生成二维码--%>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/static/common/js/jquery.qrcode.min.js"></script>
+	<!--[if lt IE 9]>
+	  <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+	  <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	<body>
+		<!--*********导航条开始***********-->
+		<nav class="navbar navbar-default" role="navigation">
+		  <div class="container-fluid">
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="#">
+		      	<img src="<%=request.getContextPath()%>/static/common/images/logo.png"/>
+		      </a>
+		    </div>
+		
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		      
+		      <ul class="nav navbar-nav navbar-right">
+		        <li class="dropdown">
+		        	<a href="#" class="dropdown-toggle" data-toggle="dropdown">系统管理 <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">权限管理</a></li>
+						<li><a href="#">角色管理</a></li>
+					</ul>
+		        </li>
+		        <li class="dropdown">
+		          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%=username%><span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="/iwuliu/login/loginOut">退出</a></li>
+					</ul>
+		        </li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		  </div><!-- /.container-fluid -->
+		</nav>
+		<!--*********导航条结束***********-->
+		<div class="container-fluid eleHeight">
+			<div class="row eleHeight">
+				<div class="col-md-2 leftMenu eleHeight">
+				</div>
+				<div class="iframeMain">
+					<h4>
+						物流公司审核
+					</h4>
+					<div class="infoConditions">
+						<form class="form-inline">
+							<div class="form-group">
+								<label>机构名称：</label>
+								<div class="display_inlineBlcok">
+									<input type="text" class="form-control company_name"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>审批列表名单：</label>
+    							<div class="display_inlineBlcok listOfexaminationApproval">
+	    							<button class="btn form-control btn-default dropdown-toggle"
+											type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										<span class="placeHolder" value="0">司机待审批列表</span>
+									    <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+									    <li value="0"><a href="javascript:;">司机待审批列表</a></li>
+									    <li value="1"><a href="javascript:;">车辆待审批列表	</a></li>
+									</ul>
+    							</div>
+							</div>
+							<div class="QuerytheReset">
+								<label class="sr-only">查询按钮</label>
+								<div class="display_inlineBlcok">
+									<a type="button" class="btn query" onclick="queryList()">查询</a>
+									<a type="button" class="btn reset"  onclick="queryListReset()">重置</a>
+								</div>
+							</div>
+						</form>
+						<%--审核司机--%>
+						<div class="buttons drivers">
+							<a type="button" class="btn btn_export" onclick="agreeDriver()">
+								同意
+							</a>
+							<a type="button" class="btn" onclick="disagreeDriver()">
+								拒绝
+							</a>
+							<a type="button" class="btn btn_detail" onclick="btn_DriverModalDetail()">
+								详情
+							</a>
+							
+						</div>
+						<div class="drivers">
+							<%--司机审核列表--%>
+							<table data-toggle="table" class="table table-striped table-bordered table-hover"
+								   id="driversManagerTable"
+								   data-query-params="driversManagerQueryParams"
+								   data-query-params-type="limit"
+								   data-pagination="true"
+								   data-pagination-first-text="首页"
+								   data-pagination-pre-text="上一页"
+								   data-pagination-next-text="下一页"
+								   data-pagination-last-text="末页"
+								   data-row-style="rowStyle"
+								   data-page-list="[10, 20,30]"
+								   data-smart-display="false"
+								   data-single-select = "true"
+							>
+								<thead style="background-color:#dbfff2;">
+								<tr>
+									<th data-field="state" data-checkbox="true" data-width="100px"></th>
+									<th data-field="person_id" data-visible="false" data-align="center" data-valign="middle">
+										个人id
+									</th>
+									<th data-field="company_name" data-align="center" data-valign="middle">公司名称</th>
+									<th data-field="person_name" data-align="center" data-valign="middle">司机姓名</th>
+									<th data-field="person_mobile_phone" data-align="center" data-valign="middle">
+										司机手机
+									</th>
+									<th data-field="type_one" data-align="center" data-valign="middle"
+										data-formatter="firstIDTypeFormatter">证件类型一</th>
+									<th data-field="id_card_number" data-align="center" data-valign="middle">证件号码</th>
+									<th data-field="type_two" data-align="center" data-valign="middle"
+										data-formatter="secondIDTypeFormatter">证件类型二</th>
+									<th data-field="driver_licence_number" data-align="center" data-valign="middle">驾驶档案编号</th>
+									<th data-field="verify_status_value" data-align="center" data-valign="middle">审核状态</th>
+								</tr>
+								</thead>
+							</table>
+							<div class="form-inline" align="center" style="margin: -45px auto 17px;">
+								<input id="driver_page" class="form-control" style="width: 60px;" type="number" value="1" min="1">
+								<button id="driver_goBtn" class="btn btn-success">GO</button>
+							</div>
+						</div>
+						<%--审核车辆--%>
+						<div class="buttons cars hidden">
+							<a type="button" class="btn btn_export" onclick="agreeTruck()">
+								同意
+							</a>
+							<a type="button" class="btn" onclick="disagreeTruck()">
+								拒绝
+							</a>
+							<a type="button" class="btn btn_detail" onclick="btn_CarModalDetail()">
+								详情
+							</a>
+							
+						</div>
+						<div class="cars hidden">
+							<%--司机审核列表--%>
+							<table data-toggle="table" class="table table-striped table-bordered table-hover"
+								   id="trucksManagerTable"
+								   data-query-params="trucksManagerQueryParams"
+								   data-query-params-type="limit"
+								   data-pagination="true"
+								   data-pagination-first-text="首页"
+								   data-pagination-pre-text="上一页"
+								   data-pagination-next-text="下一页"
+								   data-pagination-last-text="末页"
+								   data-row-style="rowStyle"
+								   data-page-list="[10, 20,30]"
+								   data-smart-display="false"
+								   data-single-select = "true"
+							>
+								<thead style="background-color:#dbfff2;">
+								<tr>
+									<th data-field="state" data-checkbox="true" data-width="100px"></th>
+									<th data-field="organization_type" data-visible="false" data-align="center" data-valign="middle">
+										企业id
+									</th>
+									<th data-field="organization_name" data-align="center" data-valign="middle">公司名称</th>
+									<th data-field="plate_number" data-align="center" data-valign="middle">车牌号</th>
+									<th data-field="truck_brand" data-align="center" data-valign="middle">
+										车辆品牌
+									</th>
+									<th data-field="truck_model_name" data-align="center" data-valign="middle">车型号</th>
+									<th data-field="truck_type" data-align="center" data-valign="middle">车类型</th>
+									<th data-field="truck_carriage_type" data-align="center" data-valign="middle">车厢类型</th>
+									<th data-field="transport_line" data-align="center" data-valign="middle">常跑干线</th>
+									<th data-field="verify_status" data-align="center" data-valign="middle">审核状态</th>
+								</tr>
+								</thead>
+							</table>
+							<div class="form-inline" align="center" style="margin: -45px auto 17px;">
+								<input id="truck_page" class="form-control" style="width: 60px;" type="number" value="1" min="1">
+								<button id="truck_goBtn" class="btn btn-success">GO</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal 司机待审批详情-->
+		<div class="modal fade bs-example-modal-lg" id="DrivermyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog modalDialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close closeLeft" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" >司机待审批详情</h4>
+		        <%--<a type="button" isClick=true class="btn edit" onclick="detail_edit(this)">编辑</a>--%>
+		      </div>
+		      <div class="modal-body">
+		      	<form  class="form-inline">
+					<div class="form-group docubleUneditable">
+						<label>司机姓名：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="person_name"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>司机手机：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="person_mobile_phone"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>证件类型一：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" value="身份证"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>证件号码：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="id_card_number"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group formgroupImg">
+						<label>手持身份证正面：</label>
+						<div class="display_inlineBlcok" id="id_card_front_pic_id">
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group formgroupImg">
+						<label>手持身份证后面：</label>
+						<div class="display_inlineBlcok" id="id_card_back_pic_id">
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>证件类型二：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" value="驾驶证"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>驾驶证档案编号：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="driver_licence_number"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group formgroupImg">
+						<label>手持驾驶证第一页：</label>
+						<div class="display_inlineBlcok" id="driver_licence_main_pic_id">
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group formgroupImg">
+						<label>手持驾驶证第二页：</label>
+						<div class="display_inlineBlcok" id="driver_licence_sub_pic_id">
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>运输从业资格证号码：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="qualification_certificate_number"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group formgroupImg">
+						<label>手持运输从业资格证照片：</label>
+						<div class="display_inlineBlcok" id="qualification_certificate_number_pic_id">
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group uneditable matchGoodType">
+						<label>审核状态：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="verify_status_value"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>公司名称：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="company_name_driver" />
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group formgroupImg_erweima">
+						<label>公司二维码：</label>
+						<div class="display_inlineBlcok" id="qrCode_driver">
+							<p></p>
+						</div>
+					</div>
+				</form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<!--Modal imgBig-->
+		<div class="modal fade" id="ModalImg" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<a type="button" class="close modalImgClose" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+						<h4 class="modal-title" id="myModalLabel">图片信息</h4>
+					</div>
+					<div class="modal-body modalImg">
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal 车辆待审批详情-->
+		<div class="modal fade bs-example-modal-lg" id="CarsmyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog modalDialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close closeLeft" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" >车辆待审批详情</h4>
+		      </div>
+		      <div class="modal-body">
+		      	<form  class="form-inline">
+					<div class="form-group docubleUneditable">
+						<label>车牌号码：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="plate_number"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>车辆品牌：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="truck_brand"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>车辆型号：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="truck_model_name"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>车厢类型：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="truck_carriage_type"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>燃料类型：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="fuel_type"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>车类型：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="truck_type"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>车架号：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="vehicle_identify_number"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>发动机号：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="engine_number"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>车长(米)：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="truck_length"/>
+							<p></p>
+						</div>
+					</div>
+					
+					<div class="form-group docubleUneditable">
+						<label>核定载重(吨)：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="load_weight"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>长跑干线：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="transport_line"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group uneditable matchGoodType">
+						<label>审核状态：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="verify_status"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group uneditable matchGoodType">
+						<label>拒绝理由：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="verify_refused_reason"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable">
+						<label>公司名称：</label>
+						<div class="display_inlineBlcok">
+							<input disabled type="text" class="form-control" id="organization_name"/>
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable formgroupImg">
+						<label>行驶证第一页：</label>
+						<div class="display_inlineBlcok" id="driving_licence_first_page_save_path">
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable formgroupImg">
+						<label>行驶证第二页：</label>
+						<div class="display_inlineBlcok" id="driving_licence_second_page_save_path">
+							<p></p>
+						</div>
+					</div>
+					<div class="form-group docubleUneditable formgroupImg">
+						<label>车辆照片：</label>
+						<div class="display_inlineBlcok" id="truck_pic_save_path">
+							<p></p>
+						</div>
+					</div>
+					<br/>
+					<div class="form-group formgroupImg_erweima">
+						<label>公司二维码：</label>
+						<div class="display_inlineBlcok" id="qrCode_truck">
+							<p></p>
+						</div>
+					</div>
+				</form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<!--Modal qrCode 二维码-->
+		<div class="modal fade" id="ModalQRCode" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+			<div class="modal-dialog modalImg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<a type="button" class="close modalImgClose" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span></a>
+						<h4 class="modal-title QRCodeCompanyName">图片信息</h4>
+					</div>
+					<div class="modal-body ModalQRCode">
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--Modal 司机审核提示框-->
+		<div class="modal fade bs-example-modal-sm" id="driverModalInfo" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+			<div class="modal-dialog modal-sm" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">确定拒绝？</h4>
+					</div>
+					<div class="modal-body text-center">
+						<h2 class="form-group">
+							<textarea name="" cols="10" rows="5" class="form-control" id="reason_driver"></textarea>
+							<p></p>
+						</h2>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default confirm" data-dismiss="modal" id="driverConfirm">确定</button>
+						<button type="button" class="btn btn-default cancel" data-dismiss="modal">取消</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--Modal 车辆审核提示框-->
+		<div class="modal fade bs-example-modal-sm" id="truckModalInfo" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+			<div class="modal-dialog modal-sm" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">确定拒绝？</h4>
+					</div>
+					<div class="modal-body text-center">
+						<h2 class="form-group">
+							<textarea id="reason_truck" cols="10" rows="5" class="form-control"></textarea>
+							<p></p>
+						</h2>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default confirm" data-dismiss="modal" id="trucKConfirm">确定</button>
+						<button type="button" class="btn btn-default cancel" data-dismiss="modal">取消</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--Modal 小信息提示框-->
+		<div class="modal fade bs-example-modal-sm" id="smallModalInfo" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+			<div class="modal-dialog modal-sm" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">信息提示</h4>
+					</div>
+					<div class="modal-body text-center">
+						<h2 class="titleInfo">
+
+						</h2>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default confirm" data-dismiss="modal">确定</button>
+						<button type="button" class="btn btn-default cancel" data-dismiss="modal">取消</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<%--引入自己的css--%>
+	<script src="<%=request.getContextPath()%>/static/operationManager/logisticsApprovaList/js/logisticsApprovaList.js" type="text/javascript" charset="utf-8"></script>
+</html>

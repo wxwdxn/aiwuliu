@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.SchedulePlanDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Transportation_Schedule_Sheet_Plan" type="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet_Plan">
+        <id column="PLAN_NUMBER" property="planNumber"></id>
+        <result column="SCHEDULE_PLAN_NUMBER" property="schedule_plan_number"></result>
+        <result column="SCHEDULE_TRUCK_ID" property="scheduleTruckId"></result>
+        <result column="BEGIN_SCHEDULE_TIME" property="beginScheduleTime"></result>
+        <result column="STATUS" property="status"></result>
+        <result column="DELETE_FLAG" property="deleteFlag"></result>
+        <result column="LAST_UPDATE" property="lastUpdate"></result>
+        <result column="LAST_UPDATE_USER_ID" property="lastUpdateUserId"></result>
+    </resultMap>
+
+
+    <!--保存货物运输计划调度单信息表-->
+    <insert id="addScheduleSheet"  parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet_Plan">
+        INSERT INTO
+            T_Data_Transportation_Schedule_Sheet_Plan(
+                SCHEDULE_PLAN_NUMBER,
+                SCHEDULE_TRUCK_ID,
+                BEGIN_SCHEDULE_TIME,
+                STATUS,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{schedule_plan_number},
+                #{scheduleTruckId},
+                #{beginScheduleTime},
+                #{status},
+                0,
+                #{lastUpdate},
+                #{lastUpdateUserId}
+                );
+    </insert>
+
+
+    <!--查询状态为0未查看货物运输计划调度单信息表-->
+    <select id="findUnLookSheet"  resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet_Plan">
+       SELECT
+        PLAN_NUMBER AS planNumber,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        BEGIN_SCHEDULE_TIME AS beginScheduleTime,
+        STATUS AS status,
+        LAST_UPDATE AS lastUpdate,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE_USER_ID  AS lastUpdateUserId
+        from
+        T_Data_Transportation_Schedule_Sheet_Plan
+      WHERE STATUS=0  AND DELETE_FLAG=0 AND SCHEDULE_PLAN_NUMBER=#{schedule_plan_number}  ORDER BY `BEGIN_SCHEDULE_TIME` ASC
+    </select>
+
+    <!--查询状态为1已查看货物运输计划调度单信息表-->
+    <select id="findLookSheet"  resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet_Plan">
+        SELECT
+        PLAN_NUMBER AS planNumber,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        BEGIN_SCHEDULE_TIME AS beginScheduleTime,
+        STATUS AS status,
+        LAST_UPDATE AS lastUpdate,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE_USER_ID  AS lastUpdateUserId
+        from
+        T_Data_Transportation_Schedule_Sheet_Plan
+        WHERE STATUS>=1 AND DELETE_FLAG=0 AND SCHEDULE_PLAN_NUMBER=#{schedule_plan_number}   ORDER BY `BEGIN_SCHEDULE_TIME` ASC
+    </select>
+
+    <!--删除货物运输计划调度单信息表-->
+    <delete id="deleteScheduleSheet" parameterType="String">
+        UPDATE
+        T_Data_Transportation_Schedule_Sheet_Plan
+        SET
+        DELETE_FLAG=1
+        WHERE PLAN_NUMBER=#{planNumber} AND  DELETE_FLAG=0
+    </delete>
+
+
+    <!--更新货物运输计划调度单信息表-->
+    <update id="updateScheduleSheet" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet_Plan">
+        UPDATE
+        T_Data_Transportation_Schedule_Sheet_Plan
+        SET
+        STATUS =#{status} ,
+        LAST_UPDATE  =#{lastUpdate} ,
+        LAST_UPDATE_USER_ID =#{lastUpdateUserId}
+        WHERE PLAN_NUMBER=#{planNumber} AND  DELETE_FLAG=0
+    </update>
+
+
+    <!--通过车辆id查询状态为0未查看货物运输计划调度单信息表-->
+    <select id="findUnLookSheetByTruckId"  resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet_Plan">
+        SELECT
+        PLAN_NUMBER AS planNumber,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        BEGIN_SCHEDULE_TIME AS beginScheduleTime,
+        STATUS AS status,
+        LAST_UPDATE AS lastUpdate,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE_USER_ID  AS lastUpdateUserId
+        from
+        T_Data_Transportation_Schedule_Sheet_Plan
+        WHERE STATUS=0  AND DELETE_FLAG=0 AND SCHEDULE_TRUCK_ID=#{scheduleTruckId}  ORDER BY `BEGIN_SCHEDULE_TIME` ASC
+    </select>
+
+    <!--通过车辆id查询状态大于1已查看货物运输计划调度单信息表-->
+    <select id="findLookSheetByTruckId"  resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet_Plan">
+        SELECT
+        PLAN_NUMBER AS planNumber,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        BEGIN_SCHEDULE_TIME AS beginScheduleTime,
+        STATUS AS status,
+        LAST_UPDATE AS lastUpdate,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE_USER_ID  AS lastUpdateUserId
+        from
+        T_Data_Transportation_Schedule_Sheet_Plan
+        WHERE STATUS>=1 AND DELETE_FLAG=0 AND SCHEDULE_TRUCK_ID=#{scheduleTruckId}   ORDER BY `BEGIN_SCHEDULE_TIME` ASC
+    </select>
+
+    <!--通过车辆id查询状态等于1已查看货物运输计划调度单信息表-->
+    <select id="findLookSheetByTruckIdAndStatus"  resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Schedule_Sheet_Plan">
+        SELECT
+        PLAN_NUMBER AS planNumber,
+        SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        SCHEDULE_TRUCK_ID AS scheduleTruckId,
+        BEGIN_SCHEDULE_TIME AS beginScheduleTime,
+        STATUS AS status,
+        LAST_UPDATE AS lastUpdate,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE_USER_ID  AS lastUpdateUserId
+        from
+        T_Data_Transportation_Schedule_Sheet_Plan
+        WHERE STATUS =1 AND DELETE_FLAG=0 AND SCHEDULE_TRUCK_ID=#{scheduleTruckId}
+    </select>
+
+
+
+
+</mapper>

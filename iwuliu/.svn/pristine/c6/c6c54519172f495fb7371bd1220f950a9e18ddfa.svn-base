@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TransportationContractDaoMapper">
+    <!--结果定义集设定-->
+    <resultMap id="T_Data_Transportation_Contract" type="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Contract">
+       <id column="CONTRACT_ID" property="contract_id"></id>
+        <result column="FIRST_PARTY_TYPE" property="first_party_type"></result>
+        <result column="FIRST_PARTY_RELEVANCE_INFO_ID" property="first_party_relevance_info_id"></result>
+        <result column="CARGO_TYPE_ID" property="cargo_type_id"></result>
+        <result column="CARGO_TOTAL" property="cargo_total"></result>
+        <result column="CREATE_DATE" property="create_date"></result>
+        <result column="BEGIN_DATE" property="begin_date"></result>
+        <result column="END_DATE" property="end_date"></result>
+        <result column="UNIT_PRICE" property="unit_price"></result>
+        <result column="BALANCE_TYPE" property="balance_type"></result>
+        <result column="BALANCE_CYCLE" property="balance_cycle"></result>
+        <result column="CONTACT_NAME" property="contact_name"></result>
+        <result column="CONTACT_PHONE" property="contact_phone"></result>
+        <result column="STATUS" property="status"></result>
+        <result column="REFUSED_REASON" property="refused_reason"></result>
+        <result column="STATUS_UPDATE_TIME" property="status_update_time"></result>
+        <result column="DELETE_FLAG" property="deleteFlag"></result>
+        <result column="LAST_UPDATE" property="last_update"></result>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"></result>
+        <result column="CODE" property="code"></result>
+    </resultMap>
+    <!--id 查询运输合同信息-->
+    <select id="findById" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Contract">
+        SELECT
+            *
+        FROM
+              t_data_transportation_contract
+        WHERE
+              CONTRACT_ID=#{contract_id} AND DELETE_FLAG=0
+    </select>
+
+    <!--code 查询运输合同信息-->
+    <select id="findByCode" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Contract">
+        SELECT
+            *
+        FROM
+            t_data_transportation_contract
+        WHERE
+            CODE=#{code}AND DELETE_FLAG=0
+    </select>
+
+    <!--添加运输合同-->
+    <insert id="saveTransportationContract" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Contract">
+      INSERT INTO
+          t_data_transportation_contract( CONTRACT_ID,
+          FIRST_PARTY_TYPE,
+          FIRST_PARTY_RELEVANCE_INFO_ID,
+          CARGO_TYPE_ID,
+          CARGO_TOTAL,
+          CREATE_DATE,
+          BEGIN_DATE,
+          END_DATE,
+          UNIT_PRICE,
+          BALANCE_TYPE,
+          BALANCE_CYCLE,
+          CONTACT_NAME,
+          CONTACT_PHONE,
+          STATUS,
+          REFUSED_REASON,
+          STATUS_UPDATE_TIME,
+          DELETE_FLAG,
+          LAST_UPDATE,
+          LAST_UPDATE_USER_ID,
+          CODE)
+      SELECT
+          #{contract_id},
+          #{first_party_type},
+          #{first_party_relevance_info_id},
+          #{cargo_type_id},
+          #{cargo_total},
+          #{create_date},
+          #{begin_date},
+          #{end_date},
+          #{unit_price},
+          #{balance_type},
+          #{balance_cycle},
+          #{contact_name},
+          #{contact_phone},
+          #{status},
+          #{refused_reason},
+          #{status_update_time},
+          0,
+          #{last_update},
+          #{last_update_user_id},
+          #{code}
+          FROM dual WHERE NOT EXISTS(
+          SELECT CODE FROM t_data_transportation_contract
+          WHERE CODE = #{code} AND DELETE_FLAG=0)
+
+     </insert>
+
+
+    <!--更新运输合同信息-->
+    <update id="updateTransportationContract" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Contract">
+        UPDATE
+            t_data_transportation_contract
+        SET
+            FIRST_PARTY_TYPE= #{first_party_type},
+            FIRST_PARTY_RELEVANCE_INFO_ID=#{first_party_relevance_info_id},
+            CARGO_TYPE_ID=#{cargo_type_id},
+            CARGO_TOTAL=#{cargo_total},
+            CREATE_DATE=#{create_date},
+            BEGIN_DATE=#{begin_date},
+            END_DATE=#{end_date},
+            UNIT_PRICE=#{unit_price},
+            BALANCE_TYPE=#{balance_type},
+            BALANCE_CYCLE=#{balance_cycle},
+            CONTACT_NAME=#{contact_name},
+            CONTACT_PHONE=#{contact_phone},
+            STATUS=#{status},
+            REFUSED_REASON=#{refused_reason},
+            STATUS_UPDATE_TIME=#{status_update_time},
+            DELETE_FLAG=0,
+            LAST_UPDATE=#{last_update},
+            LAST_UPDATE_USER_ID=#{last_update_user_id}
+        WHERE
+            CONTRACT_ID=#{contract_id}AND DELETE_FLAG=0
+    </update>
+  <!--查询所有的运输合同信息-->
+    <select id="findAllTransportationContract" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Contract">
+         SELECT
+              *
+         FROM
+              t_data_transportation_contract
+        WHERE DELETE_FLAG=0
+
+    </select>
+
+    <!--查询所有的运输合同信息=======不分页-->
+    <select id="findTransportationContractList" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Contract">
+      SELECT
+          *
+      FROM
+          t_data_transportation_contract
+      WHERE
+          DELETE_FLAG=0 AND STATUS=1
+    </select>
+
+    <!--根据货物id 查询运输合同信息-->
+    <select id="findByCargoTypeId" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Contract">
+        SELECT
+        *
+        FROM
+        t_data_transportation_contract
+        WHERE
+        CARGO_TYPE_ID=#{cargo_type_id} AND  FIRST_PARTY_TYPE=0 AND DELETE_FLAG=0
+    </select>
+</mapper>

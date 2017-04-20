@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.OwnerDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Person" type="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        <id column="PERSON_ID" property="person_id"/>
+        <result column="PERSON_NAME" property="person_name"/>
+        <result column="PERSON_MOBILE_PHONE" property="person_mobile_phone"/>
+        <result column="ID_CARD_NUMBER" property="id_card_number"/>
+        <result column="PERSON_TYPE" property="person_type"/>
+        <result column="HOLD_ID_CARD_PIC_ID" property="hold_id_card_pic_id"/>
+        <result column="ID_CARD_FRONT_PIC_ID" property="id_card_front_pic_id"/>
+        <result column="ID_CARD_BACK_PIC_ID" property="id_card_back_pic_id"/>
+        <result column="SEX" property="sex"/>
+        <result column="DRIVER_LICENCE_NUMBER" property="driver_licence_number"/>
+        <result column="DRIVER_LICENCE_MAIN_PIC_ID" property="driver_licence_main_pic_id"/>
+        <result column="DRIVER_LICENCE_SUB_PIC_ID" property="driver_licence_sub_pic_id"/>
+        <result column="QUALIFICATION_CERTIFICATE_NUMBER" property="qualification_certificate_number"/>
+        <result column="qualification_certificate_number_pic_id" property="qualification_certificate_number_pic_id"/>
+        <result column="DRIVING_TRUCK_ID" property="driving_truck_id"/>
+        <result column="DRIVING_STATUS" property="driving_status"/>
+        <result column="SUBMIT_RELATE_TIME" property="submit_relate_time"/>
+        <result column="CONFIRM_RELATE_TIME" property="confirm_relate_time"/>
+        <result column="SUBMIT_VERIFY_TIME" property="submit_verify_time"/>
+        <result column="VERIFY_STATUS" property="verify_status"/>
+        <result column="VERIFY_REFUSED_REASON" property="verify_refused_reason"/>
+        <result column="VERIFY_PASSED_TIME" property="verify_passed_time"/>
+        <result column="VERIFY_REFUSED_TIME" property="verify_refused_time"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+    
+    <select id="findOwnerList" resultType="com.cn.gazelle.logistics.pojo.T_Data_Person">
+
+        SELECT *
+        FROM `t_data_person` as p
+        WHERE PERSON_TYPE='2'
+        <if test="person_name != null and person_name != ''">
+            AND p.`PERSON_NAME` LIKE '%${person_name}%'
+        </if>
+        <if test="id_card_number != null and id_card_number != ''">
+            AND p.`ID_CARD_NUMBER` LIKE '%${id_card_number}%'
+        </if>
+        <if test="person_mobile_phone != null and person_mobile_phone != ''">
+            AND p.`PERSON_MOBILE_PHONE` LIKE '%${person_mobile_phone}%'
+        </if>
+        order BY p.`LAST_UPDATE` ASC
+
+    </select>
+
+    <!--保存个人货主信息-->
+    <insert id="saveOwner" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        INSERT INTO
+        T_Data_Person(PERSON_ID,
+        PERSON_NAME,
+        PERSON_MOBILE_PHONE,
+        ID_CARD_NUMBER,
+        PERSON_TYPE,
+        HOLD_ID_CARD_PIC_ID,
+        ID_CARD_FRONT_PIC_ID,
+        ID_CARD_BACK_PIC_ID,
+        SEX,
+        DRIVER_LICENCE_NUMBER,
+        DRIVER_LICENCE_MAIN_PIC_ID,
+        DRIVER_LICENCE_SUB_PIC_ID,
+        QUALIFICATION_CERTIFICATE_NUMBER,
+        QUALIFICATION_CERTIFICATE_NUMBER_PIC_ID,
+        DRIVING_TRUCK_ID,
+        DRIVING_STATUS,
+        SUBMIT_RELATE_TIME,
+        CONFIRM_RELATE_TIME,
+        SUBMIT_VERIFY_TIME,
+        VERIFY_STATUS,
+        VERIFY_REFUSED_REASON,
+        VERIFY_PASSED_TIME,
+        VERIFY_REFUSED_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID)
+        VALUES (
+        #{person_id},
+        #{person_name},
+        #{person_mobile_phone},
+        #{id_card_number},
+        2,
+        #{hold_id_card_pic_id},
+        #{id_card_front_pic_id},
+        #{id_card_back_pic_id},
+        #{sex},
+        #{driver_licence_number},
+        #{driver_licence_main_pic_id},
+        #{driver_licence_sub_pic_id},
+        #{qualification_certificate_number},
+        #{qualification_certificate_number_pic_id},
+        #{driving_truck_id},
+        #{driving_status},
+        #{submit_relate_time},
+        #{confirm_relate_time},
+        #{submit_verify_time},
+        2,
+        #{verify_refused_reason},
+        #{verify_passed_time},
+        #{verify_refused_time},
+        0,
+        #{last_update},
+        #{last_update_user_id})
+    </insert>
+
+
+
+
+
+    <!--更新个人信息-->
+    <update id="updatePerson" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        UPDATE
+        T_Data_Person
+        SET
+        PERSON_NAME = #{person_name},
+        PERSON_MOBILE_PHONE =#{person_mobile_phone},
+        ID_CARD_NUMBER = #{id_card_number} ,
+        PERSON_TYPE = #{person_type},
+        HOLD_ID_CARD_PIC_ID = #{hold_id_card_pic_id} ,
+        ID_CARD_FRONT_PIC_ID = #{id_card_front_pic_id} ,
+        ID_CARD_BACK_PIC_ID = #{id_card_back_pic_id} ,
+        SEX = #{sex} ,
+        DRIVER_LICENCE_NUMBER = #{driver_licence_number} ,
+        DRIVER_LICENCE_MAIN_PIC_ID = #{driver_licence_main_pic_id} ,
+        DRIVER_LICENCE_SUB_PIC_ID = #{driver_licence_sub_pic_id} ,
+        QUALIFICATION_CERTIFICATE_NUMBER = #{qualification_certificate_number} ,
+        QUALIFICATION_CERTIFICATE_NUMBER_PIC_ID = #{qualification_certificate_number_pic_id} ,
+        DRIVING_TRUCK_ID = #{driving_truck_id} ,
+        DRIVING_STATUS = #{driving_status} ,
+        SUBMIT_RELATE_TIME = #{submit_relate_time} ,
+        CONFIRM_RELATE_TIME = #{confirm_relate_time} ,
+        SUBMIT_VERIFY_TIME = #{submit_verify_time} ,
+        VERIFY_STATUS = 2 ,
+        VERIFY_REFUSED_REASON = #{verify_refused_reason} ,
+        VERIFY_PASSED_TIME = #{verify_passed_time} ,
+        VERIFY_REFUSED_TIME = #{verify_refused_time} ,
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+        PERSON_ID = #{person_id} AND DELETE_FLAG='0'
+
+    </update>
+
+
+
+
+
+    <!--查询个人货主列表信息-->
+    <select id="findPersonShipperById" resultMap="T_Data_Person">
+        SELECT
+        *
+        FROM
+        T_Data_Person
+        Where
+        PERSON_TYPE=2 AND DELETE_FLAG=0 AND VERIFY_STATUS=2 AND   PERSON_ID = #{person_id}
+    </select>
+</mapper>

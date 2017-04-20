@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TroubleCodeDaoMapper">
+    <resultMap id="T_Sys_Truck_Trouble_Code" type="com.cn.gazelle.logistics.pojo.T_Sys_Truck_Trouble_Code">
+        <id column="CODE_ID " property="code_id"/>
+        <result column="TROUBLE_ID" property="trouble_id"/>
+        <result column="TROUBLE_CODE" property="trouble_code"/>
+        <result column="TROUBLE_CONTENT" property="trouble_content"/>
+        <result column="TRUCK_TYPE" property="truck_type"/>
+        <result column="TROUBLE_DATE" property="trouble_date"/>
+        <result column="DELETE_STATES " property="delete_states"/>
+        <result column="TROUBLE_REMARK " property="trouble_remark"/>
+    </resultMap>
+
+    <!--根据ID查找故障码信息-->
+    <select id="findTroubleCodeByID" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Truck_Trouble_Code">
+        SELECT
+        *
+        FROM
+        T_Sys_Truck_Trouble_Code
+        WHERE
+        CODE_ID = #{code_id} AND DELETE_STATES = '0'
+    </select>
+
+    <!--根据故障码代码值查找信息-->
+    <select id="findTroubleCodeByCode" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Truck_Trouble_Code">
+        SELECT
+        *
+        FROM
+        T_Sys_Truck_Trouble_Code
+        WHERE
+        TROUBLE_CODE = #{trouble_code} AND TRUCK_TYPE = #{truck_type} AND DELETE_STATES = '0'
+    </select>
+
+    <!--查找所有故障码信息-->
+    <select id="findAllTroubleCode" resultMap="T_Sys_Truck_Trouble_Code">
+        SELECT
+        *
+        FROM
+        T_Sys_Truck_Trouble_Code
+        WHERE
+        DELETE_STATES = '0' AND TRUCK_TYPE = #{truck_type}
+        <if test="trouble_code !='' ">
+            AND TROUBLE_CODE LIKE '%${trouble_code}%'
+        </if>
+        limit #{page},#{rows}
+
+    </select>
+
+    <!--查找符合条件的故障码总记录数-->
+    <select id="findAllTroubleCodeSearchCount" parameterType="String" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        T_Sys_Truck_Trouble_Code
+        WHERE
+        DELETE_STATES = '0' AND TRUCK_TYPE = #{truck_type}
+        <if test="trouble_code !='' ">
+            AND TROUBLE_CODE LIKE '%${trouble_code}%'
+        </if>
+    </select>
+
+    <!--保存故障码信息-->
+    <insert id="saveTroubleCode" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Truck_Trouble_Code">
+        INSERT INTO
+        T_Sys_Truck_Trouble_Code (CODE_ID,
+        TROUBLE_ID,
+        TROUBLE_CODE,
+        TROUBLE_CONTENT,
+        TRUCK_TYPE,
+        TROUBLE_DATE,
+        DELETE_STATES,
+        TROUBLE_REMARK)
+        VALUES (
+        #{code_id},
+        #{trouble_id},
+        #{trouble_code},
+        #{trouble_content},
+        #{truck_type},
+        #{trouble_date},
+        '0',
+        #{trouble_remark} );
+    </insert>
+
+    <!--更新故障码信息-->
+    <update id="updateTroubleCode" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Truck_Trouble_Code">
+        UPDATE
+        T_Sys_Truck_Trouble_Code
+        SET
+        TROUBLE_ID = #{trouble_id},
+        TROUBLE_CODE = #{trouble_code},
+        TROUBLE_CONTENT = #{trouble_content},
+        TRUCK_TYPE = #{truck_type},
+        TROUBLE_DATE = #{trouble_date},
+        DELETE_STATES =  '0',
+        TROUBLE_REMARK = #{trouble_remark}
+        WHERE
+        CODE_ID = #{code_id}
+    </update>
+
+    <!--删除故障码信息-->
+    <delete id="delTroubleCode" parameterType="String">
+        UPDATE
+        T_Sys_Truck_Trouble_Code
+        SET
+        DELETE_STATES = '1'
+        WHERE
+        CODE_ID = #{code_id}
+    </delete>
+</mapper>

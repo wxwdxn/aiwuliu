@@ -1,0 +1,108 @@
+/**
+ * Created by YK on 2016/12/14.
+ */
+// 二层模态框小提示框消失后使其一层模态框上下滑动
+$(function(){
+    $("#smallModalInfo").on("hidden.bs.modal",function(e){
+        $("body").addClass("modal-open");
+    });
+    $("#vehicleOperationManager").on("hidden.bs.modal",function(){
+        //详情模态框还原需添加这两行
+        if($(".truckFullScreen").attr("isClick") == "false"){
+            $(".truckFullScreen").click()
+        }
+    })
+});
+
+// table表格隔行变色
+function rowStyle(row, index) {
+    if (index % 2 === 0) {
+        return {};
+    }
+    return {
+        css: {"background-color": "#eefff9"}
+    };
+}
+// 查询
+function truckOperation_searchInfo() {
+    $('#truckOperationTable').bootstrapTable('refresh',{'url': '/iwuliu/reportManager/truckOperationList'});
+    var now = new Date().getTime();//当前时间戳
+    var truckOperation_beginTime = new Date(document.getElementById('truckOperation_beginTime').value).getTime();//1的时间戳
+    var truckOperation_endTime = new Date(document.getElementById('truckOperation_endTime').value).getTime();//2的时间戳
+    if (truckOperation_beginTime > truckOperation_endTime) {
+        //bootstrap提示框
+        $("#smallModalInfo").modal();
+        $("#smallModalInfo").find(".titleInfo").html("结束日期不能小于开始日期！")
+        return false;
+    }
+    return true;
+}
+
+// 重置时间
+function truckOperation_resetTime() {
+    $('#truckOperation_beginTime').val("");
+    $('#truckOperation_endTime').val("");
+    $('#truckOperationTable').bootstrapTable('removeAll');
+}
+
+// 导出excel
+function truckOperation_export(){
+    $.ajax({
+        type: "POST",
+        url: '/iwuliu/reportManager/truckOperationExcel',
+        success: function () {
+            window.location = '/iwuliu/reportManager/truckOperationExcel';
+        }
+    });
+}
+
+//配置参数
+function truckOperationQueryParams(params) {
+    var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+        pageSize: params.limit,   //页面大小
+        pageNumber: params.pageNumber,  //页码
+        beginDate: $("#truckOperation_beginTime").val(),
+        endDate: $("#truckOperation_endTime").val(),
+        sort: params.sort,  //排序列名
+        sortOrder: params.order//排位命令（desc，asc）
+    };
+    return temp;
+}
+
+// 日历
+$('.form_datetime').datetimepicker({
+    minView: "month", //选择日期后，不会再跳转去选择时分秒
+    language: 'zh-CN',
+    format: 'yyyy-mm-dd',
+    todayBtn: 1,
+    autoclose: 1,
+});
+
+// 合计
+function sumFormatter(data) {
+    field = this.field;
+    return '<span style="color: #FF0000" >' + data.reduce(function (sum, row) {
+            var salary = row[field];
+            if (salary == "undefined" || salary == null) {
+                salary = '0';
+            }
+            return sum + (+row[field]);
+        }, 0) + '</span>';
+}
+
+function totalTextFormatter(data) {
+    return '<span style="color: #FF0000" >合计</span>';
+}
+
+$(function () {
+    var table = $('#truckOperationTable'),
+        page = $('#truckOperation_page'),
+        goBtn = $('#truckOperation_goBtn'),
+        exportBtn = $('#button_export');
+    // 跳转到某页
+    goBtn.click(function () {
+        table.bootstrapTable('selectPage', +page.val());
+    });
+    $("#truckOperationTable.th-inner").eq(12).append('<span>全选</span>');
+});
+

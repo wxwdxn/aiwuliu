@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.CargoTypeDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Master_Cargo_Type" type="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Type">
+        <id column="CARGO_TYPE_ID" property="cargoTypeId"/>
+        <result column="CARGO_TYPE_NAME" property="cargoTypeName"/>
+        <result column="CARGO_TYPE_DESC" property="cargoTypeDesc"/>
+        <result column="CARGO_TYPE_UNIT_C" property="cargoTypeUnitC"/>
+        <result column="CARGO_TYPE_UNIT_E" property="cargoTypeUnitE"/>
+        <result column="DELETE_FLAG" property="deleteFlag"/>
+        <result column="LAST_UPDATE" property="lastUpdate"/>
+        <result column="LAST_UPDATE_USER_ID" property="lastUpdateUserId"/>
+    </resultMap>
+
+    <!--添加货物类型-->
+    <insert id="addCargoType" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Type">
+        INSERT INTO
+              t_master_cargo_type(CARGO_TYPE_ID,
+              CARGO_TYPE_NAME,
+              CARGO_TYPE_DESC,
+              CARGO_TYPE_UNIT_C,
+              CARGO_TYPE_UNIT_E,
+              DELETE_FLAG,
+              LAST_UPDATE,
+              LAST_UPDATE_USER_ID)
+        SELECT
+              #{cargoTypeId},
+              #{cargoTypeName},
+              #{cargoTypeDesc},
+              #{cargoTypeUnitC},
+              #{cargoTypeUnitE},
+              0,
+              #{lastUpdate},
+              #{lastUpdateUserId}
+          FROM dual
+          WHERE NOT EXISTS
+          (SELECT CARGO_TYPE_NAME FROM t_master_cargo_type WHERE CARGO_TYPE_NAME=#{cargoTypeName}AND DELETE_FLAG=0 )
+    </insert>
+
+    <!--删除货物类型信息-->
+    <delete id="delCargoType" parameterType="String">
+      UPDATE
+            t_master_cargo_type
+        SET
+              DELETE_FLAG=1
+
+        WHERE
+            CARGO_TYPE_ID=#{cargoTypeId}AND DELETE_FLAG=0
+    </delete>
+
+    <!--根据id查询货物类型信息-->
+    <select id="findCargoType" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Type">
+        SELECT
+            CARGO_TYPE_ID as cargoTypeId ,
+            CARGO_TYPE_NAME as cargoTypeName,
+            CARGO_TYPE_DESC as cargoTypeDesc,
+            CARGO_TYPE_UNIT_C as cargoTypeUnitC,
+            CARGO_TYPE_UNIT_E as cargoTypeUnitE,
+            LAST_UPDATE as lastUpdate,
+            LAST_UPDATE_USER_ID as lastUpdateUserId
+        FROM
+              t_master_cargo_type
+        WHERE
+              CARGO_TYPE_ID=#{cargoTypeId} AND DELETE_FLAG=0
+    </select>
+
+    <!--更新货物类型信息-->
+    <update id="updateCargoType" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Type">
+        UPDATE
+            t_master_cargo_type
+        SET
+              CARGO_TYPE_ID= #{cargoTypeId},
+              CARGO_TYPE_NAME= #{cargoTypeName},
+              CARGO_TYPE_DESC=#{cargoTypeDesc},
+              CARGO_TYPE_UNIT_C=#{cargoTypeUnitC},
+              CARGO_TYPE_UNIT_E=#{cargoTypeUnitE},
+              LAST_UPDATE=#{lastUpdate},
+              LAST_UPDATE_USER_ID= #{lastUpdateUserId}
+        WHERE
+              CARGO_TYPE_ID=#{cargoTypeId}AND DELETE_FLAG=0
+    </update>
+
+    <!--根据货场名查询货场列表-->
+    <select id="findCargoTypeLists" resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Type">
+        SELECT
+            CARGO_TYPE_ID as cargoTypeId ,
+            CARGO_TYPE_NAME as cargoTypeName,
+            CARGO_TYPE_DESC as cargoTypeDesc,
+            CARGO_TYPE_UNIT_C as cargoTypeUnitC,
+            CARGO_TYPE_UNIT_E as cargoTypeUnitE,
+            LAST_UPDATE as lastUpdate,
+            LAST_UPDATE_USER_ID as lastUpdateUserId
+        FROM
+              t_master_cargo_type
+        WHERE
+              DELETE_FLAG=0
+    </select>
+
+</mapper>

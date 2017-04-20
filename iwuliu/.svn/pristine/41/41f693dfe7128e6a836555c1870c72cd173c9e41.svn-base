@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.MemberPaymentHistoryDaoMapper">
+
+    <resultMap id="T_Data_Member_Payment_History" type="com.cn.gazelle.logistics.pojo.T_Data_Member_Payment_History">
+        <id column="HISTORY_NUMBER" property="history_number" />
+        <result column="MEMBER_ID" property="member_id" />
+        <result column="PAYMENT_TYPE" property="payment_type" />
+        <result column="TARGET_ID" property="target_id" />
+        <result column="TARGET_BANK_ACCOUNT" property="target_bank_account" />
+        <result column="AMOUNT" property="amount" />
+        <result column="CREATE_TIME" property="create_time" />
+        <result column="RETURN_RESULT" property="return_result" />
+        <result column="RETURN_TIME" property="return_time" />
+        <result column="FAILURE_RESULT" property="failure_result" />
+        <result column="PAYMENT_RESULT" property="payment_result"/>
+        <result column="THIRD_PARTY_ORDER_ID" property="third_party_order_id"/>
+        <result column="DELETE_FLAG" property="delete_flag" />
+        <result column="LAST_UPDATE" property="last_update" />
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id" />
+    </resultMap>
+
+    <!--根据绑定编号查询会员支付历史信息-->
+    <select id="findMemberPaymentHistoryByAccountNo" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Payment_History">
+        SELECT
+           *
+        FROM
+            T_DATA_MEMBER_PAYMENT_HISTORY
+        WHERE
+            HISTORY_NUMBER = #{history_number}
+            and  DELETE_FLAG = '0'
+    </select>
+
+    <!--根据第三方订单Id查询会员支付历史信息表-->
+    <select id="findMemberPayMentHistoryByOrderNo" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Payment_History">
+        SELECT
+        *
+        FROM
+        T_DATA_MEMBER_PAYMENT_HISTORY
+        WHERE
+        THIRD_PARTY_ORDER_ID = #{third_party_order_id}
+        and  DELETE_FLAG = '0'
+    </select>
+
+
+    <!--根据会员关联Id和产生时间查询会员支付历史信息-->
+    <select id="findMemberPaymentHistoryByIDAndDate" resultMap="T_Data_Member_Payment_History">
+        SELECT
+        *
+        FROM
+        T_DATA_MEMBER_PAYMENT_HISTORY
+        WHERE
+        MEMBER_ID = #{member_id} AND DELETE_FLAG = '0' AND DATE(CREATE_TIME) = #{date} ORDER BY CREATE_TIME
+    </select>
+
+
+
+    <!--根据会员Id查询会员支付历史信息-->
+    <select id="findAll" resultMap="T_Data_Member_Payment_History">
+        SELECT
+        *
+        FROM
+        T_DATA_MEMBER_PAYMENT_HISTORY
+        WHERE
+        MEMBER_ID = #{member_id}
+        and
+        DELETE_FLAG = '0'
+    </select>
+
+
+
+    <!--根据时间范围查询会员支付历史信息-->
+    <select id="findHistoryAll" resultMap="T_Data_Member_Payment_History">
+        SELECT
+        *
+        FROM
+        T_DATA_MEMBER_PAYMENT_HISTORY
+       <where>
+           MEMBER_ID = #{member_id}
+           and
+           DELETE_FLAG = '0'
+           <if test="start_time != null and start_time!= ''">
+               AND DATE_FORMAT(CREATE_TIME,'%Y-%m-%d') &gt;=#{start_time}
+           </if>
+           <if test="end_time != null and end_time!= ''">
+               AND DATE_FORMAT(CREATE_TIME,'%Y-%m-%d') &lt;=#{end_time}
+           </if>
+        </where>
+    </select>
+
+    <!--保存会员支付历史信息-->
+    <insert id="saveMemberPaymentHistory" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Payment_History">
+        <selectKey resultType="java.lang.String" order="AFTER" keyProperty="history_number">
+
+            SELECT LAST_INSERT_ID() AS HISTORY_NUMBER
+
+        </selectKey>
+        INSERT INTO
+                T_DATA_MEMBER_PAYMENT_HISTORY (
+                MEMBER_ID,
+                PAYMENT_TYPE,
+                TARGET_ID,
+                TARGET_BANK_ACCOUNT,
+                AMOUNT,
+                CREATE_TIME,
+                RETURN_RESULT,
+                RETURN_TIME,
+                FAILURE_RESULT,
+                PAYMENT_RESULT,
+                THIRD_PARTY_ORDER_ID,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID
+               )
+        VALUES (
+                #{member_id},
+                #{payment_type},
+                #{target_id},
+                #{target_bank_account},
+                #{amount},
+                #{create_time},
+                #{return_result},
+                #{return_time},
+                #{failure_result},
+                #{payment_result},
+                #{third_party_order_id},
+                '0',
+                #{last_update},
+                #{last_update_user_id}
+                )
+    </insert>
+
+    <!--更新会员支付历史信息-->
+    <update id="updateMemberPaymentHistory" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Payment_History">
+        UPDATE
+            T_DATA_MEMBER_PAYMENT_HISTORY
+        SET
+                MEMBER_ID = #{member_id},
+                PAYMENT_TYPE = #{payment_type},
+                TARGET_ID = #{target_id},
+                TARGET_BANK_ACCOUNT = #{target_bank_account},
+                AMOUNT = #{amount},
+                RETURN_RESULT=#{return_result},
+                RETURN_TIME=#{return_time},
+                FAILURE_RESULT=#{failure_result},
+                PAYMENT_RESULT = #{payment_result},
+                THIRD_PARTY_ORDER_ID=#{third_party_order_id},
+                LAST_UPDATE = #{last_update},
+                LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            HISTORY_NUMBER = #{history_number} AND DELETE_FLAG = '0'
+    </update>
+
+    <!--根据绑定编号删除会员支付历史信息-->
+    <delete id="delMemberPaymentHistory" parameterType="String">
+        UPDATE
+        T_DATA_MEMBER_PAYMENT_HISTORY
+        SET
+        DELETE_FLAG = '1'
+        WHERE
+        HISTORY_NUMBER = #{history_number} AND DELETE_FLAG = '0'
+    </delete>
+</mapper>

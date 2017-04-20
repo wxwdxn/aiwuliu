@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.ContentDaoMapper">
+    <resultMap id="T_Master_Electronic_Agreement_Content" type="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Content">
+        <id column="CONTENT_ID" property="content_id"/>
+        <result column="MEMBER_TYPE" property="member_type"/>
+        <result column="ELECTRONIC_AGREEMENT_VERSION_NO" property="electronic_agreement_version_no"/>
+        <result column="ELECTRONIC_AGREEMENT_VERSION" property="electronic_agreement_version"/>
+        <result column="ELECTRONIC_AGREEMENT_CONTENT" property="electronic_agreement_content"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据ID查找协议内容信息-->
+    <select id="findContentByID"  resultType="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Content">
+        SELECT
+           *
+        FROM
+            T_Master_Electronic_Agreement_Content
+        WHERE
+            CONTENT_ID = #{content_id} AND DELETE_FLAG = '0'
+    </select>
+
+    <!--根据电子协议编号查找协议内容信息-->
+    <select id="findContentByNo"  resultType="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Content">
+        SELECT
+            *
+        FROM
+            T_Master_Electronic_Agreement_Content
+        WHERE
+            MEMBER_TYPE=#{member_type} AND ELECTRONIC_AGREEMENT_VERSION = #{electronic_agreement_version} AND DELETE_FLAG = '0'
+    </select>
+
+    <!--查找所有协议内容信息(有参)-->
+    <select id="findAllContent" resultMap="T_Master_Electronic_Agreement_Content">
+        SELECT
+            *
+        FROM
+            T_Master_Electronic_Agreement_Content WHERE DELETE_FLAG = '0'
+        <if test="electronic_agreement_version !='' ">
+            AND ELECTRONIC_AGREEMENT_VERSION LIKE '%${electronic_agreement_version}%'
+        </if>
+        limit #{page},#{rows}
+
+    </select>
+
+    <!--查找所有协议内容信息(无参)-->
+    <select id="findAll" resultMap="T_Master_Electronic_Agreement_Content">
+        SELECT
+            *
+        FROM
+            T_Master_Electronic_Agreement_Content
+        WHERE
+            DELETE_FLAG = '0'
+    </select>
+
+
+    <!--查找符合条件的协议内容总记录数-->
+    <select id="findAllContentRowsCount" parameterType="String" resultType="Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Master_Electronic_Agreement_Content
+        WHERE
+            ELECTRONIC_AGREEMENT_VERSION LIKE '%${electronic_agreement_version}%' AND DELETE_FLAG = '0'
+    </select>
+
+    <!--保存协议内容信息-->
+    <insert id="saveContent" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Content">
+        INSERT INTO
+                T_Master_Electronic_Agreement_Content (CONTENT_ID,
+                MEMBER_TYPE,
+                ELECTRONIC_AGREEMENT_VERSION_NO,
+                ELECTRONIC_AGREEMENT_VERSION,
+                ELECTRONIC_AGREEMENT_CONTENT,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        SELECT
+                #{content_id},
+                #{member_type},
+                #{electronic_agreement_version_no},
+                #{electronic_agreement_version},
+                #{electronic_agreement_content},
+                #{delete_flag},
+                #{last_update},
+                #{last_update_user_id}
+                FROM dual WHERE not exists(SELECT * FROM T_Master_Electronic_Agreement_Content WHERE DELETE_FLAG = 0 AND MEMBER_TYPE = #{member_type} AND ELECTRONIC_AGREEMENT_VERSION = #{electronic_agreement_version})
+
+    </insert>
+
+    <!--更新协议内容信息-->
+    <update id="updateContent" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Electronic_Agreement_Content">
+        UPDATE
+            T_Master_Electronic_Agreement_Content
+        SET
+            MEMBER_TYPE = #{member_type},
+            ELECTRONIC_AGREEMENT_VERSION_NO = #{electronic_agreement_version_no},
+            ELECTRONIC_AGREEMENT_VERSION = #{electronic_agreement_version},
+            ELECTRONIC_AGREEMENT_CONTENT = #{electronic_agreement_content},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            CONTENT_ID = #{content_id} AND DELETE_FLAG = '0'
+    </update>
+
+    <!--删除协议内容信息-->
+    <delete id="delContent" parameterType="String">
+        UPDATE
+            T_Master_Electronic_Agreement_Content
+        SET
+            DELETE_FLAG = '1'
+        WHERE
+            CONTENT_ID = #{content_id} AND DELETE_STATES =  '0'
+    </delete>
+
+    <!--根据用户类型查找协议内容信息-->
+    <select id="findContentByMemberType" parameterType="String" resultMap="T_Master_Electronic_Agreement_Content">
+        SELECT
+            *
+        FROM
+            T_Master_Electronic_Agreement_Content
+        WHERE
+            MEMBER_TYPE = #{member_type} AND DELETE_FLAG = '0'
+        ORDER BY
+            ELECTRONIC_AGREEMENT_VERSION_NO
+        DESC
+    </select>
+
+</mapper>

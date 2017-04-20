@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.CargoTruckTypeMatchMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Master_Cargo_Truck_Type_Match" type="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Truck_Type_Match">
+        <id column="MATCH_ID" property="matchId"/>
+        <result column="CARGO_TYPE_ID" property="cargoTypeId"/>
+        <result column="TRUCK_CARRIAGE_TYPE_ID" property="truckTypeId"/>
+        <result column="LAST_UPDATE" property="lastUpdate"/>
+        <result column="DELETE_FLAG" property="deleteFlag"/>
+        <result column="LAST_UPDATE_USER_ID" property="lastUpdateUserId"/>
+    </resultMap>
+
+    <!--添加货物车厢类型-->
+    <insert id="addCargoTruckType" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Truck_Type_Match">
+        INSERT INTO
+            t_master_cargo_truck_carriage_type_match(MATCH_ID,
+            CARGO_TYPE_ID,
+            TRUCK_CARRIAGE_TYPE_ID,
+            DELETE_FLAG,
+            LAST_UPDATE,
+            LAST_UPDATE_USER_ID)
+        SELECT
+            #{matchId},
+            #{cargoTypeId},
+            #{truckTypeId},
+            0,
+            #{lastUpdate},
+            #{lastUpdateUserId}
+        FROM dual WHERE NOT EXISTS (
+        SELECT CARGO_TYPE_ID,TRUCK_CARRIAGE_TYPE_ID FROM t_master_cargo_truck_carriage_type_match
+        WHERE CARGO_TYPE_ID= #{cargoTypeId}AND TRUCK_CARRIAGE_TYPE_ID=#{truckTypeId}AND DELETE_FLAG=0
+        )
+    </insert>
+
+    <!--删除货物车厢类型信息-->
+    <delete id="delCargoTruckType" parameterType="String">
+        update
+             t_master_cargo_truck_carriage_type_match
+        SET
+              DELETE_FLAG=1
+        WHERE
+              MATCH_ID=#{matchId}AND DELETE_FLAG=0
+    </delete>
+
+    <!--根据货物种类id删除货物车厢类型信息-->
+    <delete id="delByCargoId" parameterType="String">
+       update
+             t_master_cargo_truck_carriage_type_match
+        SET
+              DELETE_FLAG=1
+        WHERE
+        CARGO_TYPE_ID=#{cargoTypeId}AND DELETE_FLAG=0
+    </delete>
+
+    <!--根据车厢id删除货物车厢类型信息-->
+    <delete id="delByTruckId" parameterType="String">
+       update
+             t_master_cargo_truck_carriage_type_match
+        SET
+              DELETE_FLAG=1
+        WHERE
+          TRUCK_CARRIAGE_TYPE_ID=#{truckTypeId}AND DELETE_FLAG=0
+    </delete>
+
+    <!--根据id查询货物车厢类型信息-->
+    <select id="findCargoTruckType" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Truck_Type_Match" >
+        SELECT
+            MATCH_ID as matchId,
+            CARGO_TYPE_ID as cargoTypeId,
+            TRUCK_CARRIAGE_TYPE_ID as truckTypeId,
+            LAST_UPDATE as lastUpdate,
+            LAST_UPDATE_USER_ID as lastUpdateUserId
+        FROM
+            t_master_cargo_truck_carriage_type_match
+        WHERE
+            MATCH_ID=#{matchId}AND DELETE_FLAG=0
+    </select>
+
+    <!--更新货物车厢类型信息-->
+    <update id="updateCargoTruckType" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Truck_Type_Match">
+        UPDATE
+            t_master_cargo_truck_carriage_type_match
+        SET
+            MATCH_ID= #{matchId},
+            CARGO_TYPE_ID= #{cargoTypeId},
+            TRUCK_CARRIAGE_TYPE_ID= #{truckTypeId},
+            LAST_UPDATE=#{lastUpdate},
+            LAST_UPDATE_USER_ID= #{lastUpdateUserId}
+        WHERE
+            MATCH_ID=#{matchId}AND DELETE_FLAG=0
+    </update>
+
+    <!--根据货场名查询货场列表分页-->
+    <select id="findAllCargoTruckType" resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Truck_Type_Match" >
+        SELECT
+            MATCH_ID AS matchId,
+            CARGO_TYPE_ID AS cargoTypeId,
+            TRUCK_CARRIAGE_TYPE_ID AS truckTypeId,
+            LAST_UPDATE AS lastUpdate,
+            LAST_UPDATE_USER_ID AS lastUpdateUserId
+        FROM
+            t_master_cargo_truck_carriage_type_match t
+        WHERE DELETE_FLAG=0
+        <if test="searchType !=''and searchType=='truckTypeId'">
+
+            AND     t.TRUCK_CARRIAGE_TYPE_ID
+               IN (
+                    SELECT
+                         m.${searchType}
+                    FROM
+                        (SELECT
+                            TRUCK_CARRIAGE_TYPE_ID AS truckTypeId
+                        FROM
+                             `t_master_truck_carriage_type`
+                        WHERE
+                              TRUCK_CARRIAGE_TYPE_NAME  LIKE '%${name}%' AND DELETE_FLAG=0
+                        )AS m
+                    )
+        </if>
+        <if test="searchType !=''and searchType=='cargoTypeId'">
+            AND
+               t.CARGO_TYPE_ID
+            IN (
+                SELECT
+                    m.cargoTypeId
+                FROM
+                    (SELECT
+                        CARGO_TYPE_ID AS cargoTypeId
+                    FROM
+                        `t_master_cargo_type`
+                    WHERE
+                        CARGO_TYPE_NAME  LIKE '%${name}%' AND DELETE_FLAG=0
+                    )AS m
+            )
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询符合条件的货物车厢类型总数-->
+    <select id="findCargoTruckTypeRowsCount" parameterType="String" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+        t_master_cargo_truck_carriage_type_match t
+        WHERE DELETE_FLAG=0
+        <if test="searchType !=''and searchType=='truckTypeId'">
+            and
+                t.TRUCK_CARRIAGE_TYPE_ID
+            IN (
+                SELECT
+                   m.${searchType}
+                FROM
+                    (SELECT
+                        TRUCK_CARRIAGE_TYPE_ID AS truckTypeId
+                    FROM
+                        `t_master_truck_carriage_type`
+                    WHERE
+                        TRUCK_CARRIAGE_TYPE_NAME LIKE '%${name}%'AND DELETE_FLAG=0
+                    )AS m
+            )
+        </if>
+        <if test="searchType !=''and searchType=='cargoTypeId'">
+            and
+                t.CARGO_TYPE_ID
+            IN (
+                 SELECT
+                    m.cargoTypeId
+                FROM
+                    (SELECT
+                          CARGO_TYPE_ID AS cargoTypeId
+                    FROM
+                          `t_master_cargo_type`
+                    WHERE
+                            CARGO_TYPE_NAME LIKE '%${name}%'AND DELETE_FLAG=0
+                    )AS m
+            )
+        </if>
+    </select>
+
+    <!--查询车厢类型-->
+    <select id="findTruckNameList"  resultType="java.util.Map" >
+	    SELECT
+	         m.MATCH_ID AS matchId,c.`TRUCK_CARRIAGE_TYPE_NAME` AS truckName,
+	         m.`LAST_UPDATE` AS lastUpdate, m.`LAST_UPDATE_USER_ID` AS lastUpdateUserId,
+	         m.`TRUCK_CARRIAGE_TYPE_ID` AS truckTypeId
+        FROM
+            t_master_cargo_type t
+        LEFT JOIN
+            t_master_cargo_truck_carriage_type_match m
+        ON
+            t.`CARGO_TYPE_ID` = m.`CARGO_TYPE_ID`
+        LEFT JOIN
+            t_master_truck_carriage_type c
+        ON
+            c.`TRUCK_CARRIAGE_TYPE_ID` = m.`TRUCK_CARRIAGE_TYPE_ID`
+      WHERE
+            t.`CARGO_TYPE_ID` = #{cargoTypeId} AND t.DELETE_FLAG=0
+             limit #{page},#{rows}
+    </select>
+
+    <!--获取货物种类对应的车厢类型个数-->
+    <select id="findTruckNameCount" parameterType="string"  resultType="int">
+            SELECT
+                COUNT(*)
+            FROM
+               `t_master_cargo_truck_carriage_type_match`
+            WHERE
+               `CARGO_TYPE_ID` = #{cargoTypeId}AND DELETE_FLAG=0
+    </select>
+
+    <!--通过车厢id和货物id查询匹配信息-->
+    <select id="findMatchByTruckId" parameterType="string"  resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Truck_Type_Match" >
+        SELECT
+            MATCH_ID AS matchId,
+            CARGO_TYPE_ID AS cargoTypeId,
+            TRUCK_CARRIAGE_TYPE_ID AS truckTypeId,
+            LAST_UPDATE AS lastUpdate,
+            LAST_UPDATE_USER_ID AS lastUpdateUserId
+        FROM
+            t_master_cargo_truck_carriage_type_match
+        WHERE
+            TRUCK_CARRIAGE_TYPE_ID=#{truckTypeId}AND  CARGO_TYPE_ID=#{cargoTypeId}AND DELETE_FLAG=0
+    </select>
+
+    <!--通过车厢id查询匹配信息-->
+    <select id="findMatchByTruck" parameterType="string"  resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Truck_Type_Match" >
+        SELECT
+        MATCH_ID AS matchId,
+        CARGO_TYPE_ID AS cargoTypeId,
+        TRUCK_CARRIAGE_TYPE_ID AS truckTypeId,
+        LAST_UPDATE AS lastUpdate,
+        LAST_UPDATE_USER_ID AS lastUpdateUserId
+        FROM
+        t_master_cargo_truck_carriage_type_match
+        WHERE
+        TRUCK_CARRIAGE_TYPE_ID=#{truckTypeId}AND DELETE_FLAG=0
+    </select>
+
+    <!--通过货物类型id查询匹配信息-->
+    <select id="findMatchByCargoId" parameterType="string"  resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Truck_Type_Match" >
+        SELECT
+        MATCH_ID AS matchId,
+        CARGO_TYPE_ID AS cargoTypeId,
+        TRUCK_CARRIAGE_TYPE_ID AS truckTypeId,
+        LAST_UPDATE AS lastUpdate,
+        LAST_UPDATE_USER_ID AS lastUpdateUserId
+        FROM
+        t_master_cargo_truck_carriage_type_match
+        WHERE
+        CARGO_TYPE_ID=#{cargoTypeId}AND DELETE_FLAG=0
+    </select>
+
+    <!--根据货物类型删除货物车厢类型信息-->
+    <delete id="delMatchByCargoTypeId" parameterType="String">
+        update
+        t_master_cargo_truck_carriage_type_match
+        SET
+        DELETE_FLAG=1
+        WHERE
+        CARGO_TYPE_ID=#{cargoTypeId}AND DELETE_FLAG=0
+    </delete>
+
+ </mapper>

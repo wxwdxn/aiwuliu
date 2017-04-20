@@ -1,0 +1,199 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: WXW
+  Date: 2017/02/09
+  Time: 14:12
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% String username = request.getSession().getAttribute("username").toString();%>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="renderer" content="webkit|ie-comp|ie-stand">
+		<title></title>
+	</head>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap.min.css"/>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/operationManager/vehicleMonitoringManager/css/vehicleMonitoringManager.css"/>
+	<script src="<%=request.getContextPath()%>/static/common/js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/common/js/common.js" type="text/javascript" charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/operationManager/vehicleMonitoringManager/js/vehicleMonitoringManager.js" type="text/javascript" charset="utf-8"></script>
+	<!--[if lt IE 9]>
+	  <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+	  <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	<%--echart--%>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/static/common/echart/echarts.min.js"></script>
+	<%--高德地图--%>
+	<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=a0faf6f34da0f9e9fa333547de2a4a9e"></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/css/zTreeStyle.css"/>
+	<script src="<%=request.getContextPath()%>/static/common/js/jquery.ztree.core.js" type="text/javascript" charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/common/js/jquery.ztree.excheck.js" type="text/javascript" charset="utf-8"></script>
+	<style type="text/css">
+		.info {
+			border: solid 1px silver;
+		}
+		div.info-top {
+			position: relative;
+			background: none repeat scroll 0 0 #F9F9F9;
+			border-bottom: 1px solid #CCC;
+			border-radius: 5px 5px 0 0;
+		}
+		div.info-top div {
+			display: inline-block;
+			color: #333333;
+			font-size: 14px;
+			font-weight: bold;
+			line-height: 31px;
+			padding: 0 10px;
+		}
+		div.info-top img {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			transition-duration: 0.25s;
+		}
+		div.info-top img:hover {
+			box-shadow: 0px 0px 5px #000;
+		}
+		div.info-middle {
+			font-size: 12px;
+			padding: 6px;
+			line-height: 20px;
+		}
+		div.info-bottom {
+			height: 0px;
+			width: 100%;
+			clear: both;
+			text-align: center;
+		}
+		div.info-bottom img {
+			position: relative;
+			z-index: 104;
+		}
+		span {
+			margin-left: 5px;
+			font-size: 11px;
+		}
+		.info-middle img {
+			float: left;
+			margin-right: 6px;
+		}
+	</style>
+	<body>
+		<!--*********导航条开始***********-->
+		<nav class="navbar navbar-default" role="navigation">
+		  <div class="container-fluid">
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="#">
+		      	<img src="<%=request.getContextPath()%>/static/common/images/logo.png"/>
+		      </a>
+		    </div>
+		
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		      
+		      <ul class="nav navbar-nav navbar-right">
+		        <li class="dropdown">
+		        	<a href="#" class="dropdown-toggle" data-toggle="dropdown">系统管理 <span class="caret"></span></a>
+		       		<ul class="dropdown-menu" role="menu">
+			            <li><a href="#">Action</a></li>
+			            <li><a href="#">Another action</a></li>
+			            <li><a href="#">Something else here</a></li>
+			            <li class="divider"></li>
+			            <li><a href="#">Separated link</a></li>
+			          </ul>
+		        </li>
+		        <li class="dropdown">
+		          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%=username%><span class="caret"></span></a>
+		          <ul class="dropdown-menu" role="menu">
+		            <li><a href="javascript:;">Action</a></li>
+		            <li><a href="javascript:;">Another action</a></li>
+		            <li><a href="javascript:;">Something else here</a></li>
+		            <li class="divider"></li>
+		            <li><a href="javascript:;">Separated link</a></li>
+		          </ul>
+		        </li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		  </div><!-- /.container-fluid -->
+		</nav>
+		<!--*********导航条结束***********-->
+		<div class="container-fluid eleHeight">
+			<div class="row eleHeight">
+				<div class="col-md-2 leftMenu eleHeight">
+				</div>
+
+				<div class="iframeMain">
+					<h4>
+						车辆监控
+					</h4>
+					<div class="infoConditions">
+						<div class="col-md-2 vehicleMonitoringManagerCarTree">
+							<div class="form-group">
+								<label>车牌号:</label>
+								<input type="text" class="form-control" id="name"  onkeyup="findEach()"/>
+							</div>
+							<div class="carTree">
+									<ul id="treeDemo" class="ztree"></ul>
+							</div>
+						</div>
+						<div class="col-md-10 vehicleMonitoringManagerMap">
+							<div class="stateOftheVehicle">
+								<div class="col-md-2 text-center">
+									<span value="0" isCheck=false class="checkbox glyphicon glyphicon-unchecked allVehicles"></span>
+									<span class="checkTitle">全部车辆</span>
+								</div>
+								<div class="col-md-2 text-center">
+									<span value="1" isCheck=false class="checkbox glyphicon glyphicon-unchecked"></span>
+									<span  class="checkTitle">
+										<img src="<%=request.getContextPath()%>/static/common/images/normal.png"/><br/>
+										正常行驶
+									</span>
+								</div>
+								<div class="col-md-2 text-center">
+									<span value="2" isCheck=false class="checkbox glyphicon glyphicon-unchecked"></span>
+									<span class="checkTitle">
+										<img src="<%=request.getContextPath()%>/static/common/images/down.png"/><br/>
+										熄火
+									</span>
+								</div>
+								<div class="col-md-2 text-center">
+									<span value="3" isCheck=false class="checkbox glyphicon glyphicon-unchecked"></span>
+									<span class="checkTitle">
+										<img src="<%=request.getContextPath()%>/static/common/images/cass.png"/><br/>
+										报警
+									</span>
+								</div>
+								<div class="col-md-2 text-center">
+									<span value="4" isCheck=false class="checkbox glyphicon glyphicon-unchecked"></span>
+									<span class="checkTitle">
+										<img src="<%=request.getContextPath()%>/static/common/images/red.png"/><br/>
+										车辆故障
+									</span>
+								</div>
+							</div>
+							<div class="map">
+								<h2>
+									地图展示
+								</h2>
+								<div class="col-md-12" id="container"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

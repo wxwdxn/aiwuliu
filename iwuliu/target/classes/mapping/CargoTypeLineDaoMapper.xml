@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.CargoTypeLineDaoMapper">
+
+    <!--根据干线、货物类型查询这条干线的运输车辆个数-->
+    <select id="getLineInfo" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_CargoType_Line">
+
+    SELECT s.cargo_type_name AS cargoTypeName,l.`OPERATE_MAIN_LINE_NAME` AS lineName,
+		p.person_name AS NAME,t.loading_begin_date AS beginDate ,t.schedule_plan_number,
+		SUM(t.CARGO_TOTAL-t.SCHEDULE_CARGO_TOTAL ) AS total
+        FROM `t_data_transportation_plan` t
+        LEFT JOIN t_master_operate_main_line l
+        ON l.operate_main_line_id=t.operate_main_line_id
+
+        LEFT JOIN `t_data_transportation_contract` c
+        ON c.contract_id=t.contract_id
+        LEFT JOIN `t_master_cargo_type` s
+        ON s.cargo_type_id=c.cargo_type_id
+        LEFT JOIN `t_data_person` p
+        ON c.first_party_relevance_info_id=p.person_id
+        WHERE
+		t.unloading_finish_date > DATE(CURDATE()) AND t.belong_schedule_plan_number IS NULL
+
+      GROUP BY t.schedule_plan_number
+    </select>
+</mapper>

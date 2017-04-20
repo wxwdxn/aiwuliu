@@ -1,0 +1,42 @@
+.infoConditions {
+  position: relative;
+}
+.infoConditions .trackThePlayback {
+  position: absolute;
+  left: 70px;
+  left: 5rem;
+  top: 10px;
+  top: 1rem;
+  background: #fff;
+  padding: 11px;
+  padding-bottom: 0;
+  box-shadow: 0 0 7px #0e0e0e;
+  z-index:999;
+}
+.infoConditions .trackThePlayback .form-group {
+  margin: 0 3px;
+}
+.infoConditions .trackThePlayback .form-group .btn.inputAndSelect {
+  min-width: auto;
+  height:28px;
+}
+.infoConditions .trackThePlayback .form-group .license {
+  width: 138px;
+  vertical-align: top;
+}
+.infoConditions .trackThePlayback .form-group .licenseTitle {
+  margin-top: 9px;
+}
+.infoConditions .trackThePlayback .form-group label {
+  font-weight: 100;
+}
+.infoConditions .trackThePlayback .playbackBtn {
+  background: #69a2b5;
+  color: #fff;
+}
+.logisticsCompany ul,.license ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}

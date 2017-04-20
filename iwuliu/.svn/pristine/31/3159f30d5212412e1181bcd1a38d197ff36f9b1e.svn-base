@@ -1,0 +1,20 @@
+$(function(){
+	$(".leftMenu").load("/iwuliu/welcomeManager/home",function(){
+		$(".schedulingOrderManager").parents(".collapse").addClass("in");
+		$(".schedulingOrderManager").addClass("menuActive")
+	})
+	//点击图片放大
+	$(".formgroupImg").find("img").bind("click",function(){
+		var _src = $(this).attr("src");
+		$(".modalImg").html("<img src="+ _src +"/>");
+		$('#ModalImg').modal();
+		//图片放大模态框隐藏后触发的事件
+		$("#ModalImg").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open")
+		})
+	})
+})
+//点击详情
+function btn_ModalDetail(){
+	$("#myModal").modal()
+}

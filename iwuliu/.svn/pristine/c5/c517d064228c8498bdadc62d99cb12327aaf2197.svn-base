@@ -1,0 +1,62 @@
+// 全局
+$(function(){
+	// 加载当前页面菜单
+	$(".leftMenu").load("/iwuliu/welcomeManager/home",function(){
+		$(".reportManager").addClass("menuActive")
+	})
+	// table
+	var table = $('#reportManagerTable'),
+			page = $('#report_page'),
+			goBtn = $('#report_goBtn');
+	// 跳转到某页
+	goBtn.click(function () {
+		table.bootstrapTable('selectPage', +page.val());
+	});
+	$("#reportManagerTable.th-inner").eq(0).append('<span>全选</span>');
+})
+
+// table表格隔行变色
+function rowStyle(row, index) {
+	if (index % 2 === 0) {
+		return {};
+	}
+	return {
+		css: {"background-color": "#eefff9"}
+	};
+}
+
+// 格式化“报表详细”列
+function detailFormatter(){
+	var row = this.row;
+	return '<a href="javascript:;" onclick="queryReportDetail(this.parentElement.parentElement)">' +
+			'<img src="/iwuliu/static/common/images/xiangqing.png"/></a>';
+}
+
+// 详情查看报表
+function queryReportDetail(value){
+	var report_type_number = $(value).find('.report_type_number').html();
+	if(report_type_number =='3'){
+		$("#drivingBehaviorManager").modal();
+	} else if(report_type_number =='0'){
+		$("#truckTransportCapacityManager").modal();
+	} else if(report_type_number == '1'){
+		$("#driverAttendanceManager").modal();
+	} else if(report_type_number == '2'){
+		$("#driverCreditManager").modal();
+	} else if(report_type_number == '4') {
+		$("#vehicleOperationManager").modal();
+	}else if(report_type_number == '5') {
+		$("#financialOperationManager").modal();
+	}else if(report_type_number == '6') {
+		$("#platformAndSettlementManager").modal();
+	}else if(report_type_number == '7') {
+		$("#userOperationManager").modal();
+	}
+	else{
+		//bootstrap提示框
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("功能待开发！")
+		return false;
+	}
+
+}

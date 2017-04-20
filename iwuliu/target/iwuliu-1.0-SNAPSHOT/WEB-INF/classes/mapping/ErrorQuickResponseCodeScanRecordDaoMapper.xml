@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.ErrorQuickResponseCodeScanRecordDaoMapper">
+
+    <resultMap id="T_Data_Error_Quick_Response_Code_Scan_Record" type="com.cn.gazelle.logistics.pojo.T_Data_Error_Quick_Response_Code_Scan_Record">
+        <id column="RECORD_NUMBER" property="record_number" />
+        <result column="MEMBER_ID" property="member_id" />
+        <result column="SCAN_TIME" property="scan_time" />
+        <result column="QUICK_RESPONSE_CODE_CONTENT" property="quick_response_code_content" />
+        <result column="terminal_LONGITUDE" property="terminal_longitude" />
+        <result column="terminal_LATITUDE" property="terminal_latitude" />
+        <result column="ANALYSIS_RESULT" property="analysis_result"/>
+        <result column="DELETE_FLAG" property="delete_flag" />
+        <result column="LAST_UPDATE" property="last_update" />
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id" />
+    </resultMap>
+
+
+    <!--保存错误二维码扫描记录信息-->
+    <insert id="saveScanRecord" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Error_Quick_Response_Code_Scan_Record">
+        INSERT INTO
+                T_Data_Error_Quick_Response_Code_Scan_Record (RECORD_NUMBER,
+                MEMBER_ID,
+                SCAN_TIME,
+                QUICK_RESPONSE_CODE_CONTENT,
+                terminal_LONGITUDE,
+                terminal_LATITUDE,
+                ANALYSIS_RESULT,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID
+               )
+        VALUES (
+                #{record_number},
+                #{member_id},
+                #{scan_time},
+                #{quick_response_code_content},
+                #{terminal_longitude},
+                #{terminal_latitude},
+                #{analysis_result},
+                #{delete_flag},
+                #{last_update},
+                #{last_update_user_id}
+                )
+    </insert>
+
+</mapper>

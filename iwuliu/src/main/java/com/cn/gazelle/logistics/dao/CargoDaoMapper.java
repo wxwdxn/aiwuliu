@@ -1,0 +1,63 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称: CargoDaoMapper.Java
+ * 系统编号：Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：02
+ * 模块名称：货场信息管理实现
+ * 设计文件：
+ * 完成日期：2016-03-01
+ * 作    者：WXW
+ * 内容摘要：货场信息管理实现
+ */
+package com.cn.gazelle.logistics.dao;
+
+import com.cn.gazelle.logistics.pojo.T_Master_Cargo_Yard;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * 类 名 称: CargoDaoMapper
+ * 内容摘要: 货场信息管理
+ * 方法描述：该类有8个方法：
+ *         01 findById                       根据ID查货场信息
+ *         02 findCargoByName                根据货场名查找货场信息
+ *         03 findCargoList                  查找所有货场信息（不分页）
+ *         04 findAllCargo                   查找所有货场信息（分页）
+ *         05 findAllCargoRowsCount          查询货场总记录数
+ *         06 saveCargo                      保存货场信息
+ *         07 updateCargo                    更新货场信息
+ *         08 cargoDel                       删除货场信息
+ * @author WXW
+ */
+public interface CargoDaoMapper {
+
+    //根据ID查询
+    T_Master_Cargo_Yard findById(@Param(value = "cargo_id") String cargo_id);
+    
+    //增加货场
+    int saveCargo(T_Master_Cargo_Yard cargo_yard);
+
+    //根据ID删除货场delCargo
+    void cargoDel(@Param(value = "cargo_id") String cargo_id);
+
+    //更新货场信息
+    void updateCargo(T_Master_Cargo_Yard cargo_yard);
+
+    //查询所有的货场不分页
+    List<T_Master_Cargo_Yard> findCargoList();
+
+    //根据经纬度查询到装货场的距离    个人   货场的 经纬度
+    String findDistance(@Param(value = "lat1") Double lat1,
+                        @Param(value = "lng1") Double lng1,
+                        @Param(value = "lat2") Double lat2,
+                        @Param(value = "lng2") Double lng2);
+
+    //根据位置模糊查询货场
+    List<T_Master_Cargo_Yard> getFrightYardByPosition(@Param(value = "province_id") String province_id ,
+                                                      @Param(value = "city_id") String city_id,
+                                                      @Param(value = "area_id") String area_id,
+                                                      @Param(value = "town_street") String town_street);
+
+}

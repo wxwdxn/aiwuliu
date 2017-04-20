@@ -1,0 +1,4 @@
+/*表格显示*/
+.fixed-table-body{
+    height:auto;
+}

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckAlarmSummaryDaoMapper">
+
+    <!--保存卡车警情统计信息-->
+    <insert id="saveTruckAlarmSummary" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Alarm_Summary">
+        INSERT INTO
+                T_Data_Truck_Alarm_Summary(SUMMARY_NUMBER,
+                OBD_ID,
+                CLIENT_ACQUISITION_TIME,
+                LONGITUDE,
+                LATITUDE,
+                SPEED,
+                DIRECTION,
+                STATUS,
+                SATELLITE_NUMBER,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{summary_number},
+                #{obd_id},
+                #{client_acquisition_time},
+                #{longitude},
+                #{latitude},
+                #{speed},
+                #{direction},
+                #{status},
+                #{satellite_number},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新卡车警情统计信息-->
+    <update id="updateTruckAlarmSummary" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Alarm_Summary">
+        UPDATE
+            T_Data_Truck_Alarm_Summary
+        SET
+            OBD_ID = #{obd_id},
+            CLIENT_ACQUISITION_TIME = #{client_acquisition_time},
+            LONGITUDE = #{longitude},
+            LATITUDE = #{latitude},
+            SPEED = #{speed},
+            DIRECTION = #{direction},
+            STATUS = #{status},
+            SATELLITE_NUMBER = #{satellite_number},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            SUMMARY_NUMBER= #{summary_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据统计信息No删除卡车警情统计信息-->
+    <delete id="delTruckAlarmSummary" parameterType="String">
+        UPDATE
+            T_Data_Truck_Alarm_Summary
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            SUMMARY_NUMBER = #{summary_number} AND DELETE_FLAG = 0
+    </delete>
+</mapper>

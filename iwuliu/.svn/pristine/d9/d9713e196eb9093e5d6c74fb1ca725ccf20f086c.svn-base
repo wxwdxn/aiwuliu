@@ -1,0 +1,140 @@
+// 二层模态框小提示框消失后使其一层模态框上下滑动
+$(function(){
+    $("#smallModalInfo").on("hidden.bs.modal",function(e){
+        $("body").addClass("modal-open");
+    });
+
+    $("#drivingBehaviorManager").on("hidden.bs.modal",function(){
+        //详情模态框还原需添加这两行
+        if($(".fullScreen").attr("isClick") == "false"){
+            $(".fullScreen").click()
+        }
+    })
+});
+
+// 下拉框选择联动
+function SelectTab(selectTab, selectTabCompany, selectTabDriver) {
+    selectTab.change(function () {
+        var _index = this.selectedIndex;
+        switch (_index) {
+            case 0:
+                selectTabCompany.css("display", "block");
+                selectTabDriver.css("display", "block");
+                break;
+            case 1:
+                selectTabCompany.css("display", "block");
+                selectTabDriver.css("display", "none");
+                break;
+            case 2:
+                selectTabCompany.css("display", "none");
+                selectTabDriver.css("display", "block");
+                break;
+            default:
+                break;
+        }
+    })
+}
+
+// table表格隔行变色
+function rowStyle(row, index) {
+    if (index % 2 === 0) {
+        return {};
+    }
+    return {
+        css: {"background-color": "#eefff9"}
+    };
+}
+
+//配置参数
+function queryParams(params) {
+    var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+        pageSize: params.limit,   //页面大小
+        pageNumber: params.pageNumber,  //页码
+        person_name: $("#person_name").val(),
+        plate_number: $("#plate_number").val(),
+        start_time: $("#beginTime").val(),
+        end_time: $("#endTime").val(),
+        sort: params.sort,  //排序列名
+        sortOrder: params.order//排位命令（desc，asc）
+    };
+    return temp;
+}
+
+// 日历
+$('.form_datetime').datetimepicker({
+    minView: "month", //选择日期后，不会再跳转去选择时分秒
+    language: 'zh-CN',
+    format: 'yyyy-mm-dd',
+    todayBtn: 1,
+    autoclose: 1
+});
+
+// 查询重置
+function queryDrivingBehaviorReset() {
+    $(".company_name").find(".placeHolder").html("请选择");
+    $('#person_name').val("");
+    $('#plate_number').val("");
+    $('#beginTime').val("");
+    $('#endTime').val("");
+    $('#drivingBehaviorAnalysisTable').bootstrapTable('removeAll');
+}
+
+// 查询
+function queryDrivingBehavior() {
+    // 比较两个时间的大小
+    if (checkTime($('#beginTime'), $('#endTime'))) {
+        $('#drivingBehaviorAnalysisTable').bootstrapTable('refresh', {
+            url: '/iwuliu/drivingBehaviorAnalysisManager/drivingBehaviorAnalysisList'
+        });
+    } else {
+        //bootstrap提示框
+        $("#smallModalInfo").modal();
+        $("#smallModalInfo").find(".titleInfo").html("结束日期不能小于开始日期！")
+        return false;
+    }
+}
+
+ //导出Excel
+function exportExcel() {
+    //bootstrap提示框
+    $("#smallModalInfo").modal();
+    $("#smallModalInfo").find(".titleInfo").html("功能待开发！")
+    return false;
+}
+
+$(function () {
+    var table = $('#drivingBehaviorAnalysisTable'),
+        page = $('#page'),
+        goBtn = $('#goBtn');
+    // 跳转到某页
+    goBtn.click(function () {
+        table.bootstrapTable('selectPage', +page.val());
+    });
+    $("#drivingBehaviorAnalysisTable.th-inner").eq(0).append('<span>全选</span>');
+});
+
+// 格式化“评分级别”列
+function averageScoreFormatter() {
+    return '<img src="/iwuliu/static/operationManager/reportManager/images/huang.png"/><span>(危险)</span>';
+}
+
+// 格式化“建议”列
+function adviceFormatter() {
+    return '<span>危险，建议严格控制车速，少疲劳驾驶，提高警惕、谨慎驾驶!</span>'
+}
+
+// 时间的验证
+function checkTime(start, end) {
+    var _start = start.val();
+    var _end = end.val();
+    if (_start == '' || _end == ''||_start<=_end) {
+        start.css("border", "none");
+        end.css("border", "none");
+        return true;
+    } else if (_end < _start) {
+        start.css("border", "1px solid red");
+        end.css("border", "1px solid red");
+        return false;
+    }
+}
+

@@ -1,0 +1,382 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：TruckHawkeyeFunctionController.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2016-08-10
+ * 作    者: WXW
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.controller;
+
+import com.cn.gazelle.logistics.dao.*;
+import com.cn.gazelle.logistics.pojo.*;
+import com.cn.gazelle.logistics.service.DicdataService;
+import com.cn.gazelle.logistics.service.TruckCarriageTypeService;
+import com.cn.gazelle.logistics.service.TruckImmediateService;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.ResponseUtil;
+import com.cn.gazelle.logistics.util.zgtUtil.GPSUtile;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.text.DecimalFormat;
+import java.util.*;
+
+/**
+ * 类 名 称：TruckHawkeyeFuntionController
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ *          01 
+ *          02
+ *@authot WXW
+ */
+@Controller
+@RequestMapping(value = "/truckHawkeyeFunctionManager")
+public class TruckHawkeyeFunctionController {
+
+    @Resource
+    private TruckDaoMapper truckDaoMapper;
+    @Resource
+    private OBDequipmentDaoMapper obDequipmentDaoMapper;
+    @Resource
+    private TruckPositionDaoMapper truckPositionDaoMapper;
+    @Resource
+    private PersonDaoMapper personDaoMapper;
+    @Resource
+    private CompanyDaoMapper companyDaoMapper;
+    @Resource
+    private TruckImmediateService truckImmediateService;
+    @Resource
+    private TruckCarriageTypeService carriageTypeService;
+    @Resource
+    private  OBDEquipmentTruckBindingDaoMapper obdEquipmentTruckBindingDaoMapper;
+    @Resource
+    private DicdataService dicdataService;
+
+    Logger logger = Logger.getLogger(TruckHawkeyeFunctionController.class);
+
+    //车辆鹰眼功能页面
+    @RequestMapping(value = "home")
+    public String home(ModelMap model) {
+        return "truckHawkeyeFunctionManager/truckHawkeyeFunctionManager";
+    }
+
+    //根据车牌号模糊查询     结构树
+    @RequestMapping(value = "getPosition")
+    public Map getPosition(@RequestParam(required = false, defaultValue = "") String plate_number, HttpServletRequest request, HttpServletResponse response, ModelMap model){
+        // 封装查询结果
+        Map<String, List> result = new HashMap();
+        //获取车辆
+       List<T_Data_Truck>  truckList = null;
+
+        try {
+            List<Map<String, String>> lists = new ArrayList<Map<String, String>>();
+            String  detailInfo = request.getParameter("plate_number");
+            detailInfo = URLDecoder.decode(detailInfo, "UTF-8");
+            //车牌号不为空
+            if(!detailInfo.equals("")){
+                //车主id不为空
+                truckList = truckDaoMapper.findTruckByMuHuNumberAndOwerNotNull(plate_number);
+                if (truckList.size()!=0){
+                    //用于除重公司Id
+                    List ObjList=new ArrayList();
+                    for(T_Data_Truck truck :truckList) {
+                        Map map = new HashMap();
+                        String owner_member_id = truck.getOwner_member_id();
+                        if (owner_member_id != null) {
+                            //如果不包含公司id
+                            if (!ObjList.contains(owner_member_id)){
+                                ObjList.add(owner_member_id);
+                                T_Data_Company company = companyDaoMapper.findCompanyByID(owner_member_id);
+                                map.put("id", company.getCompany_id());
+                                map.put("name", company.getCompany_name());
+                                List<T_Data_Truck> dataTruckList = truckDaoMapper.findTruckByOwnerMemberIdAndPlateNumber(owner_member_id, plate_number);
+                                List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+                                for (T_Data_Truck dataTruck:dataTruckList){
+                                    Map map2 = new HashMap();
+                                    map2.put("plateNumber",dataTruck.getPlate_number());
+                                    list.add(map2);
+                                }
+                                map.put("listNumber",list);
+                                lists.add(map);
+                            }
+                        }
+                    }
+                }else{//查不到车辆只显示公司
+                    List<T_Data_Company> companyList = companyDaoMapper.findCompanyList();
+                    for (T_Data_Company company:companyList){
+                        Map map = new HashMap();
+                        map.put("id", company.getCompany_id());
+                        map.put("name", company.getCompany_name());
+                        lists.add(map);
+                    }
+                }
+                result.put("list",lists);
+            }else{
+                //车牌号为空 查询所有的车辆公司车辆
+                List<T_Data_Company> companyList = companyDaoMapper.findCompanyList();
+                for (T_Data_Company company : companyList) {
+                    Map results = new HashMap();
+                    results.put("id", company.getCompany_id());
+                    results.put("name", company.getCompany_name());
+                    List<T_Data_Truck> truckLists = truckDaoMapper.findTruckByOwnerMemberID(company.getCompany_id());
+                    if (truckLists.size()!=0){
+                        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+                        for (T_Data_Truck truck:truckLists){
+                            Map map = new HashMap();
+                            String plateNumber = truck.getPlate_number();
+                            map.put("plateNumber",plateNumber);
+                            list.add(map);
+                        }
+                        results.put("listNumber",list);
+                    }
+                    lists.add(results);
+                }
+                result.put("list",lists);
+            }
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(result));
+        } catch (Exception e) {
+            logger.error("获取经纬度失败"+e.getMessage());
+        }
+        return result;
+    }
+
+
+    //根据车牌号 时间 查询
+    @RequestMapping(value = "getPositiones")
+    public Map getPositiones(@RequestParam(required = true, defaultValue = "") String[] arr, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+
+        // 封装查询结果
+        Map<String, List> result = new HashMap();
+        //获取车辆
+        try {
+            String  detailInfo = request.getParameter("arr");
+            detailInfo = URLDecoder.decode(detailInfo, "UTF-8");
+            String[] split = detailInfo.split(",");
+            String plate_number = split[0];
+            String start_time = split[1];
+            String end_time = split[2];
+            T_Data_Truck truck = truckDaoMapper.findTruckByPlateNumber(plate_number);
+            double latitude = 0;
+            double longitude =0;
+            Map resultse = new HashMap();
+            List list = new ArrayList<Map<String, String>>();
+            List<Map<String, String>> liste = new ArrayList<Map<String, String>>();
+            if (truck!= null) {
+                String truck_id = truck.getTruck_id();
+                //根据车辆id获取绑定的OBD设备
+                T_Data_OBD_Equipment_Truck_Binding truckBinding = obdEquipmentTruckBindingDaoMapper.findOBDTruckBindingInfoByTruckID(truck_id);
+                if (truckBinding!=null){
+                    String equipment_id = truckBinding.getEquipment_id();
+                    T_Data_OBD_Equipment obdEquipment = obDequipmentDaoMapper.findById(equipment_id);
+                    if (obdEquipment != null) {
+                        //获取OBD设备的id
+                        String obdId = obdEquipment.getObd_id();
+                        //根据obd设备id获取最新的车辆位置 默认查询10条根据设备接收时间
+                        List<T_Data_Truck_Position> lastTruckPositionByObdId = truckPositionDaoMapper.findTruckPositionDateByObdId(obdId,start_time,end_time);
+                        if (lastTruckPositionByObdId.size() != 0) {
+                            for (T_Data_Truck_Position truckPosition : lastTruckPositionByObdId) {
+                                Map results = new HashMap();
+                                //获取最新的经纬度
+
+                                longitude = Double.valueOf(truckPosition.getLongitude());
+                                latitude = Double.valueOf(truckPosition.getLatitude());
+                                double[] latlng = new double[2];
+                                double[] latLon = GPSUtile.transform(latitude, longitude, latlng);
+                                double lat = latLon[0];
+                                double lon = latLon[1];
+                                results.put("latitude",lat );
+                                results.put("longitude", lon);
+                                liste.add(results);
+                            }
+                            resultse.put("LatLon", liste);
+                            String manager_member_id = truck.getManager_member_id();
+                            T_Data_Person person = personDaoMapper.findPersonByID(manager_member_id);
+                            if (person!=null){
+                                String personName = person.getPerson_name();
+                                String phone = person.getPerson_mobile_phone();
+                                //车辆管理者
+                                resultse.put("personName",personName);
+                                resultse.put("phone",phone);
+                                //车牌
+                                resultse.put("plateNumber",plate_number);
+
+                                //车厢类型
+                                String typeId = truck.getTruck_carriage_type_id();
+                                String typeName = carriageTypeService.findTruckCarriageTypeByID(typeId).getTruck_carriage_type_name();
+                                resultse.put("carriageTypeName",typeName);
+
+                                T_Data_Truck_Immediate  truckImmediate = truckImmediateService.findTruckImmediateByPlateNumber(plate_number);
+
+                                if(truckImmediate!=null){
+                                    //车辆品牌
+                                    resultse.put("brandName",truckImmediate.getTruck_brand_name());
+                                   //速度
+                                    resultse.put("speed",truckImmediate.getSpeed()+"km/h");
+                                }else {
+                                    //车辆品牌
+                                    resultse.put("brandName","暂无");
+                                }
+                            }
+                            resultse.put("flag","0");
+                        }else {
+                            //查询对应时间行驶距离较短
+                            resultse.put("flag","1");
+                        }
+                    }
+                }else {
+                    //车辆没有绑定设备
+                    resultse.put("flag","3");
+                }
+            }else{
+                //车辆不存在
+                resultse.put("flag","2");
+            }
+            list.add(resultse);
+            result.put("list", list);
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(result));
+            logger.info("获取经纬度成功");
+
+        } catch (Exception e) {
+            logger.error("获取经纬度失败" + e.getMessage());
+        }
+        return result;
+    }
+
+    //查询多个车辆
+    @RequestMapping(value = "getPositionList")
+    @ResponseBody
+    public void getPositionList(@RequestParam(required = false, defaultValue = "") String[] plateNumberList, HttpServletRequest request, HttpServletResponse response, ModelMap model) throws UnsupportedEncodingException {
+        // 封装查询结果
+        Map<String, List> result = new HashMap();
+        //获取车辆
+        T_Data_Truck_Immediate truckImmediate  = null;
+        try {
+            DecimalFormat df1 = new DecimalFormat("0.00");
+            String  detailInfo = request.getParameter("plateNumberList");
+            detailInfo = URLDecoder.decode(detailInfo, "UTF-8");
+            String[] split = detailInfo.split(",");
+            List list=new ArrayList<Map<String,String>>();
+            for (String plate_number:split){
+                HashMap map=new HashMap();
+                //车辆及时信息表
+                truckImmediate = truckImmediateService.findTruckImmediateByPlateNumber(plate_number);
+                if (truckImmediate!=null){
+                    T_Data_Truck truck = truckDaoMapper.findTruckByPlateNumber(plate_number);
+                    if (truck!=null){
+                        String manager_member_id = truck.getManager_member_id();
+                        T_Data_Person person = personDaoMapper.findPersonByID(manager_member_id);
+                        if (person!=null){
+                            String personName = person.getPerson_name();
+                            String phone = person.getPerson_mobile_phone();
+                            Date lastUpdate = truckImmediate.getLast_update();
+                            Double direction = Double.valueOf(truckImmediate.getDirection())-90;
+                            long lastUpdateTime = lastUpdate.getTime();
+                            long time = new Date().getTime();
+                            long flag = time - lastUpdateTime;
+                            //更新时间和系统时间对比 5分钟
+                            if (flag>300000){
+                                //车辆车辆熄火 0
+                                map.put("flag","2");
+                                map.put("speed",0+"km/h");
+                            }else {
+                                //车辆行驶中 1
+                                map.put("flag","1");
+                                map.put("speed",truckImmediate.getSpeed()+"km/h");
+                            }
+                            String alarm_type = truckImmediate.getAlarm_type();
+                            map.put("alarm","无");
+                            if (alarm_type!=null){
+                                //根据警报时间
+                                Date alarmTime = truckImmediate.getAlarm_time();
+                                long alarmTimeTime = alarmTime.getTime();
+                                long times = time - alarmTimeTime;
+                                if (times<300000){
+                                    //车辆报警
+                                    map.put("flag", "3");
+                                    List<T_Sys_Dicdata> allDicdataByCode = dicdataService.findAllDicdataByCode("0F890349CF774AA18ECB0D45E79C8F0C", alarm_type);
+                                    String alarm = allDicdataByCode.get(0).getDicdata_name();
+                                    map.put("alarm",alarm);
+                                    map.put("speed",truckImmediate.getSpeed()+"km/h");
+                                }
+                            }
+                            //车辆管理者
+                            map.put("personName",personName);
+                            map.put("phone",phone);
+                            //车牌
+                            map.put("plateNumber",plate_number);
+                            //车辆品牌
+                            map.put("brandName",truckImmediate.getTruck_brand_name());
+                            //车厢类型
+                            map.put("carriageTypeName",truckImmediate.getTruck_carriage_type_name());
+                            double longitude = truckImmediate.getLongitude();
+                            double latitude = truckImmediate.getLatitude();
+                            double[] latlng = new double[2];
+                            double[] latLon = GPSUtile.transform(latitude, longitude, latlng);
+                            double lat = latLon[0];
+                            double lon = latLon[1];
+                            map.put("latitude",lat);
+                            map.put("longitude",lon);
+                            map.put("direction",direction);
+                            //油耗
+                            double fuel_consumption_statistics = truckImmediate.getFuel_consumption_statistics();
+                            map.put("fuelConsumption",df1.format(fuel_consumption_statistics));
+                            //胎压
+                            double tire_pressure = truckImmediate.getTire_pressure();
+                            map.put("tirePressure",tire_pressure);
+                            list.add(map);
+                        }
+                    }
+                }else {
+                    T_Data_Truck truck = truckDaoMapper.findTruckByPlateNumber(plate_number);
+                    String carriageTypeId = truck.getTruck_carriage_type_id();
+                    String typeName = carriageTypeService.findTruckCarriageTypeByID(carriageTypeId).getTruck_carriage_type_name();
+                    if (truck!=null){
+                        String manager_member_id = truck.getManager_member_id();
+                        T_Data_Person person = personDaoMapper.findPersonByID(manager_member_id);
+                        if (person!=null){
+                            String personName = person.getPerson_name();
+                            String phone = person.getPerson_mobile_phone();
+                            //车辆车辆熄火 0
+                            map.put("flag","2");
+                            //车辆管理者
+                            map.put("personName",personName);
+                            map.put("phone",phone);
+                            //车牌
+                            map.put("plateNumber",plate_number);
+                            //车辆品牌
+                            map.put("brandName","");
+                            //车厢类型
+                            map.put("carriageTypeName",typeName);
+                            //速度
+                            map.put("speed",0+"km/h");
+                            map.put("latitude",39.90923);
+                            map.put("longitude",116.397428);
+                            list.add(map);
+                        }
+                    }
+                }
+            }
+            result.put("list",list);
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(result));
+            logger.info("获取经纬度成功");
+
+        } catch (Exception e) {
+            logger.error("获取经纬度失败"+e.getMessage());
+        }
+    }
+
+}

@@ -1,0 +1,451 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：TransactionController.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2017-01-06
+ * 作    者: zf
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.controller.operationController;
+
+import com.cn.gazelle.logistics.pojo.*;
+import com.cn.gazelle.logistics.service.*;
+import com.cn.gazelle.logistics.util.DateUtil;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.ResponseUtil;
+import com.cn.gazelle.logistics.util.message.base.LogUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称：TransactionController
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ *          01 
+ *          02
+ *@author zf
+ */
+@Controller
+@RequestMapping(value = "/transactionManager")
+public class TransactionController {
+
+    Logger logger = Logger.getLogger(TransactionController.class);
+
+    @Value("#{setting[baseUrl]}")
+    private String baseUrl;
+
+    @Resource
+    private MemberService memberService;
+    @Resource
+    private TruckService truckService;
+
+    @Resource
+    private PersonService personService;
+
+    @Resource
+    private StationService stationService;
+
+
+    @Resource
+    private MemberPayService memberPayService;
+
+    @Resource
+    private TruckPayService  truckPayService;
+
+
+    /**
+     * 方法名称:transactionRecords
+     * 内容摘要:交易记录界面
+     *
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "home")
+    public String transactionRecords(ModelMap model) {
+        return "operationManager/transactionRecords/transactionRecords";
+    }
+
+    /**
+     * 方法名称:transactionRecordsDetail
+     * 内容摘要:跳转到详情页
+     *
+     * @param model
+     * @return
+     */
+
+    @RequestMapping(value = "transactionRecordsDetail")
+    public String transactionRecordsDetail(ModelMap model) {
+        return "operationManager/transactionRecordsDetail/transactionRecordsDetail";
+    }
+
+    /**
+     * 方法名称:transactionRecordsList
+     * 功能描述:交易记录列表
+     *
+     * @param request
+     * @param response
+     * @param model
+     */
+    @RequestMapping(value = "transactionRecordsList")
+    public void transactionRecordsList(@RequestParam(required = false, defaultValue = "") String account_dept,
+                                       @RequestParam(required = false, defaultValue = "") String account_type,
+                                       @RequestParam(required = false, defaultValue = "") String account_name,
+                                       @RequestParam(required = false, defaultValue = "") String account_no,
+                                       @RequestParam(required = false, defaultValue = "") String transaction_money,
+                                       @RequestParam(required = false, defaultValue = "") String transaction_type,
+                                       @RequestParam(required = false, defaultValue = "") String transaction_name,
+                                       @RequestParam(required = false, defaultValue = "") String order_no,
+                                       @RequestParam(required = false, defaultValue = "") String start_time,
+                                       @RequestParam(required = false, defaultValue = "") String end_time,
+                                       HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+        System.out.println("account_dept=" + account_dept);
+        System.out.println("account_type=" + account_type);
+        System.out.println("account_name=" + account_name);
+        System.out.println("account_no=" + account_no);
+        System.out.println("transaction_money=" + transaction_money);
+        System.out.println("transaction_type=" + transaction_type);
+        System.out.println("transaction_name=" + transaction_name);
+        System.out.println("order_no=" + order_no);
+        System.out.println("start_time=" + start_time);
+        System.out.println("end_time=" + end_time);
+
+        String member_name = request.getSession().getAttribute("username").toString();
+
+        List<T_Data_Transaction_Info> transactionManagerList = null;
+        HashMap<String, String> conditions = new HashMap<String, String>();
+        try {
+            T_Data_Member member = memberService.findMemberByName(member_name);
+            String member_id = member.getMember_id();
+            logger.info(member_id);
+            if(account_dept.equals("0")){
+                conditions.put("company_id","");
+            }else{
+                conditions.put("company_id",account_dept);
+            }
+            conditions.put("member_id",member_id);
+            if(account_type.equals("全部")||account_type.equals("请选择")){
+                conditions.put("account_type","");                         // 账户类型
+            }else{
+                conditions.put("account_type", account_type);              // 账户类型
+            }
+            conditions.put("account_name", account_name);                     // 账户名
+            conditions.put("account_no", account_no);                        // 交易人账号
+            conditions.put("transaction_money", transaction_money);           // 交易金额
+            if(transaction_type.equals("全部")||transaction_type.equals("请选择")){
+                conditions.put("transaction_type","");
+            }else {
+                conditions.put("transaction_type",transaction_type);
+            }
+
+            if(transaction_name.equals("全部")||transaction_name.equals("请选择")){
+                conditions.put("transaction_name","");
+            }else{
+                conditions.put("transaction_name",transaction_name);
+            }
+
+            conditions.put("order_no",order_no);
+            conditions.put("start_time",start_time);
+            conditions.put("end_time",end_time);
+            transactionManagerList = memberService.queryTransactionRecords(conditions);
+            logger.info(transactionManagerList);
+           ResponseUtil.outWrite(response, JSONUtil.toJSONString(transactionManagerList));
+            logger.info(JSONUtil.toJSON(conditions));
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(LogUtil.searchErr + e.getMessage());
+        }
+       // return transactionManagerList;
+    }
+
+    /**
+     * 方法描述:交易记录导出到Excel表格
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    @RequestMapping(value = "transactionRecordsExport")
+    public void driverExport(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        try {
+            String domainPath = request.getSession().getServletContext().getRealPath("/");
+            System.out.println("domainPath=" + domainPath);
+            domainPath = domainPath.substring(0, domainPath.lastIndexOf(File.separator));
+            domainPath = domainPath.substring(0, domainPath.lastIndexOf(File.separator));
+            String baseUrl = domainPath + File.separator + this.baseUrl;
+            String path = baseUrl + "/ExportExcel/transactionRecordsExport.xls";
+            InputStream in = new FileInputStream(new File(path));
+            SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //为了转时间
+            Workbook work = new HSSFWorkbook(in);
+            List<T_Data_Transaction_Info> transactionManagerList = null;
+            HashMap<String, String> conditions = new HashMap<String, String>();
+            // 得到excel的第0张表
+            Sheet sheet = work.getSheetAt(0);
+            try {
+                // 将数据写入excel
+                transactionManagerList = memberService.queryTransactionRecords(conditions);
+                int i = 2;  // 起始行数，0为第一行
+                for (T_Data_Transaction_Info transactionDriversManager : transactionManagerList) {
+                    Row row = sheet.createRow(i);
+                    i++;
+                    row.createCell(0).setCellValue(transactionDriversManager.getAccount_type());
+                    row.createCell(1).setCellValue(transactionDriversManager.getAccount_name());
+                    row.createCell(2).setCellValue(transactionDriversManager.getAccount_money());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            String address = simpleFormat.format(new Date());
+            OutputStream os = response.getOutputStream();// 取得输出流
+            response.setContentType("application/vnd.ms-excel");
+            // 传递中文参数编码
+            String codedFileName = java.net.URLEncoder.encode("交易记录", "UTF-8");
+            response.setHeader("content-disposition", "attachment;filename=" + codedFileName + address + ".xls");
+            work.write(os);
+            in.close();
+            os.close();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("文件路径错误");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("文件输入流错误");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 方法描述:获取交易记录详情
+     *
+     * @param detailInfo
+     * @param request
+     * @param response
+     * @return
+     */
+
+    @ResponseBody
+    @RequestMapping(value = "getTransactionRecordsDetailInfo")
+    public Map<String, String> getTransactionRecordsDetailInfo(@RequestParam("detailInfo") String detailInfo, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            detailInfo = URLDecoder.decode(detailInfo, "UTF-8");
+            logger.info(detailInfo);
+            Gson gson = new Gson();
+            List<Map<String, String>> detailList = gson.fromJson(detailInfo, new TypeToken<List<Map<String, String>>>() {
+            }.getType());
+            result.put("account_name", detailList.get(0).get("account_name"));
+            result.put("account_money", detailList.get(0).get("account_money"));
+            logger.info(detailInfo);
+            //return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 方法描述:交易记录详情信息列表
+     * @param start_time
+     * @param end_time
+     * @param detailInfo
+     * @param request
+     * @param response
+     * @param model
+     */
+    @RequestMapping(value = "transactionRecordsDetailList")
+    public void transactionRecordsDetailList(@RequestParam(required = false, defaultValue = "") String start_time,
+                                             @RequestParam(required = false, defaultValue = "") String end_time,
+                                             String detailInfo, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+
+        System.out.println("start_time=" + start_time);
+        System.out.println("end_time=" + end_time);
+        HashMap<String, String> conditions = new HashMap<String, String>();
+        try {
+            logger.info(detailInfo);
+            Gson gson = new Gson();
+            List<Map<String, String>> detailList = gson.fromJson(detailInfo, new TypeToken<List<Map<String, String>>>() {}.getType());
+            String account_type = detailList.get(0).get("account_type");
+            String account_money = detailList.get(0).get("account_money");
+            logger.info(account_type);
+            if("个人账户".equals(account_type)){
+                List<T_Data_Member_Payment_History> transactionManagerList = null;
+                String member_name = detailList.get(0).get("phone_num");
+                T_Data_Member member = memberService.findMemberByName(member_name);
+                String member_id = member.getMember_id();
+                conditions.put("member_id",member_id);
+                conditions.put("start_time",start_time);
+                conditions.put("end_time",end_time);
+                transactionManagerList = memberPayService.findHistoryAll(conditions);
+                logger.info(transactionManagerList);
+                for (T_Data_Member_Payment_History memberPaymentHistory:transactionManagerList) {
+                    String payment_type = memberPaymentHistory.getPayment_type();
+                    String target_id = memberPaymentHistory.getTarget_id();
+                    Double amount = memberPaymentHistory.getAmount();
+                    String account_amount = Double.toString(amount);
+                    memberPaymentHistory.setAccount_money(account_money);
+                    Date time = memberPaymentHistory.getCreate_time();
+                    String transaction_time = DateUtil.date2HourString(time);
+                    memberPaymentHistory.setTime_text(transaction_time);
+                    if ("0".equals(payment_type)){
+                        memberPaymentHistory.setPayment_text("充值");
+                        memberPaymentHistory.setAmount_text("+"+account_amount);
+                        int startIndex = target_id.indexOf("0");
+                        String Start_text = target_id.substring(startIndex);
+                        int num =  Integer .parseInt(Start_text);
+                        String account_no  =  String.valueOf(num);
+                        T_Data_Member_Bank_Account memberBankAccount = memberPayService.findMemberBankAccountByAccountNo(account_no);
+                        String bank_account = memberBankAccount.getBank_account();
+                        memberPaymentHistory.setTarget_text(bank_account);
+                    }else if ("1".equals(payment_type)){
+                        memberPaymentHistory.setPayment_text("提现");
+                        memberPaymentHistory.setAmount_text("-"+account_amount);
+                        int startIndex = target_id.indexOf("0");
+                        String Start_text = target_id.substring(startIndex);
+                        int num =  Integer .parseInt(Start_text);
+                        String account_no  =  String.valueOf(num);
+                        T_Data_Member_Bank_Account memberBankAccount = memberPayService.findMemberBankAccountByAccountNo(account_no);
+                        String bank_account = memberBankAccount.getBank_account();
+                        memberPaymentHistory.setTarget_text(bank_account);
+                    }else if ("2".equals(payment_type)){
+                        memberPaymentHistory.setPayment_text("车辆资金分配");
+                        memberPaymentHistory.setAmount_text("-"+account_amount);
+                        int startIndex = target_id.indexOf("T");
+                        String truck_id = target_id.substring(startIndex+1);
+                        T_Data_Truck truck = truckService.findTruckByID(truck_id);
+                        String plate_number = truck.getPlate_number();
+                        memberPaymentHistory.setTarget_text(plate_number);
+                    }else if ("3".equals(payment_type)){
+                        memberPaymentHistory.setPayment_text("车辆资金回收");
+                        memberPaymentHistory.setAmount_text("+"+account_amount);
+                        int startIndex = target_id.indexOf("T");
+                        String truck_id = target_id.substring(startIndex+1);
+                        T_Data_Truck truck = truckService.findTruckByID(truck_id);
+                        String plate_number = truck.getPlate_number();
+                        memberPaymentHistory.setTarget_text(plate_number);
+                    }else if ("4".equals(payment_type)){
+                        memberPaymentHistory.setPayment_text("运费收入");
+                        memberPaymentHistory.setAmount_text("+"+account_amount);
+                        memberPaymentHistory.setTarget_text("平台");
+                    }else if ("5".equals(payment_type)){
+                        memberPaymentHistory.setPayment_text("运输成本扣除");
+                        memberPaymentHistory.setAmount_text("-"+account_amount);
+                        memberPaymentHistory.setTarget_text("平台");
+                    }
+                }
+                logger.info("个人账户**");
+                logger.info(transactionManagerList);
+                ResponseUtil.outWrite(response, JSONUtil.toJSONString(transactionManagerList));
+            }else if ("车辆账户".equals(account_type)){
+                List<T_Data_Truck_Payment_History> transactionManagerList = null;
+                String plate_number = detailList.get(0).get("car_num");
+                T_Data_Truck truck = truckService.findTruckByPlateNumber(plate_number);
+                String truck_id = truck.getTruck_id();
+                conditions.put("truck_id",truck_id);
+                conditions.put("start_time",start_time);
+                conditions.put("end_time",end_time);
+                transactionManagerList = truckPayService.findHistoryAll(conditions);
+                for (T_Data_Truck_Payment_History truckPaymentHistory:transactionManagerList){
+                    String payment_type = truckPaymentHistory.getPayment_type();
+                    String target_id = truckPaymentHistory.getTarget_id();
+                    Double amount = truckPaymentHistory.getAmount();
+                    String account_amount = Double.toString(amount);
+                    truckPaymentHistory.setAccount_money(account_money);
+                    Date create_time = truckPaymentHistory.getCreate_time();
+                    String transaction_time = DateUtil.date2HourString(create_time);
+                    truckPaymentHistory.setTime_text(transaction_time);
+                    if("0".equals(payment_type)){
+                        truckPaymentHistory.setPayment_text("车辆资金分配");
+                        truckPaymentHistory.setAmount_text("-"+account_amount);
+                        int startIndex = target_id.indexOf("M");
+                        String member_id = target_id.substring(startIndex+1);
+                        T_Data_Member member = memberService.findMemberByID(member_id);
+                        String member_name = member.getMember_name();
+                        String relevance_info_id = member.getRelevance_info_id();
+                        T_Data_Person person = personService.findPersonByID(relevance_info_id);
+                        String person_name = person.getPerson_name();
+                        truckPaymentHistory.setTarget_text(person_name+","+member_name);
+                    }else if ("1".equals(payment_type)){
+                        truckPaymentHistory.setPayment_text("车辆资金回收");
+                        truckPaymentHistory.setAmount_text("+"+account_amount);
+                        int startIndex = target_id.indexOf("M");
+                        String member_id = target_id.substring(startIndex+1);
+                        T_Data_Member member = memberService.findMemberByID(member_id);
+                        String member_name = member.getMember_name();
+                        String relevance_info_id = member.getRelevance_info_id();
+                        T_Data_Person person = personService.findPersonByID(relevance_info_id);
+                        String person_name = person.getPerson_name();
+                        truckPaymentHistory.setTarget_text(person_name+","+member_name);
+                    } else if ("2".equals(payment_type)){
+                        truckPaymentHistory.setPayment_text("支出");
+                        truckPaymentHistory.setAmount_text("-"+account_amount);
+                        T_Master_Service_Station serviceStation =  stationService.findStationByID(target_id);
+                        String station_name = serviceStation.getStation_name();
+                        truckPaymentHistory.setTarget_text(station_name);
+                    }
+                }
+                logger.info("车辆账户**");
+                logger.info(transactionManagerList);
+                ResponseUtil.outWrite(response, JSONUtil.toJSONString(transactionManagerList));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @RequestMapping(value = "getMember")
+    public String getMember(ModelMap model){
+
+
+        return null;
+    }
+
+
+    /**
+     * @方法说明:导出Excel
+     **/
+//    @RequestMapping("/export")
+//    public String exportExcel(@ModelAttribute("cond") CmsAdvertCond cond, HttpServletResponse response, HttpSession session) {
+//        try {
+//            String name = null;
+//           // if (Util.getTimeOut(session)) {
+//            //    return "redirect:/user/tologin?msg=1";
+//           // } else {
+//           //     name = Util.getLoginName(session);
+//          //  }
+//            memberPayService.exportExcel(cond, response, name);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            logger.error("导出广告位列表时发生异常!");
+//        }
+//        return null;
+//    }
+
+}

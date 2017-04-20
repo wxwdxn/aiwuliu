@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.DispatchSheetDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Transportation_Dispatch_Sheet" type="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Dispatch_Sheet">
+        <id column="DISPATCH_SHEET_ID" property="dispatchSheetId"></id>
+        <result column="SCHEDULE_SHEET_ID" property="scheduleSheetId"></result>
+        <result column="SEND_MEMBER_ID" property="sendMemberId"></result>
+        <result column="RECEIVE_MEMBER_ID" property="receiveMemberId"></result>
+        <result column="DISPATCH_SHEET_STATUS" property="dispatchSheetStatus"></result>
+        <result column="DELETE_FLAG" property="deleteFlag"></result>
+        <result column="LAST_UPDATE" property="lastUpdate"></result>
+        <result column="LAST_UPDATE_USER_ID" property="lastUpdateUserId"></result>
+        <result column="DCODE" property="DCode"></result>
+    </resultMap>
+
+    <!--查询id条件的派车单列表信息（默认查询所派车单列表信息）-->
+    <select id="findDispatchSheetByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Dispatch_Sheet">
+        SELECT
+             DISPATCH_SHEET_ID as dispatchSheetId,
+             SCHEDULE_SHEET_ID as scheduleSheetId,
+             SEND_MEMBER_ID as sendMemberId,
+             RECEIVE_MEMBER_ID AS receiveMemberId,
+             DISPATCH_SHEET_STATUS AS dispatchSheetStatus,
+             LAST_UPDATE as lastUpdate,
+             LAST_UPDATE_USER_ID as lastUpdateUserId,
+             DCODE as DCode
+        FROM
+             t_data_transportation_dispatch_sheet
+        WHERE
+             DISPATCH_SHEET_ID=#{dispatchSheetId} AND DELETE_FLAG=0
+    </select>
+
+    <!--根据状态和接收会员id查询卸货中派车单信息（-->
+    <select id="findUnloadingDispatchByMemId" resultMap="T_Data_Transportation_Dispatch_Sheet">
+        SELECT
+             s.DISPATCH_SHEET_ID AS dispatchSheetId,
+             s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+             s.SEND_MEMBER_ID AS sendMemberId,
+             s.RECEIVE_MEMBER_ID AS receiveMemberId,
+             s.DISPATCH_SHEET_STATUS AS dispatchSheetStatus,
+             s.LAST_UPDATE AS lastUpdate,
+             s. LAST_UPDATE_USER_ID AS lastUpdateUserId,
+             s.DCODE AS DCode
+        FROM
+             t_data_transportation_dispatch_sheet s
+              LEFT JOIN `t_data_transportation_schedule_sheet` t
+        ON  t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+              s.RECEIVE_MEMBER_ID=#{receiveMemberId}AND s.DELETE_FLAG=0 AND t.`DELETE_FLAG`=0 AND t.`STATUS` = 4;
+    </select>
+
+
+    <!--保存派车单信息-->
+    <insert id="saveDispatchSheet" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Dispatch_Sheet">
+        INSERT INTO
+                t_data_transportation_dispatch_sheet( DISPATCH_SHEET_ID,
+                SCHEDULE_SHEET_ID,
+                SEND_MEMBER_ID,
+                RECEIVE_MEMBER_ID,
+                DISPATCH_SHEET_STATUS,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID,
+                DCODE )
+        VALUES (
+                #{dispatchSheetId},
+                #{scheduleSheetId},
+                #{sendMemberId},
+                #{receiveMemberId},
+                #{dispatchSheetStatus},
+                0,
+                #{lastUpdate},
+                #{lastUpdateUserId},
+                #{DCode} )
+    </insert>
+
+    <!--更新派车单信息-->
+    <update id="updateDispatchSheet" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Dispatch_Sheet">
+        UPDATE
+            t_data_transportation_dispatch_sheet
+        SET
+            SCHEDULE_SHEET_ID = #{scheduleSheetId},
+            SEND_MEMBER_ID = #{sendMemberId} ,
+            RECEIVE_MEMBER_ID = #{receiveMemberId} ,
+            DISPATCH_SHEET_STATUS= #{dispatchSheetStatus},
+            LAST_UPDATE = #{lastUpdate} ,
+            LAST_UPDATE_USER_ID = #{lastUpdateUserId}
+        WHERE
+            DISPATCH_SHEET_ID = #{dispatchSheetId} AND DELETE_FLAG=0
+    </update>
+
+    <!--查询所有的派车单根据分页显示-->
+    <select id="findAllDispatchSheet" resultMap="T_Data_Transportation_Dispatch_Sheet">
+        SELECT
+            DISPATCH_SHEET_ID as dispatchSheetId,
+            SCHEDULE_SHEET_ID as scheduleSheetId,
+            SEND_MEMBER_ID as sendMemberId,
+            RECEIVE_MEMBER_ID AS receiveMemberId,
+            DISPATCH_SHEET_STATUS AS dispatchSheetStatus,
+            LAST_UPDATE as lastUpdate,
+            LAST_UPDATE_USER_ID as lastUpdateUserId,
+            DCODE as DCode
+        FROM
+            t_data_transportation_dispatch_sheet t
+        WHERE t.DELETE_FLAG=0
+        <if test="searchType !=''and searchType== 'DCode'">
+            AND
+                ${searchType} LIKE '%${name}%'
+        </if>
+        <if test="searchType !='' and searchType=='SEND_MEMBER_ID'">
+            AND
+                t.${searchType}
+            IN (
+                SELECT
+                      m.sendMemberId
+                FROM
+                      (
+                        SELECT
+                              relevance_info_id AS sendMemberId
+                        FROM
+                              `t_data_member` e
+                        WHERE
+                              member_name LIKE '%${name}%'AND e.DELETE_FLAG=0
+                      )AS m
+                )
+        </if>
+        <if test="searchType !='' and searchType=='RECEIVE_MEMBER_ID'">
+            AND
+                  t.${searchType}
+            IN (
+                SELECT
+                    m.receiveMemberId
+                FROM (
+                      SELECT
+                            relevance_info_id AS receiveMemberId
+                      FROM
+                            `t_data_member` e
+                      WHERE
+                            member_name LIKE '%${name}%'AND e.DELETE_FLAG=0
+                      )AS m
+                 )
+        </if>
+          limit #{page},#{rows}
+    </select>
+
+    <!--删除派车单信息-->
+    <delete id="delDispatchSheet" parameterType="String">
+        UPDATE
+              t_data_transportation_dispatch_sheet
+        SET
+              DELETE_FLAG=1
+        WHERE
+                DISPATCH_SHEET_ID=#{dispatchSheetId} AND DELETE_FLAG=0
+    </delete>
+
+    <!--根据调度单id获取-->
+    <select id="findByScheduleId" resultMap="T_Data_Transportation_Dispatch_Sheet">
+        SELECT
+        DISPATCH_SHEET_ID as dispatchSheetId,
+        SCHEDULE_SHEET_ID as scheduleSheetId,
+        SEND_MEMBER_ID as sendMemberId,
+        RECEIVE_MEMBER_ID AS receiveMemberId,
+        DISPATCH_SHEET_STATUS AS dispatchSheetStatus,
+        LAST_UPDATE as lastUpdate,
+        LAST_UPDATE_USER_ID as lastUpdateUserId,
+        DCODE as DCode
+        FROM
+        t_data_transportation_dispatch_sheet
+        WHERE
+        SCHEDULE_SHEET_ID=#{scheduleSheetId}AND DELETE_FLAG=0
+    </select>
+
+
+
+    <!--根据状态和接收会员id查询派车单列表信息（默认查询所派车单列表信息）-->
+    <select id="findDispatchByMemIdList" resultMap="T_Data_Transportation_Dispatch_Sheet">
+        SELECT
+        s.DISPATCH_SHEET_ID AS dispatchSheetId,
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.DISPATCH_SHEET_STATUS AS dispatchSheetStatus,
+        s.LAST_UPDATE AS lastUpdate,
+        s. LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.DCODE AS DCode
+        FROM
+        t_data_transportation_dispatch_sheet s
+        LEFT JOIN `t_data_transportation_schedule_sheet` t
+        ON  t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        s.RECEIVE_MEMBER_ID=#{receiveMemberId}AND s.DELETE_FLAG=0 AND t.`DELETE_FLAG`=0 AND t.`STATUS` &lt; 5;
+    </select>
+
+
+    <!--根据接收会员id查询未完成的派车单列表信息222222（默认查询所派车单列表信息）-->
+    <select id="findUnfinishDispatchByMendId" resultMap="T_Data_Transportation_Dispatch_Sheet">
+        SELECT
+        s.DISPATCH_SHEET_ID AS dispatchSheetId,
+        s.SCHEDULE_SHEET_ID AS scheduleSheetId,
+        s.SEND_MEMBER_ID AS sendMemberId,
+        s.RECEIVE_MEMBER_ID AS receiveMemberId,
+        s.DISPATCH_SHEET_STATUS AS dispatchSheetStatus,
+        s.LAST_UPDATE AS lastUpdate,
+        s. LAST_UPDATE_USER_ID AS lastUpdateUserId,
+        s.DCODE AS DCode
+        FROM
+        t_data_transportation_dispatch_sheet s
+        LEFT JOIN `t_data_transportation_schedule_sheet` t
+        ON  t.`SCHEDULE_SHEET_ID`=s.`SCHEDULE_SHEET_ID`
+        WHERE
+        s.RECEIVE_MEMBER_ID like #{receiveMemberId}AND s.DELETE_FLAG=0 AND t.`DELETE_FLAG`=0 AND t.`STATUS` &lt; 4;
+    </select>
+
+
+</mapper>

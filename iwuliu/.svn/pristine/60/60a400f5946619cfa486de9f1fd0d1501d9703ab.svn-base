@@ -1,0 +1,4 @@
+#myModal label {
+    min-width: 117px;
+    text-align: right;
+}

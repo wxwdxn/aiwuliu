@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckPaymentHistoryDaoMapper">
+
+    <resultMap id="T_Data_Truck_Payment_History" type="com.cn.gazelle.logistics.pojo.T_Data_Truck_Payment_History">
+        <id column="HISTORY_NUMBER" property="history_number" />
+        <result column="TRUCK_ID" property="truck_id" />
+        <result column="PAYMENT_TYPE" property="payment_type" />
+        <result column="FINACIAL_FLOW_TYPE" property="finacial_flow_type" />
+        <result column="TARGET_ID" property="target_id" />
+        <result column="TARGET_BANK_ACCOUNT" property="target_bank_account" />
+        <result column="AMOUNT" property="amount" />
+        <result column="CREATE_TIME" property="create_time" />
+        <result column="TRUCK_LONGITUDE" property="truck_longitude" />
+        <result column="TRUCK_LATITUDE" property="truck_latitude" />
+        <result column="terminal_LONGITUDE" property="terminal_longitude" />
+        <result column="terminal_LATITUDE" property="terminal_latitude" />
+        <result column="DEAL_PERSON_ID" property="deal_person_id" />
+        <result column="RETURN_RESULT" property="return_result" />
+        <result column="RETURN_TIME" property="return_time" />
+        <result column="PAYMENT_RESULT" property="payment_result"/>
+        <result column="FAILURE_RESULT" property="failure_result" />
+        <result column="THIRD_PARTY_ORDER_ID" property="third_party_order_id"/>
+        <result column="DELETE_FLAG" property="delete_flag" />
+        <result column="LAST_UPDATE" property="last_update" />
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id" />
+    </resultMap>
+
+    <!--根据历史编号查询卡车支付历史信息-->
+    <select id="findTruckPaymentHistoryByAccountNo" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Payment_History">
+        SELECT
+           *
+        FROM
+            T_DATA_TRUCK_PAYMENT_HISTORY
+        WHERE
+            HISTORY_NUMBER = #{history_number}
+            and  DELETE_FLAG = '0'
+    </select>
+
+
+    <!--根据卡车Id查询卡车支付历史信息-->
+    <select id="findAll" resultMap="T_Data_Truck_Payment_History">
+        SELECT
+        *
+        FROM
+        T_DATA_TRUCK_PAYMENT_HISTORY
+        WHERE
+        TRUCK_ID = #{truck_id}
+        and
+        DELETE_FLAG = '0'
+    </select>
+
+
+    <!--根据条件查询车辆账户信息-->
+    <select id="findTruckAccountInfo" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_AccountInfo">
+        SELECT
+        x.account_name,x.account_dept,x.account_money,x.account_income,x.COMPANY_ID,x.account_pay,x.create_time
+        FROM
+        (
+        SELECT
+        a.plate_number as account_name ,e.COMPANY_NAME as account_dept,e.COMPANY_ID,a.cash_amount as account_money ,a.owner_member_id,a.truck_id,d.转入 account_income,d.转出 AS account_pay,d.create_time
+        FROM
+        (
+        SELECT
+        *
+        FROM
+        t_data_truck
+        ) a
+        JOIN
+        t_data_company e
+        ON
+        e.COMPANY_ID = a.owner_member_id AND  e.delete_flag='0' AND  a.delete_flag='0'
+        LEFT JOIN
+        (SELECT *
+        FROM
+        (
+        (select b.truck_id,b.amount as '转入','0' AS '转出',b.create_time
+        FROM
+        t_data_truck_payment_history b
+        WHERE
+        b.payment_type = '0' AND  b.delete_flag='0'
+        )
+        UNION ALL
+        (
+        select c.truck_id,'0' as '转入',c.amount AS '转出',c.create_time
+        FROM
+        t_data_truck_payment_history c
+        WHERE
+        (c.payment_type = '1' or c.payment_type = '2') AND  c.delete_flag='0'
+        )
+        ) e ) d
+        ON
+        a.truck_id = d.TRUCK_ID
+        ) x
+
+        <where>
+            x.COMPANY_ID = #{company_id}
+            and
+            x.account_name = #{account_name}
+            <if test="start_time != null and start_time!= ''">
+                AND DATE_FORMAT(x.create_time,'%Y-%m-%d') &gt;=#{start_time}
+            </if>
+            <if test="end_time != null and end_time!= ''">
+                AND DATE_FORMAT(x.create_time,'%Y-%m-%d') &lt;=#{end_time}
+            </if>
+        </where>
+    </select>
+
+
+    <!--根据时间范围查询卡车支付历史信息-->
+    <select id="findHistoryAll" resultMap="T_Data_Truck_Payment_History">
+        SELECT
+        *
+        FROM
+        T_DATA_TRUCK_PAYMENT_HISTORY
+        <where>
+            TRUCK_ID = #{truck_id}
+            and
+            DELETE_FLAG = '0'
+            <if test="start_time != null and start_time!= ''">
+                AND DATE_FORMAT(CREATE_TIME,'%Y-%m-%d') &gt;=#{start_time}
+            </if>
+            <if test="end_time != null and end_time!= ''">
+                AND DATE_FORMAT(CREATE_TIME,'%Y-%m-%d') &lt;=#{end_time}
+            </if>
+        </where>
+    </select>
+
+    <!--保存卡车支付历史信息-->
+    <insert id="saveTruckPaymentHistory" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Payment_History">
+        <selectKey resultType="java.lang.String" order="AFTER" keyProperty="history_number">
+
+            SELECT LAST_INSERT_ID() AS HISTORY_NUMBER
+
+        </selectKey>
+        INSERT INTO
+        T_DATA_TRUCK_PAYMENT_HISTORY (
+        TRUCK_ID,
+        PAYMENT_TYPE,
+        FINACIAL_FLOW_TYPE,
+        TARGET_ID,
+        TARGET_BANK_ACCOUNT,
+        AMOUNT,
+        CREATE_TIME,
+        TRUCK_LONGITUDE,
+        TRUCK_LATITUDE,
+        terminal_LONGITUDE,
+        terminal_LATITUDE,
+        DEAL_PERSON_ID,
+        RETURN_RESULT,
+        RETURN_TIME,
+        PAYMENT_RESULT,
+        FAILURE_RESULT,
+        THIRD_PARTY_ORDER_ID,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        )
+        VALUES (
+        #{truck_id},
+        #{payment_type},
+        #{finacial_flow_type},
+        #{target_id},
+        #{target_bank_account},
+        #{amount},
+        #{create_time},
+        #{truck_longitude},
+        #{truck_latitude},
+        #{terminal_longitude},
+        #{terminal_latitude},
+        #{deal_person_id},
+        #{return_result},
+        #{return_time},
+        #{payment_result},
+        #{failure_result},
+        #{third_party_order_id},
+        #{delete_flag},
+        #{last_update},
+        #{last_update_user_id}
+        )
+    </insert>
+
+    <!--更新卡车支付历史信息-->
+    <update id="updateTruckPaymentHistory" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Payment_History">
+        UPDATE
+            T_DATA_TRUCK_PAYMENT_HISTORY
+        SET
+                TRUCK_ID = #{truck_id},
+                PAYMENT_TYPE = #{payment_type},
+                FINACIAL_FLOW_TYPE = #{finacial_flow_type},
+                TARGET_ID = #{target_id},
+                TARGET_BANK_ACCOUNT = #{target_bank_account},
+                AMOUNT = #{amount},
+                TRUCK_LONGITUDE=#{truck_longitude},
+                TRUCK_LATITUDE=#{truck_latitude},
+                terminal_LONGITUDE=#{terminal_longitude},
+                terminal_LATITUDE=#{terminal_latitude},
+                DEAL_PERSON_ID=#{deal_person_id},
+                RETURN_RESULT = #{return_result},
+                RETURN_TIME = #{return_time},
+                PAYMENT_RESULT = #{payment_result},
+                FAILURE_RESULT = #{failure_result},
+                THIRD_PARTY_ORDER_ID = #{third_party_order_id},
+                LAST_UPDATE = #{last_update},
+                LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            HISTORY_NUMBER = #{history_number} AND DELETE_FLAG = '0'
+    </update>
+
+    <!--根据历史编号删除卡车支付历史信息-->
+    <delete id="delTruckPaymentHistory" parameterType="String">
+        UPDATE
+        T_DATA_TRUCK_PAYMENT_HISTORY
+        SET
+        DELETE_FLAG = '1'
+        WHERE
+        HISTORY_NUMBER = #{history_number} AND DELETE_FLAG = '0'
+    </delete>
+
+    <!--根据卡车Id和产生时间查询卡车支付历史信息-->
+    <select id="findTruckPaymentHistoryByTruckIDAndDate" resultMap="T_Data_Truck_Payment_History">
+        SELECT
+        *
+        FROM
+        T_DATA_TRUCK_PAYMENT_HISTORY
+        WHERE
+        TRUCK_ID = #{truck_id} AND DELETE_FLAG = '0' AND DATE(CREATE_TIME) = #{date} ORDER BY CREATE_TIME
+    </select>
+
+    <!--根据第三方订单ID查询卡车支付历史信息-->
+    <select id="findTruckPaymentHistoryByThirdPartyOrderId" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Payment_History">
+        SELECT
+        *
+        FROM
+        T_DATA_TRUCK_PAYMENT_HISTORY
+        WHERE
+        THIRD_PARTY_ORDER_ID = #{third_party_order_id}
+        and  DELETE_FLAG = '0'
+    </select>
+</mapper>

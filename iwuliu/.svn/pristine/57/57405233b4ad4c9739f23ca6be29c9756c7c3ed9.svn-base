@@ -1,0 +1,236 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称: LoginController.Java
+ * 系统编号：Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：01
+ * 模块名称：登录页面
+ * 设计文件：
+ * 完成日期：2015-12-02
+ * 作    者：CYH
+ * 内容摘要：登录页的用户信息及验证码验证
+ */
+
+package com.cn.gazelle.logistics.controller;
+
+import com.cn.gazelle.logistics.pojo.T_Data_Member;
+import com.cn.gazelle.logistics.service.MemberService;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.MD5Util;
+import com.cn.gazelle.logistics.util.ResponseUtil;
+import com.cn.gazelle.logistics.util.message.base.MessageUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 类 名 称: LoginController
+ * 内容摘要: 登录页的用户信息及验证码验证
+ * 方法描述：该类有3个方法：
+ * 01 home              登录页面调用
+ * 02 selectUser        用户登录信息查询
+ * 03 saveUser          用户登出
+ *
+ * @author YK
+ */
+@Controller
+@RequestMapping(value = "/login")
+public class LoginController {
+    Logger logger = Logger.getLogger(LoginController.class);
+    @Resource
+    private MemberService memberService;
+
+    /**
+     * 方法名称：memberHome
+     * 内容摘要：外部会员的登录页面。
+     *
+     * @return string 外部会员的登录页面
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "memberHome")
+    public String memberHome() {
+        logger.info(MessageUtil.loginTip);
+        return "login/login_member";
+    }
+
+    /**
+     * 方法名称：selectMember
+     * 内容摘要：外部会员登录验证。
+     *
+     * @param username 账户
+     * @param loginPaw 密码
+     * @param session  session
+     * @param request  request
+     * @param response response
+     */
+    @RequestMapping(value = "selectMember", method = RequestMethod.POST)
+    public void selectMember(String username, String loginPaw, HttpSession session, HttpServletRequest request,
+                             HttpServletResponse response) {
+
+        T_Data_Member member = null; // 外部账户(无类型限制)
+        try {
+            if (username.equals("") || loginPaw.equals("")) {
+                ResponseUtil.outWrite(response, MessageUtil.verifyUserPassNullNUM);
+                logger.info(MessageUtil.verifyUserPassNull);
+            } else {
+                member = this.memberService.findMemberByNameAndPassword(username, MD5Util.md5(loginPaw), "");
+                // 判断用户名和密码是否正确
+                if (member == null) {
+                    ResponseUtil.outWrite(response, MessageUtil.verifyUserPassErrorNUM);
+                    logger.info(MessageUtil.verifyUserPassError);
+                } else {
+                    ResponseUtil.outWrite(response, MessageUtil.verifyUserPassSuccessNUM);
+                    // 验证成功，设置session
+                    session.setAttribute("username", username);
+                    logger.info(MessageUtil.verifyUserPassSuccess);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 方法名称：loginOut
+     * 内容摘要：用户登出。
+     *
+     * @param session session
+     */
+    @RequestMapping(value = "loginOut")
+    public String loginOut(HttpSession session) {
+        try {
+            if (session != null) {
+                session.invalidate();
+            }
+            return "login/login_member";
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return "login/login_member";
+        }
+    }
+
+    /**
+     * 方法名称：timeout
+     * 内容摘要：登陆超时。
+     */
+    @RequestMapping(value = "timeout")
+    public String timeout() {
+        logger.info(MessageUtil.loginTip);
+        return "login/timeout";
+    }
+
+    /**
+     * 方法名称：sendSMS
+     * 内容摘要：pc端获取验证码
+     *
+     * @param mobilePhone 手机号
+     * @param request     request
+     * @param response    response
+     * @return string 会员管理页面
+     */
+    @RequestMapping(value = "sendSMS")
+    public void sendSMS(String mobilePhone, HttpServletRequest request, HttpServletResponse response) {
+        String json = null; // 获取验证码
+        try {
+            json = this.memberService.phoneCode(mobilePhone, "1"); // 0代表注册，1代表修改密码
+            Gson gson = new Gson();
+            Type typeClass = new TypeToken<Map<String, String>>() {
+            }.getType();
+            Map<String, String> map = gson.fromJson(json, typeClass);
+            // 判断手机是否尚未注册
+            if (map.get("ecode").equals("3004")) {
+                ResponseUtil.outWrite(response, MessageUtil.unRegisteredNUM);
+                logger.info(MessageUtil.unRegisteredError);
+            } else if (map.get("ecode").equals("1000")) {
+                ResponseUtil.outWrite(response, MessageUtil.sendMsmNUM);
+                logger.info(MessageUtil.sendMsmSuccess);
+            }
+        } catch (Exception e) {
+            ResponseUtil.outWrite(response, MessageUtil.systemErrorNUM);
+            logger.error(MessageUtil.sendMsmSuccess + e.getMessage());
+        }
+    }
+
+    /**
+     * 方法名称：editPsw
+     * 内容摘要：修改密码
+     *
+     * @return string 修改密码
+     */
+    @RequestMapping(value = "editPsw", method = RequestMethod.POST)
+    public void editPsw(String mobilePhone, String code, String newPSW, String againPSW,
+                        HttpSession session, HttpServletRequest request,
+                        HttpServletResponse response) {
+        Map<String, String> result = new HashMap<String, String>();
+        Gson gson = new Gson();
+        String memberJson = null; // 找回密码传参
+        String ecodeJson = null; // 找回密码响应参数
+        String verityJson = null; // 验证验证码响应参数
+        result.put("member_name", mobilePhone);
+        result.put("member_password", againPSW);
+        result.put("member_type", "1"); // 司机账号
+        memberJson = JSONUtil.toJSONString(result);
+        Type typeClass = new TypeToken<Map<String, String>>() {
+            }.getType();
+//        String verifyServer = (String) request.getSession().getAttribute("verifyServerCode"); // 服务器验证码
+//        if (verifyServer == null) {
+//            ResponseUtil.outWrite(response, MessageUtil.noSendMsmNUM);
+//            logger.info(MessageUtil.noSendMsmError);
+//        } else {
+//            Gson gson = new Gson();
+//            Type typeClass = new TypeToken<Map<String, String>>() {
+//            }.getType();
+//            Map<String, String> map = gson.fromJson(verifyServer, typeClass);
+
+        verityJson = this.memberService.vertifyPhoneCode(code, mobilePhone);
+        Map<String, String> map = gson.fromJson(verityJson, typeClass);
+
+
+//        if (mobilePhone.equals(map.get("mobilePhone")) && code.equals(map.get("phoneCode"))) {
+            // 验证码输入正确
+        // 判断验证码是否输入正确
+        if (map.get("ecode").equals("1000")){
+            try {
+                ecodeJson = this.memberService.findPassword(memberJson);
+                Map<String, String> ecodeMap = gson.fromJson(ecodeJson, typeClass);
+                // 判断密码是否修改成功
+                if (ecodeMap.get("ecode").equals("1000")) {
+                    ResponseUtil.outWrite(response, MessageUtil.editPassSuccessNUM);
+                    logger.info(MessageUtil.editPassSuccess);
+                }
+                // 判断重置密码与原密码是否重合
+                else if (ecodeMap.get("ecode").equals("3002")) {
+                    ResponseUtil.outWrite(response, MessageUtil.pwsRepeatNUM);
+                    logger.info(MessageUtil.pwsRepeatError);
+                }
+            } catch (Exception e) {
+                // 密码修改失败
+                ResponseUtil.outWrite(response, MessageUtil.editPassErrorNUM);
+                logger.info(MessageUtil.editPassError);
+                logger.error(e.getMessage());
+            }
+        } else if (map.get("ecode").equals("2000")||map.get("ecode").equals("3003")){
+            ResponseUtil.outWrite(response, MessageUtil.verifyCodeErrorNUM);
+            logger.info(MessageUtil.verifyCodeError);
+        } else if (map.get("ecode").equals("3004")) {
+            ResponseUtil.outWrite(response, MessageUtil.codeOutTimeNUM);
+        }
+
+//        } else {
+//            // 返回验证码错误提示
+//            ResponseUtil.outWrite(response, MessageUtil.verifyCodeErrorNUM);
+//            logger.info(MessageUtil.verifyCodeError);
+//        }
+//        }
+    }
+}

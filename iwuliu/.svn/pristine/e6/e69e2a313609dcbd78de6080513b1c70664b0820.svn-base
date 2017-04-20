@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.MemberBankAccountDaoMapper">
+
+    <resultMap id="T_Data_Member_Bank_Account" type="com.cn.gazelle.logistics.pojo.T_Data_Member_Bank_Account">
+        <id column="ACCOUNT_NO" property="account_no" />
+        <result column="MEMBER_ID" property="member_id" />
+        <result column="BANK_ID" property="bank_id" />
+        <result column="BANK_ACCOUNT" property="bank_account" />
+        <result column="BANK_SAVE_MOBILE_PHONE" property="bank_save_mobile_phone" />
+        <result column="BIND_ID" property="bind_id" />
+        <result column="DELETE_FLAG" property="delete_flag" />
+        <result column="LAST_UPDATE" property="last_update" />
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id" />
+    </resultMap>
+
+    <!--根据银行卡号和预留的手机号查询会员银行卡信息-->
+    <select id="findMemberBankAccountByBankAccountAndPhone" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Bank_Account">
+        SELECT
+           *
+        FROM
+            T_DATA_MEMBER_BANK_ACCOUNT
+        WHERE
+            BANK_ACCOUNT = #{bank_account}
+            and
+            BANK_SAVE_MOBILE_PHONE =#{bank_save_mobile_phone}
+            and  DELETE_FLAG = '0'
+    </select>
+
+    <!--根据银行卡号和预留的手机号查询会员银行卡信息-->
+    <select id="findMemberBankAccountByBankAccountAndMemberId" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Bank_Account">
+        SELECT
+        *
+        FROM
+        T_DATA_MEMBER_BANK_ACCOUNT
+        WHERE
+        BANK_ACCOUNT = #{bank_account}
+        and
+        MEMBER_ID=#{member_id}
+        and  DELETE_FLAG = '0'
+    </select>
+
+
+    <!--根据条件查询公司账户信息-->
+    <select id="findAccountInfo" resultType="com.cn.gazelle.logistics.pojo.T_Data_Company_AccountInfo">
+       SELECT
+      pm.account_name,pm.bank_info,pm.member_name,pm.account_money,pm.member_id,pm.create_time,pm.account_income ,pm.account_withdraw,pm.account_pay
+     FROM
+    (
+     SELECT
+    *
+    FROM
+   (
+    SELECT
+   *
+   from
+   (
+     SELECT
+      c.COMPANY_NAME AS account_name, getBank(m.MEMBER_ID) as bank_info ,m.MEMBER_ID,m.MEMBER_NAME,b.BANK_ID,b.BANK_ACCOUNT,m.MEMBER_ACCOUNT_AMOUNT AS account_money
+     FROM
+      t_data_company c
+    JOIN
+    t_data_member m
+     ON
+     c.COMPANY_ID = m.RELEVANCE_INFO_ID AND  c.delete_flag = '0' AND  m.delete_flag='0'
+    JOIN
+    t_data_member_bank_account b
+    ON
+     m.MEMBER_ID = b.MEMBER_ID AND  b.delete_flag='0') a
+    )  x
+    LEFT JOIN
+    (
+     SELECT h.MEMBER_ID as member_id1,h.CREATE_TIME, sum(h.收入) as  account_income , sum(h.`提现`)  AS account_withdraw ,SUM(h.`支出`) AS account_pay FROM (
+     (SELECT
+     t1.MEMBER_ID,t1.CREATE_TIME,SUM(AMOUNT) as '收入','0' AS '提现','0' AS '支出'
+    FROM
+     t_data_member_payment_history  t1
+     WHERE
+     (t1.payment_type = '0' OR t1.PAYMENT_TYPE = '3') AND  t1.delete_flag='0'
+      GROUP BY
+       t1.member_id,t1.CREATE_TIME  )
+        UNION ALL
+      (
+        SELECT
+        t2.MEMBER_ID,t2.CREATE_TIME,'0' AS '收入',SUM(AMOUNT) as '提现','0' as '支出'
+        FROM
+         t_data_member_payment_history  t2
+        WHERE
+         t2.payment_type = '1' AND  t2.delete_flag='0'
+        GROUP BY
+        t2.member_id,t2.CREATE_TIME
+     )
+      UNION ALL
+     (
+      SELECT
+      t3.MEMBER_ID,t3.CREATE_TIME,'0' AS '收入', '0'as '提现',SUM(AMOUNT) AS '支出'
+       FROM
+       t_data_member_payment_history  t3
+       WHERE
+      t3.payment_type = '2' and t3.delete_flag='0'
+      GROUP BY
+     t3.member_id,t3.CREATE_TIME
+    )
+   ) AS h
+    GROUP BY
+    h.member_id,h.CREATE_TIME
+   ) y
+    ON
+    x.member_id = y.member_id1
+   ) pm
+    <where>
+        pm.account_name = #{account_name}
+        AND  pm.member_id = #{member_id}
+        <if test="start_time != null and start_time!= ''">
+            AND DATE_FORMAT(pm.CREATE_TIME,'%Y-%m-%d') &gt;=#{start_time}
+        </if>
+        <if test="end_time != null and end_time!= ''">
+            AND DATE_FORMAT(pm.CREATE_TIME,'%Y-%m-%d') &lt;=#{end_time}
+        </if>
+      </where>
+    </select>
+
+    <!--根据绑定编号查询会员银行卡信息-->
+    <select id="findMemberBankAccountByAccountNo" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Bank_Account">
+        SELECT
+        *
+        FROM
+        T_DATA_MEMBER_BANK_ACCOUNT
+        WHERE
+        ACCOUNT_NO = #{account_no}
+        and  DELETE_FLAG = '0'
+    </select>
+
+
+    <select id="findAll" parameterType="String"  resultMap="T_Data_Member_Bank_Account">
+        SELECT
+        *
+        FROM
+        T_DATA_MEMBER_BANK_ACCOUNT
+        WHERE
+        DELETE_FLAG = '0'
+        AND
+        MEMBER_ID = #{member_id}
+    </select>
+
+    <!--保存会员银行卡信息-->
+    <insert id="saveMemberBankAccount" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Bank_Account">
+        INSERT INTO
+                T_DATA_MEMBER_BANK_ACCOUNT (ACCOUNT_NO,
+                MEMBER_ID,
+                BANK_ID,
+                BANK_ACCOUNT,
+                BANK_SAVE_MOBILE_PHONE,
+                BIND_ID,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID
+               )
+        VALUES (
+                #{account_no},
+                #{member_id},
+                #{bank_id},
+                #{bank_account},
+                #{bank_save_mobile_phone},
+                #{bind_id},
+                '0',
+                #{last_update},
+                #{last_update_user_id}
+                )
+    </insert>
+
+    <!--根据绑卡编号更新会员银行卡信息-->
+    <update id="updateMemberBankAccount" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Bank_Account">
+        UPDATE
+            T_DATA_MEMBER_BANK_ACCOUNT
+        SET
+                MEMBER_ID = #{member_id},
+                BANK_ID = #{bank_id},
+                BANK_ACCOUNT = #{bank_account},
+                BANK_SAVE_MOBILE_PHONE = #{bank_save_mobile_phone},
+                BIND_ID = #{bind_id},
+                LAST_UPDATE = #{last_update},
+                LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            ACCOUNT_NO = #{account_no} AND DELETE_FLAG = '0'
+    </update>
+
+    <!--根据会员id更新会员银行卡信息-->
+    <update id="updateMemberBankAccountByMemberId" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Bank_Account">
+        UPDATE
+        T_DATA_MEMBER_BANK_ACCOUNT
+        SET
+        BANK_ID = #{bank_id},
+        BANK_SAVE_MOBILE_PHONE = #{bank_save_mobile_phone},
+        BIND_ID = #{bind_id},
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+        MEMBER_ID = #{member_id} AND DELETE_FLAG = '0'
+        AND  BANK_ACCOUNT = #{bank_account}
+    </update>
+
+
+    <!--根据绑定编号删除会员银行卡信息-->
+    <delete id="delMemberBankAccount" parameterType="String">
+        UPDATE
+        T_DATA_MEMBER_BANK_ACCOUNT
+        SET
+        DELETE_FLAG = '1'
+        WHERE
+        ACCOUNT_NO = #{account_no} AND DELETE_FLAG = '0'
+    </delete>
+
+    <!--根据绑定编号删除会员银行卡信息-->
+    <delete id="delMemberBankAccountByBindId" parameterType="String">
+        UPDATE
+        T_DATA_MEMBER_BANK_ACCOUNT
+        SET
+        DELETE_FLAG = '1'
+        WHERE
+        BIND_ID = #{bind_id} AND DELETE_FLAG = '0'
+    </delete>
+</mapper>

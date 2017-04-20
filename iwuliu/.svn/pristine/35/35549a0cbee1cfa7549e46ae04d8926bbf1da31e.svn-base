@@ -1,0 +1,218 @@
+$(function(){
+	//账户类型下拉
+	var accountType = new customDropDown($(".accountType"));
+	$(".accountType").find(".dropdown-menu li").bind("click",function(){
+		var _text = $(this).text();
+		console.log(_text)
+		switch(_text){
+			case "全部":
+				$('#carNum').val("");
+				$('#personName').val("");
+				$('#phoneNum').val("");
+				$(".licensePlateNumber").removeClass("hidden");
+				$(".individualName").removeClass("hidden");
+				$(".phoneNumber").removeClass("hidden");
+				break;
+			case "车辆账户":
+				$('#carNum').val("");
+				$('#personName').val("");
+				$('#phoneNum').val("");
+				$(".licensePlateNumber").removeClass("hidden");
+				$(".individualName").addClass("hidden");
+				$(".phoneNumber").addClass("hidden");
+				break;
+			case "个人账户":
+				$('#carNum').val("");
+				$('#personName').val("");
+				$('#phoneNum').val("");
+				$(".licensePlateNumber").addClass("hidden");
+				$(".individualName").removeClass("hidden");
+				$(".phoneNumber").removeClass("hidden");
+				break;
+		}
+	})
+//模态框隐藏之后执行的函数
+	$('#myModal').on('hidden.bs.modal', function (e) {
+		$('#start_time').val("");
+		$('#end_time').val("");
+		$('#transactionDetailManagerTable').bootstrapTable('removeAll');
+	})
+
+
+})
+
+
+function transactionQuery() {
+	//alert(111);
+	var _text = $(".accountType").find(".placeHolder").text();
+	$('#transactionManagerTable').bootstrapTable('refresh', {'url': '/iwuliu/transactionManager/transactionRecordsList'});
+}
+
+
+
+//交易记录table页脚
+$(function () {
+	var table = $('#transactionManagerTable'),
+			page = $('#transaction_page'),
+			goBtn = $('#transaction_goBtn');
+	// 跳转到某页
+	goBtn.click(function () {
+		table.bootstrapTable('selectPage', +page.val());
+	});
+	$("#transactionManagerTable .th-inner").eq(0).append('<span>全选</span>');
+
+
+})
+
+//条件重置
+function transactionManagerQueryReset() {
+
+	$(".accountType").find(".placeHolder").text("请选择");
+	$(".licensePlateNumber").removeClass("hidden");
+	$(".individualName").removeClass("hidden");
+	$(".phoneNumber").removeClass("hidden");
+	$('#carNum').val("");
+	$('#personName').val("");
+	$('#phoneNum').val("");
+	$('#transactionManagerTable').bootstrapTable('removeAll');
+}
+//配置参数
+function transactionManagerQueryParams(params) {
+	var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+		pageSize: params.limit,   //页面大小
+		pageNumber: params.pageNumber,  //页码
+		account_type:$(".accountType").find(".placeHolder").text(),//$("#accountType option:selected").text(),
+		car_num: $("#carNum").val(),
+		person_name: $("#personName").val(),
+		phone_num: $("#phoneNum").val(),
+		sort: params.sort,  //排序列名
+		sortOrder: params.order//排位命令（desc，asc）
+	};
+	return temp;
+}
+
+// 导出EXCEL
+function transactionRecords_export(){
+	$.ajax({
+		type: "POST",
+		url: '/Logistics/transactionManager/transactionRecordsExport',
+		success: function () {
+			window.location = '/Logistics/transactionManager/transactionRecordsExport';
+		}
+	});
+	alert("导出报表EXCEL");
+}
+
+
+// 格式化“余额”列,保留两位小数
+function moneyFormatter(value) {
+	var f = parseFloat(value);
+	if (isNaN(f)) {
+		return false;
+	}
+	var f = Math.round(value*100)/100;
+	var s = f.toString();
+	var rs = s.indexOf('.');
+	if (rs < 0) {
+		rs = s.length;
+		s += '.';
+	}
+	while (s.length <= rs + 2) {
+		s += '0';
+	}
+	return s;
+}
+
+$(function() {
+	// 时间查询日历框
+	$('.form_datetime').datetimepicker({
+		minView: "month", //选择日期后，不会再跳转去选择时分秒
+		language: 'zh-CN',
+		format: 'yyyy-mm-dd',
+		todayBtn: 1,
+		autoclose: 1
+	});
+})
+//详情模态框消失
+$("#myModalDetail").on("hidden.bs.modal",function(){
+	$("#myModalDetail").find(".form-group").addClass("uneditable");
+	$("#myModalDetail").find("input").attr("disabled","true");
+	$("#myModalDetail").find(".form-group").find("button").attr("disabled","true");
+	$("#myModalDetail").find(".edit").attr("isClick","true");
+	$("#myModalDetail").find(".edit").removeAttr("disabled");
+	$("#myModalDetail").find(".edit").css("background","#69a2b5")
+})
+
+//交易记录详情table页脚
+$(function () {
+	var table = $('#transactionDetailManagerTable'),
+			page = $('#transactionDetail_page'),
+			goBtn = $('#transactionDetail_goBtn');
+	// 跳转到某页
+	goBtn.click(function () {
+		table.bootstrapTable('selectPage', +page.val());
+	});
+	//$("#transactionManagerTable .th-inner").eq(0).append('<span>全选</span>');
+
+})
+
+//交易详情列表
+var detailInfo;
+function transactionRecordsDetailClick() {
+	var _search = window.location.search;
+	var _index = _search.indexOf("=");
+	//detailInfo = _search.substring(_index + 1);
+	detailInfo = sessionStorage.getItem("detailInfo");
+	alert(detailInfo);
+	//console.log($("#carNum").val(),$("#personName").val(),$("#phoneNum").val(),$("#accountType option:selected").text())
+	$('#transactionDetailManagerTable').bootstrapTable('refresh', {'url': '/iwuliu/transactionManager/transactionRecordsDetailList?detailInfo=' + encodeURI(detailInfo)});
+}
+
+//配置参数
+function transactionDetailManagerQueryParams(params) {
+	var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+		pageSize: params.limit,   //页面大小
+		pageNumber: params.pageNumber,  //页码
+		start_time: $("#start_time").val(),//$("#accountType option:selected").text(),
+		end_time: $("#end_time").val(),
+		sort: params.sort,  //排序列名
+		sortOrder: params.order//排位命令（desc，asc）
+	};
+	return temp;
+}
+
+
+//点击详情按钮
+function btn_ModalDetail(){
+	//$('#start_time').val("");
+	//$('#end_time').val("");
+	//$('#transactionDetailManagerTable').bootstrapTable('removeAll');
+	var selects = $('#transactionManagerTable').bootstrapTable('getSelections'); //获取表选择的行
+	if (selects.length==1){
+		var detailInfo = JSON.stringify(selects);//将获取的行转化为json对象，注意selects，而不是selects[0]
+		sessionStorage.setItem("detailInfo",detailInfo);
+		$.ajax({
+			type: "post",
+			url: "/iwuliu/transactionManager/getTransactionRecordsDetailInfo",
+			data:{detailInfo:encodeURI(detailInfo)},
+			contentType:"application/x-www-form-urlencoded; charset=utf-8",
+			success: function (data) {
+				var JsonData = eval(data);
+				console.log(JsonData);
+				var _append = '';
+				// 车辆信息
+				$("#accountName").val(JsonData.account_name);
+				$("#accountMoney").val(JsonData.account_money);
+			}
+		})
+		$("#myModal").modal();
+	}else {
+		//bootstrap提示框
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("请选择一行数据")
+		return false;
+	}
+
+}
+
+

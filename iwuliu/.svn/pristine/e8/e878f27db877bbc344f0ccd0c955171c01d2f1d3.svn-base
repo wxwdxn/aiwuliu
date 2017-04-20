@@ -1,0 +1,577 @@
+
+//车牌号码验证
+var regTicNum=/^[\u4e00-\u9fa5]{1}[A-Z]{1}[A-Z_0-9]{5}$/;
+$(function(){
+	$(".leftMenu").load("/iwuliu/welcomeManager/home",function(){
+		$(".transportPlan").parents(".collapse").addClass("in");
+		$(".transportPlan").addClass("menuActive")
+	});
+	$("#smallModalInfo").on("hidden.bs.modal",function(e){
+		$("body").addClass("modal-open");
+	});
+	////goBtn按钮无数据时隐藏
+	//var webservice = $('#manualOrderTable').attr("data-url");
+	//$.ajax({
+	//	url:webservice,
+	//	success:function(data){
+	//		if(data.length == 0){
+	//			$(".form-inline").css("display","none");
+	//		}
+	//	}
+	//});
+	////goBtn按钮无数据时隐藏
+	//var webservice2 = $('#manualFinishedOrderTable').attr("data-url");
+	//$.ajax({
+	//	url:webservice2,
+	//	success:function(data){
+	//		if(data.length == 0){
+	//			$(".form-inline").css("display","none");
+	//		}
+	//	}
+	//});
+		//初始页面
+		var table = $('#manualOrderTable'),
+				page = $('#manualOrderTablepage'),
+				goBtn = $('#manualOrderTablegoBtn');
+
+		// 跳转到某页
+		goBtn.click(function () {
+			table.bootstrapTable('selectPage', +page.val());
+		});
+		var table2 = $('#manualFinishedOrderTable'),
+				page2 = $('#manualFinishedOrderTablepage'),
+				goBtn2 = $('#manualFinishedOrderTablegoBtn');
+
+		// 跳转到某页
+		goBtn2.click(function () {
+			table2.bootstrapTable('selectPage', +page2.val());
+		});
+
+
+	//goBtn按钮无数据时隐藏 详情
+	var webservice3 = $('#manualOrderTable3').attr("data-url");
+	$.ajax({
+		url:webservice3,
+		success:function(data){
+			if(data.length == 0){
+				$(".form-inline").css("display","none");
+			}
+		}
+	});
+	//goBtn按钮无数据时隐藏 详情
+	var webservice4 = $('#manualOrderTable4').attr("data-url");
+	$.ajax({
+		url:webservice4,
+		success:function(data){
+			if(data.length == 0){
+				$(".form-inline").css("display","none");
+			}
+		}
+	});
+
+		var table3 = $('#manualOrderTable3'),
+				page3 = $('#manualOrderTablepage3'),
+				goBtn3 = $('#manualOrderTablegoBtn3');
+
+		// 跳转到某页
+		goBtn3.click(function () {
+			table3.bootstrapTable('selectPage', +page3.val());
+		});
+		var table4 = $('#manualOrderTable4'),
+				page4 = $('#manualOrderTablepage4'),
+				goBtn4 = $('#manualOrderTablegoBtn4');
+
+		// 跳转到某页
+		goBtn4.click(function () {
+			table4.bootstrapTable('selectPage', +page4.val());
+		});
+
+	//不可运输的详情
+	var table5 = $('#manualFinishOrderTable'),
+			page5 = $('#manualFinishTablepage'),
+			goBtn5 = $('#manualFinishTablegoBtn');
+
+	// 跳转到某页
+	goBtn5.click(function () {
+		table5.bootstrapTable('selectPage', +page5.val());
+	});
+	//goBtn按钮无数据时隐藏 详情
+	var webservice5 = $('#manualFinishOrderTable').attr("data-url");
+	$.ajax({
+		url:webservice5,
+		success:function(data){
+			if(data.length == 0){
+				$(".form-inline").css("display","none");
+			}
+		}
+	});
+
+	//不可运输的详情
+	var table6 = $('#manualOrderTable2'),
+			page6 = $('#manualOrderTablepage2'),
+			goBtn6 = $('#manualOrderTablegoBtn2');
+
+	// 跳转到某页
+	goBtn6.click(function () {
+		table6.bootstrapTable('selectPage', +page6.val());
+	});
+	//goBtn按钮无数据时隐藏 详情
+	var webservice6 = $('#manualOrderTable2').attr("data-url");
+	$.ajax({
+		url:webservice6,
+		success:function(data){
+			if(data.length == 0){
+				$(".form-inline").css("display","none");
+			}
+		}
+	});
+
+})
+
+// table表格隔行变色
+function rowStyle(row, index) {
+	if (index % 2 === 0) {
+		return{};
+	}
+	return {
+		css: {"background-color": "#eefff9"}
+	};
+}
+//配置参数
+function queryParams(params) {
+	var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+		pageSize: params.limit,   //页面大小
+		pageNumber: params.pageNumber,  //页码
+		sort: params.sort,  //排序列名
+		sortOrder: params.order//排位命令（desc，asc）
+	};
+	return temp;
+}
+
+//干线id
+var mainLine;
+//货物id
+var goodType;
+//选择的计划编号
+var planNumbers;
+//手工分配
+function btn_manuallyAssign(){
+	var selects = $('#manualOrderTable').bootstrapTable('getSelections'); //获取表选择的行
+	if (selects.length==1){
+		var newSelects = $.parseJSON(JSON.stringify(selects));
+		planNumbers=newSelects[0].planNumber;
+		$.ajax({
+			type:"post",
+			url:"/iwuliu/transportationOrderManager/manualOrderDetails",
+			data:{"planNumber":planNumbers},
+			success:function(data){
+				var JsonData =JSON.parse(data);
+				mainLine=JsonData.lineId;
+				goodType=JsonData.cargoType;
+				$("#goodType").val(JsonData.cargo_type_id);
+				$("#mainLineName").val(JsonData.lineName);
+				$("#loadCargoId").val(JsonData.loading_cargo_yard_id);
+				$("#unloading_cargo_yard_id").val(JsonData.unloading_cargo_yard_id);
+				$("#unRedistributeCount").val(JsonData.unRedistributeTotal);
+				$("#unitprice").val(JsonData.price);
+				$("#startDate").val(JsonData.beginDate);
+			}
+		});
+		$("#mymanuallyAssign").modal();
+	}else {
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("请选择一行数据！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+	}
+
+}
+
+var objPlateNumber;//车辆信息
+//分派计划时获取车辆信息
+function searchInfo(){
+	var plateNumber=$("#plate_number").val();
+	if (plateNumber.trim().length!=0){
+		var str=[];
+		str.push(plateNumber);
+		str.push(mainLine);
+		str.push(goodType);
+		if(!checkMob($("#plate_number"), regTicNum)){
+			$("#smallModalInfo").modal();
+			$("#smallModalInfo").find(".titleInfo").html("车牌号输入错误！")
+			$("#smallModalInfo").on("hidden.bs.modal",function(e){
+				$("body").addClass("modal-open");
+			});
+		}else {
+			$.ajax({
+				type:"post",
+				url:"/iwuliu/transportationOrderManager/positionByParams?params="+str,
+				success:function(data){
+					objPlateNumber=JSON.parse(data);
+					if (objPlateNumber.flag=="0"){
+						$("#typeName").val("");
+						$("#position").val("");
+						$("#status").val("");
+						$("#smallModalInfo").modal();
+						$("#smallModalInfo").find(".titleInfo").html("车辆不存在！")
+						$("#smallModalInfo").on("hidden.bs.modal",function(e){
+							$("body").addClass("modal-open");
+						});
+						$("#plate_number").css("border","1px solid red");
+						return false;
+					}else {
+						$("#typeName").val(objPlateNumber.typeName);
+						$("#position").val(objPlateNumber.position);
+						$("#status").val(objPlateNumber.statusName);
+						if (objPlateNumber.flag=="1"){
+							$("#smallModalInfo").modal();
+							$("#smallModalInfo").find(".titleInfo").html("车辆有未完成订单！")
+							$("#smallModalInfo").on("hidden.bs.modal",function(e){
+								$("body").addClass("modal-open");
+							});
+							$("#status").css("border","1px solid red");
+						}else if(objPlateNumber.flag=="2"){
+							$("#smallModalInfo").modal();
+							$("#smallModalInfo").find(".titleInfo").html("车厢类型不匹配！")
+							$("#smallModalInfo").on("hidden.bs.modal",function(e){
+								$("body").addClass("modal-open");
+							});
+							$("#typeName").css("border","1px solid red");
+						}else if(objPlateNumber.flag=="3"){
+							$("#smallModalInfo").modal();
+							$("#smallModalInfo").find(".titleInfo").html("车辆干线不匹配！")
+							$("#smallModalInfo").on("hidden.bs.modal",function(e){
+								$("body").addClass("modal-open");
+							});
+							$("#plate_number").css("border","1px solid red");
+						}else if(objPlateNumber.flag=="4"){
+							$("#smallModalInfo").modal();
+							$("#smallModalInfo").find(".titleInfo").html("车辆拒单中！")
+							$("#smallModalInfo").on("hidden.bs.modal",function(e){
+								$("body").addClass("modal-open");
+							});
+							$("#plate_number").css("border","1px solid red");
+						}else {
+							$("#plate_number").css("border","none");
+							$("#typeName").css("border","none");
+							$("#status").css("border","none");
+						}
+
+					}
+				}
+			});
+		}
+	}else {
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("请输入车牌号！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+		$("#plate_number").css("border","1px solid red");
+	}
+
+}
+//可用计划详情
+function btn_ModalDetail(){
+	var selects = $('#manualOrderTable').bootstrapTable('getSelections'); //获取表选择的行
+	if (selects.length==1){
+		var newSelects = $.parseJSON(JSON.stringify(selects));
+		var planNumber=newSelects[0].planNumber;
+		$.ajax({
+			type:"post",
+			url:"/iwuliu/transportationOrderManager/manualOrderDetails",
+			data:{"planNumber":planNumber},
+			success:function(data){
+				var JsonData =JSON.parse(data);
+				lineId=JsonData.lineId;
+				cargoTypeId=JsonData.cargoType;
+				$("#cargo_type_id").val(JsonData.cargo_type_id);
+				$("#lineName").val(JsonData.lineName);
+				$("#loading_cargo_yard_id").val(JsonData.loading_cargo_yard_id);
+				$("#unloading_cargo_yard_id").val(JsonData.unloading_cargo_yard_id);
+				$("#unRedistributeTotal").val(JsonData.unRedistributeTotal);
+				$("#price").val(JsonData.price);
+				$("#distributionState").val(JsonData.redistributeTotal);
+				$("#beginDate").val(JsonData.beginDate);
+			}
+		});
+		$('#manualOrderTable3').bootstrapTable('refresh',{'url':'/iwuliu/ScheduleSheetManager/findLookSheet?scheduleNumber='+planNumber});
+		$('#manualOrderTable4').bootstrapTable('refresh',{'url':'/iwuliu/ScheduleSheetManager/findUnLookSheet?scheduleNumber='+planNumber});
+		$("#myModal").modal();
+	}else {
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("请选择一行数据！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+	}
+}
+//保存计划派单
+function  addScheduleSheetDummy(){
+	var plateNumber=$("#plate_number").val();
+	//如果车牌号填写
+	if (plateNumber.trim().length!=0){
+		if (objPlateNumber.flag=="0"){
+			$("#typeName").val("");
+			$("#position").val("");
+			$("#status").val("");
+			$("#smallModalInfo").modal();
+			$("#smallModalInfo").find(".titleInfo").html("车辆不存在！")
+			$("#smallModalInfo").on("hidden.bs.modal",function(e){
+				$("body").addClass("modal-open");
+			});
+			$("#plate_number").css("border","1px solid red");
+			return false;
+		}else {
+			$("#typeName").val(objPlateNumber.typeName);
+			$("#position").val(objPlateNumber.position);
+			$("#status").val(objPlateNumber.statusName);
+			if (objPlateNumber.flag=="1"){
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("车辆有未完成订单！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+				});
+				$("#status").css("border","1px solid red");
+			}else if(objPlateNumber.flag=="2"){
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("车厢类型不匹配！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+				});
+				$("#typeName").css("border","1px solid red");
+			}else if(objPlateNumber.flag=="3"){
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("车辆干线不匹配！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+				});
+				$("#plate_number").css("border","1px solid red");
+			}else if(objPlateNumber.flag=="4"){
+				$("#smallModalInfo").modal();
+				$("#smallModalInfo").find(".titleInfo").html("车辆拒单中！")
+				$("#smallModalInfo").on("hidden.bs.modal",function(e){
+					$("body").addClass("modal-open");
+				});
+				$("#plate_number").css("border","1px solid red");
+			}else {
+				$("#plate_number").css("border","none");
+				$("#typeName").css("border","none");
+				$("#status").css("border","none");
+			}
+		}
+		//为空可以添加
+		if (objPlateNumber.flag==undefined){
+			var beginDate=$("#startDate").val();
+			var params = {};
+			params["planNumber"]=planNumbers;
+			params["plateNumber"]=plateNumber;
+			params["beginDate"]=beginDate;
+			var paramsList=JSON.stringify(params);
+			$.ajax({
+				type:"post",
+				url:"/iwuliu/ScheduleSheetManager/addScheduleSheet",
+				data:{"list":paramsList},
+				async:true,
+				success:function(data){
+					var obj = eval(data);
+					if(obj.result==1){
+						$("#smallModalInfo").modal();
+						$("#smallModalInfo").find(".titleInfo").html("保存成功！")
+						$("#smallModalInfo").on("hidden.bs.modal",function(e){
+							$("body").addClass("modal-open");
+							$("#mymanuallyAssign").modal('hide');
+						});
+
+						$('#manualOrderTable4').bootstrapTable('refresh');
+						$('#manualOrderTable3').bootstrapTable('refresh');
+					}else{
+						$("#smallModalInfo").modal();
+						$("#smallModalInfo").find(".titleInfo").html("保存失败！")
+						$("#smallModalInfo").on("hidden.bs.modal",function(e){
+							$("body").addClass("modal-open");
+						});
+					}
+				},
+				error:function(){
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+					});
+				}
+			});
+		}
+
+	}else {//车牌号未填写
+		modalAlert("请输入车牌号!");
+		$("#plate_number").css("border","1px solid red");
+	}
+
+}
+
+//可用详情多行删除和撤销
+function cancelSheetDummy(){
+	var selectTions=$("#manualOrderTable4").bootstrapTable("getSelections");
+	if (selectTions.length != 0) {
+		var OrderTableID = "";
+		for (var i = 0; i < selectTions.length; i++) {
+			if (i == 0) {
+				OrderTableID = selectTions[i].planNumber;
+			} else {
+				OrderTableID += "," + selectTions[i].planNumber;
+			}
+		}
+		$("#smallModalInfoDelete").modal();
+		$("#smallModalInfoDelete").find(".titleInfoDelete").html("确认撤销？")
+		//点击确定删除
+		$(".deleteTruckType").click(function () {
+			//发送请求
+			$.ajax({
+				type: "post",
+				url: "/iwuliu/ScheduleSheetManager/OrderTableDel",
+				data:{"OrderTableID":OrderTableID},
+				dataType:"json",
+				cache:'false',
+				success: function (data) {
+					// json 类型的专为对象
+					var obj = eval(data);
+					if (obj.result == 0) {
+						$("#smallModalInfo").modal();
+						$("#smallModalInfo").find(".titleInfo").html("撤销成功！")
+						$("#smallModalInfo").on("hidden.bs.modal",function(e){
+							$("body").addClass("modal-open");
+						});
+						$('#manualOrderTable4').bootstrapTable('refresh');
+					} else {
+						$("#smallModalInfo").modal();
+						$("#smallModalInfo").find(".titleInfo").html("撤销失败！")
+						$("#smallModalInfo").on("hidden.bs.modal",function(e){
+							$("body").addClass("modal-open");
+						});
+					}
+				},
+				error: function () {
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+					});
+				}
+			})
+		});
+
+	} else {
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("选择撤销的行！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+
+	}
+};
+//不可用计划详情
+function btn_UnModalDetail(){
+	var selects = $('#manualFinishedOrderTable').bootstrapTable('getSelections'); //获取表选择的行
+	if (selects.length==1){
+		var newSelects = $.parseJSON(JSON.stringify(selects));
+		var planFinishNumber=newSelects[0].planNumber;
+		$.ajax({
+			type:"post",
+			url:"/iwuliu/transportationOrderManager/manualOrderDetails",
+			data:{"planNumber":planFinishNumber},
+			success:function(data){
+				var JsonData =JSON.parse(data);
+				$("#unGoodType").val(JsonData.cargo_type_id);
+				$("#unLine").val(JsonData.lineName);
+				$("#unload").val(JsonData.loading_cargo_yard_id);
+				$("#undisbuite").val(JsonData.unRedistributeTotal);
+				$("#unPrice").val(JsonData.price);
+				$("#total").val(JsonData.redistributeTotal);
+				$("#unStart").val(JsonData.beginDate);
+			}
+		});
+		$('#manualFinishOrderTable').bootstrapTable('refresh',{'url':'/iwuliu/ScheduleSheetManager/findLookSheet?scheduleNumber='+planFinishNumber});
+		$('#manualOrderTable2').bootstrapTable('refresh',{'url':'/iwuliu/ScheduleSheetManager/findUnLookSheet?scheduleNumber='+planFinishNumber});
+		$("#UnmyModal").modal();
+	}else {
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("请选择一行数据！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+	}
+
+}
+//不可用详情多行删除和撤销
+function deleteUnSheetDummy(){
+	var selectTions=$("#manualOrderTable2").bootstrapTable("getSelections");
+	if (selectTions.length != 0) {
+		var OrderTableID = "";
+		for (var i = 0; i < selectTions.length; i++) {
+			if (i == 0) {
+				OrderTableID = selectTions[i].planNumber;
+			} else {
+				OrderTableID += "," + selectTions[i].planNumber;
+			}
+		}
+		$("#smallModalInfoDelete").modal();
+		$("#smallModalInfoDelete").find(".titleInfoDelete").html("确认撤销？")
+		//点击确定删除
+		$(".deleteTruckType").click(function () {
+			//发送请求
+			$.ajax({
+				type: "post",
+				url: "/iwuliu/ScheduleSheetManager/OrderTableDel",
+				data:{"OrderTableID":OrderTableID},
+				dataType:"json",
+				cache:'false',
+				success: function (data) {
+					// json 类型的专为对象
+					var obj = eval(data);
+					if (obj.result == 0) {
+						$("#smallModalInfo").modal();
+						$("#smallModalInfo").find(".titleInfo").html("撤销成功！")
+						$("#smallModalInfo").on("hidden.bs.modal",function(e){
+							$("body").addClass("modal-open");
+						});
+						$('#manualOrderTable4').bootstrapTable('refresh');
+					} else {
+						$("#smallModalInfo").modal();
+						$("#smallModalInfo").find(".titleInfo").html("撤销失败！")
+						$("#smallModalInfo").on("hidden.bs.modal",function(e){
+							$("body").addClass("modal-open");
+						});
+					}
+				},
+				error: function () {
+					$("#smallModalInfo").modal();
+					$("#smallModalInfo").find(".titleInfo").html("系统错误！")
+					$("#smallModalInfo").on("hidden.bs.modal",function(e){
+						$("body").addClass("modal-open");
+					});
+				}
+			})
+		});
+
+	} else {
+		$("#smallModalInfo").modal();
+		$("#smallModalInfo").find(".titleInfo").html("选择撤销的行！")
+		$("#smallModalInfo").on("hidden.bs.modal",function(e){
+			$("body").addClass("modal-open");
+		});
+
+	}
+};
+// 正则验证
+function checkMob(inp, regEx) {
+	var _value = inp.val();
+	if(_value==''||regEx.test(_value)){
+		inp.css("border","none");
+		return true;
+	}else{
+		inp.css("border","1px solid red");
+		return false;
+	}
+}

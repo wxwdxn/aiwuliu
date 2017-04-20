@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.WithdrawApplyDaoMapper">
+    <select id="findWithdrawApplyById" resultType="com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply">
+        SELECT
+        APPLY_NUMBER,
+        PAYMENT_HISTORY_NUMBER,
+        ACCOUNT_NO,
+        CASH_AMOUNT,
+        APPLY_TIME,
+        STATUS,
+        DENY_REASON,
+        DEAL_USER_ID,
+        DEAL_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        FROM
+        T_Data_Withdraw_Apply
+        WHERE
+        DELETE_FLAG = '0'
+    </select>
+
+    <!--保存现申请信息-->
+    <insert id="saveWithdrawApply" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply">
+        <selectKey resultType="java.lang.String" order="AFTER" keyProperty="apply_number">
+
+            SELECT LAST_INSERT_ID() AS APPLY_NUMBER
+
+        </selectKey>
+
+        INSERT INTO
+        T_Data_Withdraw_Apply (
+        PAYMENT_HISTORY_NUMBER,
+        ACCOUNT_NO,
+        CASH_AMOUNT,
+        APPLY_TIME,
+        STATUS,
+        DENY_REASON,
+        DEAL_USER_ID,
+        DEAL_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        )
+        VALUES (
+        #{payment_history_number},
+        #{account_no},
+        #{cash_amount},
+        #{apply_time},
+        #{status},
+        #{deny_reason},
+        #{deal_user_id},
+        #{deal_time},
+        '0',
+        #{last_update},
+        #{last_update_user_id}
+        )
+    </insert>
+
+    <!--更新现申请信息-->
+    <update id="updateWithdrawApply" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply">
+        UPDATE
+        T_Data_Withdraw_Apply
+        SET
+        PAYMENT_HISTORY_NUMBER = #{payment_history_number},
+        STATUS = #{status},
+        DENY_REASON = #{deny_reason},
+        DEAL_USER_ID = #{deal_user_id},
+        DEAL_TIME = #{deal_time},
+        DELETE_FLAG =  '0',
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+        APPLY_NUMBER = #{apply_number} AND DELETE_FLAG = '0'
+    </update>
+
+    <!--删除现申请信息-->
+    <update id="withdrawApplyDel" parameterType="String">
+        UPDATE
+        T_Data_Withdraw_Apply
+        SET
+        DELETE_FLAG = '1'
+        WHERE
+        APPLY_NUMBER = #{apply_number} AND DELETE_FLAG = '0'
+    </update>
+
+    <!--根据银行卡绑定编号和申请状态查询现申请信息-->
+    <select id="findWithdrawApplyByAccountAndStatus" resultType="com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply">
+        SELECT
+        APPLY_NUMBER,
+        PAYMENT_HISTORY_NUMBER,
+        ACCOUNT_NO,
+        CASH_AMOUNT,
+        APPLY_TIME,
+        STATUS,
+        DENY_REASON,
+        DEAL_USER_ID,
+        DEAL_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        FROM
+        T_Data_Withdraw_Apply
+        WHERE
+        ACCOUNT_NO = #{account_no}
+        AND
+        STATUS = #{status}
+        AND
+        DELETE_FLAG = '0'
+    </select>
+
+    <!--根据会员支付历史编号查找提现申请信息-->
+    <select id="findWithdrawApplyByNumber" resultType="com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply">
+        SELECT
+        APPLY_NUMBER,
+        PAYMENT_HISTORY_NUMBER,
+        ACCOUNT_NO,
+        CASH_AMOUNT,
+        APPLY_TIME,
+        STATUS,
+        DENY_REASON,
+        DEAL_USER_ID,
+        DEAL_TIME,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        FROM
+        T_Data_Withdraw_Apply
+        WHERE
+        PAYMENT_HISTORY_NUMBER = #{payment_history_number}
+        AND
+        DELETE_FLAG = '0'
+    </select>
+
+    <!--查询个人账户提现申请信息-->
+    <select id="findWithdrawApplyDetail" resultType="com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply_Detail">
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        dm.APPLY_NUMBER AS transaction_no,dm.COMPANY_ID as company_id,dm.THIRD_PARTY_ORDER_ID AS order_no,dm.COMPANY_NAME AS account_dept,dm.COMPANY_NAME AS account_name,dm.transaction_name,dm.CONTACT_NAME,dm.TARGET as income_name,dm.CASH_AMOUNT AS withdraw_money,
+        CASE  dm.PAYMENT_RESULT
+        WHEN  '0' then '已结算'
+        when  '1' THEN '结算失败'
+        WHEN  '2' then '待结算'
+        END
+        AS settle_status,
+        CASE dm.`STATUS`
+        WHEN '0' then '待审核'
+        WHEN '1' THEN '审核通过'
+        WHEN '5' THEN '审核通过'
+        WHEN '2' THEN '审核不通过'
+        WHEN '3' THEN '审核不通过'
+        WHEN '4' THEN '审核不通过'
+        END
+        as check_status,dm.APPLY_TIME AS create_time,
+        CASE WHEN dm.DENY_REASON IS  NULL  THEN  '提现成功'
+              ELSE dm.DENY_REASON
+         END
+         as withdraw_remark
+        FROM
+        (
+        SELECT
+        a.PAYMENT_RESULT,a.FAILURE_RESULT,a.TARGET_BANK_ACCOUNT,a.THIRD_PARTY_ORDER_ID,b.APPLY_NUMBER,b.APPLY_TIME,b.CASH_AMOUNT,b.DENY_REASON,b.`STATUS`, CONCAT(dd.`DICDATA_NAME`,'-',ba.`BANK_ACCOUNT`) AS TARGET, CONCAT(p.CONTACT_NAME,'，',p.CONTACT_MOBILE_PHONE)AS transaction_name
+        ,p.COMPANY_ID,p.COMPANY_NAME,p.CONTACT_NAME
+        FROM
+        t_data_member_payment_history a
+        JOIN
+        t_data_withdraw_apply b
+        ON
+        a.HISTORY_NUMBER = b.PAYMENT_HISTORY_NUMBER
+        AND
+        a.PAYMENT_TYPE = '1'
+        and a.DELETE_FLAG = '0'
+        AND b.DELETE_FLAG = '0'
+        JOIN t_data_member_bank_account AS ba ON ba.`ACCOUNT_NO` = b.`ACCOUNT_NO`
+        AND b.`DELETE_FLAG`='0'
+        JOIN t_sys_dicdata AS dd ON dd.`DICDATA_CODE` = ba.`BANK_ID`
+        AND dd.`DICTIONARY_ID` = '40C440A05FD14E7CA187B00BD9EDEE21'
+        AND dd.`DELETE_STATES` = '0'
+        JOIN t_data_member AS m ON m.`MEMBER_ID` = ba.`MEMBER_ID`
+        AND m.`DELETE_FLAG` = '0'
+        JOIN t_data_company AS p ON p.COMPANY_ID = m.`RELEVANCE_INFO_ID`
+        AND p.`DELETE_FLAG` = '0'
+        JOIN t_sys_dicdata AS dda ON dda.`DICDATA_CODE` = b.`STATUS`
+        AND dda.`DICTIONARY_ID` = '3D0A476153694906AD0A72C92EA6CF4D'
+        AND dda.`DELETE_STATES`='0'
+        ) dm
+        ) pm
+        <where>
+            <if test="company_id != null and company_id!= ''">
+                AND pm.company_id = #{company_id}
+            </if>
+            <if test="transaction_no != null and transaction_no!= ''">
+                AND pm.transaction_no = #{transaction_no}
+            </if>
+            <if test="order_no != null and order_no!= ''">
+                AND pm.order_no =#{order_no}
+            </if>
+            <if test="account_name != null and account_name!= ''">
+                AND pm.account_name = #{account_name}
+            </if>
+            <if test="settle_status != null and settle_status!= ''">
+                AND pm.settle_status =#{settle_status}
+            </if>
+            <if test="transaction_name != null and transaction_name!= ''">
+                AND pm.CONTACT_NAME = #{transaction_name}
+            </if>
+            <if test="check_status != null and check_status!= ''">
+                AND pm.check_status = #{check_status}
+            </if>
+            <if test="start_time != null and start_time!= ''">
+                AND DATE_FORMAT(pm.create_time,'%Y-%m-%d') &gt;=#{start_time}
+            </if>
+            <if test="end_time != null and end_time!= ''">
+                AND DATE_FORMAT(pm.create_time,'%Y-%m-%d') &lt;=#{end_time}
+            </if>
+        </where>
+    </select>
+
+    <!--查询车辆账户提现申请信息-->
+    <select id="findWithdrawApplyDetailOfTruck" resultType="com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply_Detail">
+        select * from ( SELECT
+            h.`HISTORY_NUMBER` AS APPLY_NUMBER,
+            '车辆账户' AS ACCOUNT_TYPE,
+            t.`PLATE_NUMBER` AS ACCOUNT_NAME,
+            CONCAT(p.`PERSON_NAME`,'，',m.`MEMBER_NAME`) AS TARGET,
+            h.`AMOUNT` AS WITHDRAW_AMOUNT,
+            '审核通过'AS WITHDRAW_STATUS,
+            '5' AS STATUS,
+            '' AS DENY_REASON,
+            h.`CREATE_TIME` AS APPLY_TIME,
+            h.`DELETE_FLAG` AS DELETE_FLAG,
+            h.`PAYMENT_TYPE` AS PAYMENT_TYPE
+        FROM `t_data_truck_payment_history` h
+        LEFT JOIN `t_data_truck` t ON t.`TRUCK_ID`=h.`TRUCK_ID`
+        AND t.`DELETE_FLAG`=0
+        LEFT JOIN `t_data_member` m ON RIGHT(h.`TARGET_ID`,-1)=m.`MEMBER_ID`
+        AND m.`DELETE_FLAG`=0
+        INNER JOIN `t_data_person` p ON p.`PERSON_ID`=m.`RELEVANCE_INFO_ID`
+        AND p.`DELETE_FLAG`=0 ) a
+        <where>
+            a.`DELETE_FLAG`=0
+            AND a.`PAYMENT_TYPE`=1
+            <if test="start_time != null and start_time!= ''">
+                AND DATE_FORMAT(a.`APPLY_TIME`,'%Y-%m-%d') &gt;=#{start_time}
+            </if>
+            <if test="end_time != null and end_time!= ''">
+                AND DATE_FORMAT(a.`APPLY_TIME`,'%Y-%m-%d') &lt;=#{end_time}
+            </if>
+            <if test="withdraw_status != null and withdraw_status!= ''">
+                AND a.WITHDRAW_STATUS = #{withdraw_status}
+            </if>
+        </where>
+    </select>
+
+    <!--查询个人账户提现申请总额-->
+    <select id="findWithdrawApplySumOfMember" resultType="double">
+        SELECT
+        SUM(wa.`CASH_AMOUNT`)
+        FROM t_data_withdraw_apply AS wa
+        INNER JOIN t_data_member_bank_account AS ba ON ba.`ACCOUNT_NO` = wa.`ACCOUNT_NO`
+        AND ba.`DELETE_FLAG`='0'
+        INNER JOIN t_sys_dicdata AS dd ON dd.`DICDATA_CODE` = ba.`BANK_ID`
+        AND dd.`DICTIONARY_ID` = '40C440A05FD14E7CA187B00BD9EDEE21'
+        AND dd.`DELETE_STATES` = '0'
+        INNER JOIN t_data_member AS m ON m.`MEMBER_ID` = ba.`MEMBER_ID`
+        AND m.`DELETE_FLAG` = '0'
+        INNER JOIN t_data_person AS p ON p.`PERSON_ID` = m.`RELEVANCE_INFO_ID`
+        AND p.`DELETE_FLAG` = '0'
+        INNER JOIN t_sys_dicdata AS dda ON dda.`DICDATA_CODE` = wa.`STATUS`
+        AND dda.`DICTIONARY_ID` = '3D0A476153694906AD0A72C92EA6CF4D'
+        AND dda.`DELETE_STATES`='0'
+        WHERE wa.`DELETE_FLAG`='0'
+    </select>
+
+    <!--查询车辆账户提现申请总额-->
+    <select id="findWithdrawApplySumOfTruck" resultType="double">
+        SELECT
+        SUM(h.`AMOUNT`)
+        FROM `t_data_truck_payment_history` h
+        LEFT JOIN `t_data_truck` t ON t.`TRUCK_ID`=h.`TRUCK_ID`
+        AND t.`DELETE_FLAG`=0
+        LEFT JOIN `t_data_member` m ON RIGHT(h.`TARGET_ID`,-1)=m.`MEMBER_ID`
+        AND m.`DELETE_FLAG`=0
+        INNER JOIN `t_data_person` p ON p.`PERSON_ID`=m.`RELEVANCE_INFO_ID`
+        AND p.`DELETE_FLAG`=0
+        WHERE
+            h.`DELETE_FLAG`=0
+            AND h.`PAYMENT_TYPE`=1
+    </select>
+</mapper>

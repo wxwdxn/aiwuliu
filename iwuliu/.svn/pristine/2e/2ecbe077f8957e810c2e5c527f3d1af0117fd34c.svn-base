@@ -1,0 +1,542 @@
+var provinceName = "";
+var cityName = "";
+var areaName = "";
+$(function () {
+    //获取省、市、区
+    $.ajax({
+        type: 'post',
+        url: '/iwuliu/dictionaryManager/provinceJson',
+        dataType: 'json',
+        cache: 'false',
+        success: function (data) {
+            var str = "";
+            for (var i = 0; i < data.length; i++) {
+                str += "<li value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+            }
+            $(".province_id").find(".dropdown-menu").html(str);
+            //省
+            var province = new customDropDown($(".province_id"));
+            //根据省获取市
+            $(".province_id").find(".dropdown-menu li").bind("click", function () {
+                var province = $(this).attr("value");
+                if (province != '' && province != 'undefined') {
+                    $.ajax({
+                        type: "POST",
+                        url: "/iwuliu/dictionaryManager/cityJson?dicdata_code=" + province,
+                        cache: false,
+                        dataType: "json",
+                        success: function (data) {
+                            var str = "";
+                            for (var i = 0; i < data.length; i++) {
+                                str += "<li value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+                            }
+                            //市
+                            $(".city_id").find(".dropdown-menu").html("");
+                            $(".city_id").find(".placeHolder").html("请选择");
+                            $(".city_id").find(".dropdown-menu").html(str);
+                            //县
+                            $(".area_id").find(".dropdown-menu").html("");
+                            $(".area_id").find(".placeHolder").html("请选择");
+                            $(".area_id").find(".placeHolder").attr("value", "");
+                            //市
+                            var city = new customDropDown($(".city_id"));
+                            //根据市获取县
+                            $(".city_id").find(".dropdown-menu li").bind("click", function () {
+                                var city = $(this).attr("value");
+                                if (city != '' && city != 'undefined') {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "/iwuliu/dictionaryManager/areaJson?dicdata_code=" + city,
+                                        cache: false,
+                                        dataType: "json",
+                                        success: function (data) {
+                                            var str = "";
+                                            for (var i = 0; i < data.length; i++) {
+                                                str += "<li value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+                                            }
+                                            $(".area_id").find(".placeHolder").html(data[0].name);
+                                            $(".area_id").find(".placeHolder").attr("value", data[0].id);
+                                            $(".area_id").find(".dropdown-menu").html(str);
+                                            var area = new customDropDown($(".area_id"));
+                                        }
+                                    });
+                                }
+                            })
+                        }
+                    });
+                }
+            })
+        },
+        error: function () {
+            alert("错误");
+        }
+    });
+
+    //启用表格
+    $("#allianceBusinessTable").bootstrapTable({
+        onLoadSuccess: function (data) {
+            var station_type = $(".station_type");
+            for (var i = 1; i < station_type.length; i++) {
+                var type = station_type[i].innerHTML;
+                switch (type) {
+                    case "0":
+                        station_type[i].innerHTML = "维修站"
+                        break;
+                    case "1":
+                        station_type[i].innerHTML = "加气站"
+                        break;
+                    case "2":
+                        station_type[i].innerHTML = "4S店"
+                        break;
+                    case "3":
+                        station_type[i].innerHTML = "加油站"
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    });
+
+    //下拉框
+    var stationType = new customDropDown($(".station_type"));
+    //点击图片放大
+    $(".formgroupImg").find("img").bind("click", function () {
+        var _src = $(this).attr("src");
+        $(".modalImg").html("<img src=" + _src + "/>");
+        $('#ModalImg').modal();
+        //图片放大模态框隐藏后触发的事件
+        $("#ModalImg").on("hidden.bs.modal", function (e) {
+            $("body").addClass("modal-open")
+        })
+    })
+    $(".edit").bind("click", function () {
+        $(".getMap").removeClass("hidden");
+        $(".LatitudeAndLongitude").find("input").attr("disabled", "true")
+    })
+
+    var table = $('#allianceBusinessTable'),
+        allianceBusiness_page = $('#allianceBusiness_page'),
+        allianceBusiness_goBtn = $('#allianceBusiness_goBtn');
+    // 跳转到某页
+    allianceBusiness_goBtn.click(function () {
+        table.bootstrapTable('selectPage', +allianceBusiness_page.val());
+    });
+    $(".th-inner").eq(0).append('<span>全选</span>');
+
+    //新增模态框消失重置表单数据
+    $('#myModalNewAdd').on('hidden.bs.modal', function () {
+        $("#myModalNewAdd").find("input").val("");
+        $("#myModalNewAdd").find("p").html("");
+        $("#myModalNewAdd").find(".placeHolder").html("请选择");
+        $(".add_city").find(".dropdown-menu").html("");
+        $(".add_area").find(".dropdown-menu").html("");
+    })
+});
+
+// 格式化“二维码”列
+function qrCodePhotoFormatter() {
+    return '<a type="button" isClick=true class="NewDetail btn btn-success" onclick="qrCodePhotoDetail(this.parentElement.parentElement)">查看二维码</a>';
+}
+
+// 点击“查看二维码”
+function qrCodePhotoDetail(value) {
+    var script = document.createElement("script");
+    script.setAttribute("type", "text/javascript");
+    script.setAttribute("src", "/iwuliu/static/common/js/jquery.qrcode.min.js");
+    script.setAttribute("class", "qrcode");
+    $("head")[0].appendChild(script);
+    script.onload = function () {
+        var _value = $(value).find(".hidden").html();
+        var _stationName = $(value).find(".station_name").html();
+        $(".QRCodeStationName").html(_stationName);
+        $(".ModalQRCode").qrcode({
+            render: "table", //table方式
+            width: 400, //宽度
+            height: 400, //高度
+            text: _value //任意内容
+        });
+        $('#ModalQRCode').modal();
+        //图片放大模态框隐藏后触发的事件
+        $("#ModalQRCode").on("hidden.bs.modal", function (e) {
+            $(".ModalQRCode").html("");
+        })
+    }
+}
+
+// 二维码识别中文
+//function toUtf8(str) {
+//	var out, i, len, c;
+//	out = "";
+//	len = str.length;
+//	for(i = 0; i < len; i++) {
+//		c = str.charCodeAt(i);
+//		if ((c >= 0x0001) && (c <= 0x007F)) {
+//			out += str.charAt(i);
+//		} else if (c > 0x07FF) {
+//			out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
+//			out += String.fromCharCode(0x80 | ((c >>  6) & 0x3F));
+//			out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));
+//		} else {
+//			out += String.fromCharCode(0xC0 | ((c >>  6) & 0x1F));
+//			out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));
+//		}
+//	}
+//	return out;
+//}
+//var _value = toUtf8("识别中文！");
+//$('.ModalQRCode').qrcode(_value);
+
+//点击详情
+function btn_ModalDetail() {
+    $("#myModal").modal()
+}
+//点击获取经纬度
+function getMap(ele) {
+    //地图模态框消失
+    $("#ModalMap").on("hidden.bs.modal",function(){
+        $("#ModalMap").find("input").val("");
+    });
+
+    var _townStreetValue = $("#add_townStreet").val();
+
+    $("#ModalMap").modal();
+    //省市县
+    $(".map_address").val(provinceName + cityName + areaName + _townStreetValue);
+    console.log(provinceName + cityName + areaName + _townStreetValue);
+
+    //图片放大模态框隐藏后触发的事件
+    $("#ModalMap").on("hidden.bs.modal", function () {
+        $("body").addClass("modal-open")
+    })
+}
+
+function getClick() {
+    objMap.clearMap();
+    var geocoder = new AMap.Geocoder({
+        radius: 500 //范围，默认：500
+    });
+    var key = $(".map_address").val();
+    //地理编码,返回地理编码结果
+    geocoder.getLocation(key, function (status, result) {
+        if (status === 'complete' && result.info === 'OK') {
+            geocoder_CallBack(result);
+        }
+    });
+}
+function addMarker(i, d) {
+    var marker = new AMap.Marker({
+        map: objMap,
+        position: [d.location.getLng(), d.location.getLat()]
+    });
+    var infoWindow = new AMap.InfoWindow({
+        content: d.formattedAddress,
+        offset: {x: 0, y: -30}
+    });
+    marker.on("mouseover", function (e) {
+        infoWindow.open(objMap, marker.getPosition());
+    });
+}
+//地理编码返回结果展示
+function geocoder_CallBack(data) {
+    //地理编码结果数组
+    var geocode = data.geocodes;
+    addMarker(0, geocode[0]);
+    objMap.setFitView();
+    $(".map_longitude").val(geocode[0].location.getLng());
+    $(".map_latitude").val(geocode[0].location.getLat());
+}
+
+//地图点击确定按钮关闭模态框
+function determine() {
+    var _longitudeValue = $(".map_longitude").val();
+    var _latitudeValue = $(".map_latitude").val();
+    $("#add_longitude").val(_longitudeValue);
+    $("#add_latitude").val(_latitudeValue);
+}
+
+var objMap;
+//地图
+$(function () {
+    objMap = new AMap.Map('container', {
+        resizeEnable: true,
+        zoom: 11,
+        center: [116.397428, 39.90923]
+
+    });
+    //加载地图基本控件
+    objMap.plugin(["AMap.ToolBar", "AMap.OverView", "AMap.Scale", "AMap.TileLayer", "AMap.MapType", "AMap.Driving", "AMap.Geocoder"], function () {
+        //添加工具条
+        objMap.addControl(new AMap.ToolBar());
+        //比例尺
+        objMap.addControl(new AMap.Scale());
+        //添加鹰眼
+        objMap.addControl(new AMap.OverView({isOpen: true}));
+        //实时路况
+        objMap.addControl(new AMap.TileLayer.Traffic({
+            zIndex: 10
+        }));
+        //实现默认图层与卫星图、实施交通图层之间切换的控
+        objMap.addControl(new AMap.MapType());
+        objMap.addControl(new AMap.Driving());
+        objMap.addControl(new AMap.Geocoder());
+    });
+});
+
+//点击新增按钮
+function btn_newAdd() {
+    provinceName = "";
+    cityName = "";
+    areaName = "";
+    $("#myModalNewAdd").modal();
+    //服务站类型
+    var mydropdown = new customDropDown($(".add_station_type"));
+    //开户银行
+    var add_bank_id = new customDropDown($(".add_bank_id"));
+
+    //获取开户银行
+    $.ajax({
+        type: 'post',
+        url: '/iwuliu/dictionaryManager/bankJson',
+        dataType: 'json',
+        cache: 'false',
+        success: function (data) {
+            var str = "";
+            for (var i = 0; i < data.length; i++) {
+                str += "<li value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+            }
+            $(".add_bank_id").find(".dropdown-menu").html(str);
+            var add_bank_id = new customDropDown($(".add_bank_id"));
+        }
+    });
+
+//获取省、市、区
+    $.ajax({
+        type: 'post',
+        url: '/iwuliu/dictionaryManager/provinceJson',
+        dataType: 'json',
+        cache: 'false',
+        success: function (data) {
+            cityName = "";
+            areaName = "";
+            var str = "";
+            for (var i = 0; i < data.length; i++) {
+                str += "<li onclick='choice_province(this)' value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+            }
+            $(".add_province").find(".dropdown-menu").html(str);
+            //省
+            var add_province = new customDropDown($(".add_province"));
+            //根据省获取市
+            $(".add_province").find(".dropdown-menu li").bind("click", function () {
+                var add_province = $(this).attr("value");
+                if (add_province != '' && add_province != 'undefined') {
+                    $.ajax({
+                        type: "POST",
+                        url: "/iwuliu/dictionaryManager/cityJson?dicdata_code=" + add_province,
+                        cache: false,
+                        dataType: "json",
+                        success: function (data) {
+                            cityName = "";
+                            areaName = "";
+                            var str = "";
+                            for (var i = 0; i < data.length; i++) {
+                                str += "<li onclick='choice_city(this)' value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+                            }
+                            //市
+                            $(".add_city").find(".dropdown-menu").html("");
+                            $(".add_city").find(".placeHolder").html("请选择");
+                            $(".add_city").find(".dropdown-menu").html(str);
+                            //县
+                            $(".add_area").find(".dropdown-menu").html("");
+                            $(".add_area").find(".placeHolder").html("请选择");
+                            $(".add_area").find(".placeHolder").attr("value", "");
+                            //市
+                            var add_city = new customDropDown($(".add_city"));
+                            //根据市获取县
+                            $(".add_city").find(".dropdown-menu li").bind("click", function () {
+                                var add_city = $(this).attr("value");
+                                cityName =  $(".add_city").find(".placeHolder").text();
+                                if (add_city != '' && add_city != 'undefined') {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "/iwuliu/dictionaryManager/areaJson?dicdata_code=" + add_city,
+                                        cache: false,
+                                        dataType: "json",
+                                        success: function (data) {
+                                            var str = "";
+                                            for (var i = 0; i < data.length; i++) {
+                                                str += "<li onclick='choice_area(this)' value=" + data[i].id + "><a href='javascript:;'>" + data[i].name + "</a></li>"
+                                            }
+                                            $(".add_area").find(".placeHolder").html(data[0].name);
+                                            $(".add_area").find(".placeHolder").attr("value", data[0].id);
+                                            $(".add_area").find(".dropdown-menu").html(str);
+                                            var add_area = new customDropDown($(".add_area"));
+                                            areaName =  $(".add_area").find(".placeHolder").text();
+                                        }
+                                    });
+                                }
+                            })
+                        }
+                    });
+                }
+            })
+        }
+    });
+}
+
+// 新增保存
+function stationNewAddSave() {
+    if (checkNotNull($("#add_station_name")) & checkSelectNotNull($(".add_station_type").find(".placeHolder")) & checkNotNull($("#add_station_name"))) {
+        // 封装表单中的参数
+        var companyInfoObj = {
+            // 下拉框
+            "add_province": $(".add_province").find(".placeHolder").attr("value"),
+            "add_city": $(".add_city").find(".placeHolder").attr("value"),
+            "add_area": $(".add_area").find(".placeHolder").attr("value"),
+            "add_contact_sex": $(".add_contact_sex").find(".placeHolder").attr("value"),
+            // input框
+            "add_townStreet": $("#add_townStreet").val(),
+            "add_company_name": $("#add_company_name").val(),
+            "add_contact_name": $("#add_contact_name").val(),
+            "add_contact_mobile_phone": $("#add_contact_mobile_phone").val(),
+            "add_business_licence": $("#add_business_licence").val(),
+            "add_company_fixed_phone": $("#add_company_fixed_phone").val()
+        };
+        //开始ajax操作，data中传的是表单中的参数
+        $("#companyNewAddForm").ajaxSubmit({
+            type: "POST",//提交类型
+            dataType: "json",//返回结果格式
+            url: "/iwuliu/logisticsCompanyManager/saveCompanyInfo",//请求地址
+            data: {
+                "companyInfo": JSON.stringify(companyInfoObj)
+            },
+            success: function (data) {
+                var obj = eval(data);
+                if (obj.result == 1) {
+                    //bootstrap提示框
+                    $("#smallModalInfo").modal();
+                    $("#smallModalInfo").find(".titleInfo").html("保存成功！")
+                    $("#smallModalInfo").on("hidden.bs.modal", function (e) {
+                        $("body").addClass("modal-open");
+                        $('#myModalNewAdd').modal('hide');
+                        companyManagerQuery();
+                    })
+                } else if (obj.result == 0) {
+                    //bootstrap提示框
+                    $("#smallModalInfo").modal();
+                    $("#smallModalInfo").find(".titleInfo").html("营业执照重复！");
+                    $("#smallModalInfo").on("hidden.bs.modal", function (e) {
+                        $("body").addClass("modal-open");
+                    })
+                    return false;
+                } else if (obj.result == 2) {
+                    //bootstrap提示框
+                    $("#smallModalInfo").modal();
+                    $("#smallModalInfo").find(".titleInfo").html("手机号已经注册！");
+                    $("#smallModalInfo").on("hidden.bs.modal", function (e) {
+                        $("body").addClass("modal-open");
+                    })
+                    return false;
+                } else {
+                    //bootstrap提示框
+                    $("#smallModalInfo").modal();
+                    $("#smallModalInfo").find(".titleInfo").html("保存失败！");
+                    $("#smallModalInfo").on("hidden.bs.modal", function (e) {
+                        $("body").addClass("modal-open");
+                    })
+                    return false;
+                }
+            },
+            error: function () {
+                //bootstrap提示框
+                $("#smallModalInfo").modal();
+                $("#smallModalInfo").find(".titleInfo").html("系统异常！");
+                $("#smallModalInfo").on("hidden.bs.modal", function (e) {
+                    $("body").addClass("modal-open");
+                })
+                return false;
+            }
+        });
+    } else {
+        //bootstrap提示框
+        $("#smallModalInfo").modal();
+        $("#smallModalInfo").find(".titleInfo").html("请填写数据！")
+        $("#smallModalInfo").on("hidden.bs.modal", function (e) {
+            $("body").addClass("modal-open");
+        })
+        return false;
+    }
+}
+
+// table表格隔行变色
+function rowStyle(row, index) {
+    if (index % 2 === 0) {
+        return {};
+    }
+    return {
+        css: {"background-color": "#eefff9"}
+    };
+}
+
+//配置参数
+function allianceBusinessQueryParams(params) {
+    var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+        pageSize: params.limit,   //页面大小
+        pageNumber: params.pageNumber,  //页码
+        station_name: $("#station_name").val(),
+        station_type: $(".station_type").find(".placeHolder").attr("value"),
+        province_id: $(".province_id").find(".placeHolder").attr("value"),
+        city_id: $(".city_id").find(".placeHolder").attr("value"),
+        area_id: $(".area_id").find(".placeHolder").attr("value"),
+        town_street: $("#town_street").val(),
+        sort: params.sort,  //排序列名
+        sortOrder: params.order//排位命令（desc，asc）
+    };
+    return temp;
+}
+
+// 查询线下加盟服务商管理列表
+function allianceBusinessQuery() {
+    $('#allianceBusinessTable').bootstrapTable('refresh', {'url': '/iwuliu/allianceBusiness/allianceBusinessList'});
+}
+
+// 查询重置
+function allianceBusinessQueryReset() {
+    $('#station_name').val("");
+    $('.placeHolder').html("请选择");
+    $('.placeHolder').attr("value", "");
+    $('.station_type').find(".placeHolder").html("全部");
+    $('.station_type').find(".placeHolder").attr("value", "");
+    $(".city_id").find(".dropdown-menu").html("");
+    $(".area_id").find(".dropdown-menu").html("");
+    $(".sr-only").removeClass("sr-only");
+    $('#town_street').val("");
+    $('#allianceBusinessTable').bootstrapTable('removeAll');
+}
+
+//goBtn按钮无数据时隐藏
+var webservice = $('#allianceBusinessTable').attr("data-url");
+$.ajax({
+    url: webservice,
+    success: function (data) {
+        if (data.length == 0) {
+            $(".form-inline").css("display", "none");
+        }
+    }
+});
+
+
+//==============================新增页面
+
+//获取选择的省名称
+function choice_province(ele) {
+    provinceName = $(ele).text();
+}
+//获取选择的城市名称
+function choice_city(ele) {
+    cityName = $(ele).text();
+}
+//获取选择的区县名称
+function choice_area(ele) {
+    areaName = $(ele).text();
+}

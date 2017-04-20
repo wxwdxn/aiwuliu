@@ -1,0 +1,13 @@
+
+##数据库连接配置-
+jdbc.driverClassName=com.mysql.jdbc.Driver
+validationQuery=SELECT 1
+jdbc_url=jdbc:mysql://test-server:3306/logistics_debug?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+jdbc_username=root
+jdbc_password=123456
+###云端数据库连接配置-
+#driverClassName=com.mysql.jdbc.Driver
+#validationQuery=SELECT 1
+#jdbc_url=jdbc:mysql://127.0.0.1:3306/logistics?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+#jdbc_username=logistics
+#jdbc_password=dl4403a

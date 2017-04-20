@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.AttributionDaoMapper">
+
+    <!--通过字典名称查询字典数据信息-->
+    <select id="findDicdataByDicdataName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Dicdata">
+        SELECT
+            *
+        FROM
+            T_Sys_Dicdata
+        WHERE
+            DICDATA_NAME=#{dicdata_name}
+    </select>
+</mapper>

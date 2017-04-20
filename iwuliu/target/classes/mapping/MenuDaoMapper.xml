@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        <mapper namespace="com.cn.gazelle.logistics.dao.MenuDaoMapper">
+    <resultMap id="T_Sys_Menu" type="com.cn.gazelle.logistics.pojo.T_Sys_Menu">
+        <id column="MENU_ID" property="menu_id"/>
+        <result column="MENU_PID" property="menu_pid"/>
+        <result column="MENU_NAME" property="menu_name"/>
+        <result column="MENU_URL" property="menu_url"/>
+        <result column="MENU_SN" property="menu_sn"/>
+        <result column="MENU_ICON" property="menu_icon"/>
+        <result column="MENU_DATE" property="menu_date"/>
+        <result column="GROUP_ID" property="group_id"/>
+        <result column="GROUP_NAME" property="group_name"/>
+        <result column="DELETE_STATES" property="delete_states"/>
+        <result column="MENU_REMARK" property="menu_remark"/>
+    </resultMap>
+    <resultMap id="T_Sys_MenuAndUser" type="com.cn.gazelle.logistics.pojo.T_Sys_Menu" extends="T_Sys_Menu">
+        <id column="USER_ID" property="user_id" />
+        <result column="LOGIN_NAME" property="login_name" />
+        <result column="LOGIN_PASSWORD" property="login_password" />
+        <result column="USER_NAME" property="user_name" />
+        <result column="USER_SEX" property="user_sex" />
+        <result column="USER_PHONE" property="user_phone" />
+        <result column="USER_TEL" property="user_tel" />
+        <result column="USER_MAIL" property="user_mail" />
+        <result column="USER_AD" property="user_ad" />
+        <result column="GROUP_ID" property="group_id" />
+        <result column="GROUP_NAME" property="group_name" />
+        <result column="USER_DATE" property="user_date" />
+        <result column="DELETE_STATES" property="delete_states" />
+        <result column="USER_REMARK" property="user_remark" />
+    </resultMap>
+
+
+    <!--关联查询 查询用户所在分组-->
+    <select id="findGroupNameOfUser" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Menu">
+        SELECT
+        DISTINCT(u.GROUP_NAME)
+        FROM
+            t_sys_user u
+        LEFT JOIN
+            t_sys_menu m
+        ON
+            u.group_name = m.group_name
+        WHERE
+            LOGIN_NAME = #{login_name} AND  m.DELETE_STATES = '0' AND u.DELETE_STATES = '0'
+    </select>
+
+    <!--根据ID查询菜单信息-->
+    <select id="findMenuByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Menu">
+        SELECT
+            *
+        FROM
+            T_Sys_Menu
+        WHERE
+            MENU_ID = #{menu_id} AND DELETE_STATES = '0'
+    </select>
+
+    <!--根据菜单名查询菜单信息-->
+    <select id="findMenuByMenuName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Menu">
+        SELECT
+            *
+        FROM
+            T_Sys_Menu
+        WHERE
+            MENU_NAME = #{menu_name} AND DELETE_STATES = '0'
+    </select>
+
+    <!--查询所有父节点-->
+    <select id="findAllParentRoot" resultMap="T_Sys_Menu">
+        SELECT
+            *
+        FROM
+            t_sys_menu
+        WHERE
+            MENU_PID ="" AND DELETE_STATES = '0'
+        ORDER BY MENU_SN
+    </select>
+
+    <!--查询菜单父节点-->
+    <select id="findParentRoot" parameterType="String" resultMap="T_Sys_Menu">
+        SELECT
+            MENU_ID,MENU_PID,MENU_NAME
+        FROM
+            t_sys_menu
+        WHERE  DELETE_STATES = '0'
+        <if test="group_name!=null">
+            AND MENU_PID ="" AND GROUP_NAME LIKE '%${group_name}%' ORDER BY MENU_SN
+        </if>
+        <if test="group_name==null">
+            AND GROUP_NAME = #{group_name} ORDER BY MENU_SN
+        </if>
+    </select>
+
+    <!--查找菜单子节点-->
+    <select id="findChildRoot" resultMap="T_Sys_Menu">
+        SELECT
+           *
+        FROM
+            t_sys_menu
+        WHERE
+            MENU_PID = #{menu_pid} AND GROUP_NAME LIKE '%${group_name}%' AND DELETE_STATES = '0'
+        ORDER BY
+            MENU_SN
+    </select>
+
+    <!--查询所有菜单信息-->
+    <select id="findAllMenu" resultMap="T_Sys_Menu">
+        SELECT
+            *
+        FROM
+            T_Sys_Menu
+        WHERE
+            DELETE_STATES = '0'
+        <if test="menu_name!='' ">
+            AND MENU_NAME LIKE '%${menu_name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询菜单信息总记录数-->
+    <select id="findAllMenuRowsCount" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_Menu
+        WHERE
+            DELETE_STATES = '0'
+    </select>
+
+    <!--查询符合条件的总记录数-->
+    <select id="findAllMenuSearchCount" parameterType="String" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_Menu
+        WHERE
+            MENU_NAME LIKE '%${menu_name}' AND DELETE_STATES = '0'
+    </select>
+
+    <!--保存菜单信息-->
+    <insert id="saveMenu" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Menu">
+        INSERT INTO
+                T_Sys_Menu(MENU_ID,
+                MENU_PID,
+                MENU_NAME,
+                MENU_URL,
+                MENU_SN,
+                MENU_ICON,
+                MENU_DATE,
+                DELETE_STATES,
+                MENU_REMARK)
+        VALUES(
+                #{menu_id},
+                #{menu_pid},
+                #{menu_name},
+                #{menu_url},
+                #{menu_sn},
+                #{menu_icon},
+                #{menu_date},
+                '0',
+                #{menu_remark})
+    </insert>
+
+    <!--更新菜单信息-->
+    <update id="updateMenu" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Menu">
+        UPDATE
+            T_Sys_Menu
+        SET
+            MENU_PID = #{menu_pid},
+            MENU_NAME = #{menu_name},
+            MENU_URL = #{menu_url},
+            MENU_SN = #{menu_sn},
+            MENU_ICON = #{menu_icon},
+            MENU_DATE = #{menu_date},
+            DELETE_STATES = '0',
+            MENU_REMARK = #{menu_remark}
+        WHERE
+            MENU_ID = #{menu_id}
+
+    </update>
+
+    <!--菜单分配用户组-->
+    <update id="allotUserGroup" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Menu">
+        UPDATE
+            T_Sys_Menu
+        SET
+            MENU_NAME = #{menu_name},
+            MENU_DATE = #{menu_date},
+            GROUP_NAME = #{group_name}
+        WHERE
+            MENU_ID = #{menu_id} AND DELETE_STATES = '0'
+
+    </update>
+    <!--删除菜单信息-->
+    <delete id="delMenu" parameterType="String">
+        UPDATE
+            T_Sys_Menu
+        SET
+            DELETE_STATES = '1'
+        WHERE
+            MENU_ID = #{menu_id} AND DELETE_STATES = '0'
+    </delete>
+
+</mapper>

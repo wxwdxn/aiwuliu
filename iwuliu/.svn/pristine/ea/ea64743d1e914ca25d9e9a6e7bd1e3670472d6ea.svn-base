@@ -1,0 +1,30 @@
+.routerInfo {
+  border-top: 1px solid #e8e8e8;
+}
+.routerInfo h4 {
+  padding: 10px 0;
+}
+.glyphicon {
+  cursor: pointer;
+}
+/*表格显示*/
+.fixed-table-body{
+  height:auto;
+}
+/*新增合同页面的下拉*/
+.newAdd_infoConditions .form-group .cargoType ul,.ownerType ul,.owner ul,.payType ul,.mainLine ul,.loadFreightYard ul,.unloadFreightYard ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+.NewDetail{
+  background: #5cb85c;
+  color: #fff;
+}
+td a{
+  cursor: pointer;
+}
+td{
+  font-size:14px;
+}

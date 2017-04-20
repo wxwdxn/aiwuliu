@@ -1,0 +1,336 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: WXW
+  Date: 2017/2/224
+  Time: 17:22
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% String username = request.getSession().getAttribute("username").toString();%>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="renderer" content="webkit|ie-comp|ie-stand"> 
+		<title></title>
+	</head>	
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap.min.css"/>
+	<%--Bootstrap-table CSS文件--%>
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-table.min.css">
+	<link rel="stylesheet"
+		  href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/operationManager/operationPlanManager/css/operationPlanManager.css"/>
+	<%--Bootstrap时间控件  JavaScript 文件以及汉化文件--%>
+	<script src="<%=request.getContextPath()%>/static/common/js/jquery.min.js" type="text/javascript"
+			charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/common/js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table.min.js"></script>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table-zh-CN.js"></script>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="<%=request.getContextPath()%>/static/common/js/common.js" type="text/javascript" charset="utf-8"></script>
+	<script src="<%=request.getContextPath()%>/static/operationManager/operationPlanManager/js/operationPlanManager.js" type="text/javascript" charset="utf-8"></script>
+
+	<!--[if lt IE 9]>
+	<script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+	<script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	<body>
+		<!--*********导航条开始***********-->
+		<nav class="navbar navbar-default" role="navigation">
+		  <div class="container-fluid">
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="#">
+		      	<img src="<%=request.getContextPath()%>/static/common/images/logo.png"/>
+		      </a>
+		    </div>
+		
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		      
+		      <ul class="nav navbar-nav navbar-right">
+		        <li class="dropdown">
+		        	<a href="#" class="dropdown-toggle" data-toggle="dropdown">系统管理 <span class="caret"></span></a>
+		       		<ul class="dropdown-menu" role="menu">
+			            <li><a href="#">Action</a></li>
+			            <li><a href="#">Another action</a></li>
+			            <li><a href="#">Something else here</a></li>
+			            <li class="divider"></li>
+			            <li><a href="#">Separated link</a></li>
+			          </ul>
+		        </li>
+		        <li class="dropdown">
+		          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%=username%><span class="caret"></span></a>
+		          <ul class="dropdown-menu" role="menu">
+		            <li><a href="javascript:;">Action</a></li>
+		            <li><a href="javascript:;">Another action</a></li>
+		            <li><a href="javascript:;">Something else here</a></li>
+		            <li class="divider"></li>
+		            <li><a href="javascript:;">Separated link</a></li>
+		          </ul>
+		        </li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		  </div><!-- /.container-fluid -->
+		</nav>
+		<!--*********导航条结束***********-->
+		<div class="container-fluid eleHeight">
+			<div class="row eleHeight">
+				<div class="col-md-2 leftMenu eleHeight">
+				</div>
+				
+				<div class="iframeMain">
+					<h4>
+						计划管理
+					</h4>
+					<div class="infoConditions">
+						<form class="form-inline">
+							<div class="form-group">
+								<label>合同编号：</label>
+								<div class="display_inlineBlcok">
+									<input type="text" class="form-control" id="code" />
+									<p></p>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>选择干线：</label>
+    							<div class="display_inlineBlcok mainLine">
+	    							<button class="btn form-control btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										<span class="placeHolder">请选择</span>
+									    <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+									</ul>
+    							</div>
+							</div>
+							<div class="form-group">
+								<label>计划状态：</label>
+    							<div class="display_inlineBlcok planStatus">
+	    							<button class="btn form-control btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										<span class="placeHolder">请选择</span>
+									    <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+									</ul>
+    							</div>
+							</div>
+							<div class="QuerytheReset">
+								<label class="sr-only">查询按钮</label>
+								<div class="display_inlineBlcok">
+									<a type="button" class="btn query" onclick="searchPlan()">查询</a>
+									<a type="button" class="btn reset" onclick="resetPlan()">重置</a>
+								</div>
+							</div>
+						</form>
+						<div class="buttons">
+							<a type="button" class="btn btn_export">
+								导出
+							</a>
+						</div>
+						<div class="col-md-12">
+							<%--运输计划--%>
+							<table data-toggle="table" class="table table-striped table-bordered table-hover"
+								   id="transportationContractTable"
+								   data-url="/iwuliu/transportationOrderManager/OrderListBelongNull"
+								   data-query-params="transportationContractParams"
+								   data-query-params-type="limit"
+								   data-pagination="true"
+								   data-pagination-first-text="首页"
+								   data-pagination-pre-text="上一页"
+								   data-pagination-next-text="下一页"
+								   data-pagination-last-text="末页"
+								   data-show-footer="false"
+								   data-row-style="rowStyle"
+								   data-page-list="[10, 20,30]"
+								   data-smart-display="false"
+								   data-height="100">
+								<thead style="background-color:#dbfff2;">
+
+								<tr>
+									<th data-field="state" data-checkbox="true"></th>
+									<th data-field="code" data-align="center" data-valign="middle" data-sortable="true" data-width="120px" >
+										合同编号
+									</th>
+									<th class="htID" data-field="schedule_plan_number" data-sortable="true" data-width="120px"  data-align="center" data-valign="middle" data-formatter="codeFormatter">
+										计划编号
+									</th>
+									<th data-field="cargo_type_id" data-align="center" data-valign="middle" data-width="120px" data-sortable="true">货物类型</th>
+									<th data-field="lineName" data-align="center" data-valign="middle" data-sortable="true" data-width="130px">对应运营干线</th>
+									<th data-field="loading_cargo_yard_id" data-align="center" data-valign="middle" data-width="120px" data-sortable="true"
+									>装货货场
+									</th>
+									<th data-field="loading_begin_date" data-align="center" data-valign="middle" data-width="120px"data-sortable="true">
+										装货开始时间
+									</th>
+									<th data-field="loading_contact_name" data-align="center" data-valign="middle"data-width="130px" data-sortable="true"
+									>装货联系人姓名
+									</th>
+									<th data-field="loading_contact_phone" data-align="center" data-valign="middle" data-width="130px"data-sortable="true"
+									>装货联系人电话
+									</th>
+									<th data-field="unloading_cargo_yard_id" data-align="center" data-valign="middle" data-width="120px" data-sortable="true"
+									>卸货货场
+									</th>
+									<th data-field="unloading_finish_date" data-align="center" data-valign="middle" data-width="120px"data-sortable="true"
+									>卸货结束时间
+									</th>
+									<th data-field="unloading_contact_name" data-align="center" data-valign="middle"data-width="130px" data-sortable="true"
+									>卸货联系人姓名
+									</th>
+									<th data-field="unloading_contact_phone" data-align="center" data-valign="middle"data-width="130px"  data-sortable="true"
+									>卸货联系人电话
+									</th>
+									<th data-field="transport_unit_price" data-align="center"data-width="140px"  data-valign="middle" data-sortable="true"
+									>运输单价（元/吨）
+									</th>
+									<th data-field="cargo_total" data-align="center" data-valign="middle" data-width="130px" data-sortable="true"
+									>货物总数（吨）
+									</th>
+									<th data-field="status" data-align="center" data-valign="middle" data-width="130px" data-sortable="true"
+									>订单状态
+									</th>
+									<th data-field="completedCargoTatal" data-align="center" data-width="140px" data-valign="middle" data-sortable="true"
+									>已完成货物（吨）
+									</th>
+									<th data-field="transportCargoTotal" data-align="center"data-width="140px"  data-valign="middle" data-sortable="true"
+									>已运输货物（吨）
+									</th>
+								</tr>
+								</thead>
+							</table>
+							<div class="form-inline" align="center" style="margin: -45px auto 17px;">
+								<input id="transportationContractTablepage" class="form-control" style="width: 60px;" type="number"
+									   value="1" min="1">
+								<button id="transportationContractTablegoBtn" class="btn btn-success">GO</button>
+							</div>
+						</div>
+						<div class="buttons">
+							<a type="button" class="btn btn_export">
+								导出
+							</a>
+						</div>
+						<div class="col-md-12" >
+							<%--运输计划--%>
+							<table data-toggle="table" class="table table-striped table-bordered table-hover"
+								   id="transportationPlanTable2"
+								   data-query-params="transportationContractParams"
+								   data-query-params-type="limit"
+								   data-pagination="true"
+								   data-pagination-first-text="首页"
+								   data-pagination-pre-text="上一页"
+								   data-pagination-next-text="下一页"
+								   data-pagination-last-text="末页"
+								   data-show-footer="false"
+								   data-row-style="rowStyle"
+								   data-page-list="[10, 20,30]"
+								   data-smart-display="false"
+								   data-height="100">
+								<thead style="background-color:#dbfff2;">
+
+								<tr>
+									<th data-field="state" data-checkbox="true"></th>
+									<th data-field="code" data-align="center" data-valign="middle" data-width="120px"data-sortable="true">
+										合同编号
+									</th>
+									<th data-field="name" data-align="center" data-valign="middle" data-sortable="true"data-width="120px">货主</th>
+									<th data-field="cargo_type_id" data-align="center" data-valign="middle" data-sortable="true"data-width="120px">货物类型</th>
+									<th data-field="lineName" data-align="center" data-valign="middle" data-sortable="true"data-width="120px">对应运营干线</th>
+									<th data-field="loading_cargo_yard_id" data-align="center" data-valign="middle" data-sortable="true" data-width="120px"
+									>装货货场
+									</th>
+									<th data-field="loading_begin_date" data-align="center" data-valign="middle" data-sortable="true"data-width="120px">
+										装货开始时间
+									</th>
+									<th data-field="loading_contact_name" data-align="center" data-valign="middle" data-sortable="true" data-width="130px"
+									>装货联系人姓名
+									</th>
+									<th data-field="loading_contact_phone" data-align="center" data-valign="middle" data-sortable="true"data-width="130px"
+									>装货联系人电话
+									</th>
+									<th data-field="unloading_cargo_yard_id" data-align="center" data-valign="middle" data-sortable="true"data-width="120px"
+									>卸货货场
+									</th>
+									<th data-field="unloading_finish_date" data-align="center" data-valign="middle" data-sortable="true"data-width="120px"
+									>卸货结束时间
+									</th>
+									<th data-field="unloading_contact_name" data-align="center" data-valign="middle" data-sortable="true"data-width="130px"
+									>卸货联系人姓名
+									</th>
+									<th data-field="unloading_contact_phone" data-align="center" data-valign="middle" data-sortable="true"data-width="130px"
+									>卸货联系人电话
+									</th>
+									<th data-field="transport_unit_price" data-align="center" data-valign="middle" data-sortable="true"data-width="140px"
+									>运输单价(元/吨)
+									</th>
+									<th data-field="cargo_total" data-align="center" data-valign="middle" data-sortable="true"data-width="130px"
+									>货物总数（吨）
+									</th>
+									<th data-field="plate_number" data-align="center" data-valign="middle" data-sortable="true"data-width="120px"
+									>车牌
+									</th>
+									<th data-field="length" data-align="center" data-valign="middle" data-sortable="true"data-width="120px"
+									>车辆长度
+									</th>
+									<th data-field="carriageName" data-align="center" data-valign="middle" data-sortable="true"data-width="120px"
+									>车厢类型
+									</th>
+									<th data-field="status" data-align="center" data-valign="middle" data-sortable="true"data-width="120px"
+									>订单状态
+									</th>
+									<th data-field="completedCargoTatal" data-align="center" data-valign="middle" data-sortable="true"data-width="140px"
+									>已完成货物（吨）
+									</th>
+									<th data-field="transportCargoTotal" data-align="center" data-valign="middle" data-sortable="true"data-width="140px"
+									>已运输货物（吨）
+									</th>
+								</tr>
+								</thead>
+							</table>
+							<div class="form-inline" align="center" style="margin: -45px auto 17px;">
+								<input id="transportationPlanTablepage2" class="form-control" style="width: 60px;" type="number"
+									   value="1" min="1">
+								<button id="transportationPlanTablegoBtn2" class="btn btn-success">GO</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--Modal 小提示框-->
+		<div class="modal fade bs-example-modal-sm" id="smallModalInfo" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+			<div class="modal-dialog modal-sm" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">提示信息</h4>
+					</div>
+					<div class="modal-body text-center">
+						<h4 class="titleInfo">
+
+						</h4>
+					</div>
+					<div class="modal-footer text-center">
+						<button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	</body>
+	<script src="<%=request.getContextPath()%>/static/common/js/jquery.form.js" type="text/javascript" charset="utf-8">
+	</script>
+	<%--Bootstrap-table JavaScript 文件以及汉化文件--%>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table.min.js"></script>
+	<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table-zh-CN.js"></script>
+</html>

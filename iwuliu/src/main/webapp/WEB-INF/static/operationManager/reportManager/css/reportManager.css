@@ -1,0 +1,11 @@
+.modal-content .modal-body h4 {
+  line-height: 30px;
+  text-indent: 15px;
+  font-size: 16px;
+}
+#transportCapacity,#driverAttendance,#driverCredit{
+  margin:0 auto;
+}
+.fixed-table-body{
+  height:auto;
+}

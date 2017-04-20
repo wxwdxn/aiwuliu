@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.PidDaoMapper">
+    <resultMap id="T_Sys_Pid" type="com.cn.gazelle.logistics.pojo.T_Sys_Pid">
+        <id column="PID_ID " property="pid_id"/>
+        <result column="PID_CODE" property="pid_code"/>
+        <result column="PID_CONTENT" property="pid_content"/>
+        <result column="PID_DATA_TYPE" property="pid_data_type"/>
+        <result column="PID_SIZE" property="pid_size"/>
+        <result column="PID_UNIT" property="pid_unit"/>
+        <result column="TRUCK_TYPE" property="truck_type"/>
+        <result column="PID_DATE" property="pid_date"/>
+        <result column="DELETE_STATES " property="delete_states"/>
+        <result column="PID_REMARK " property="pid_remark"/>
+    </resultMap>
+
+    <!--根据ID查找PID信息-->
+    <select id="findPidByID" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Pid">
+        SELECT
+        *
+        FROM
+        T_Sys_Pid
+        WHERE
+        PID_ID = #{pid_id} AND DELETE_STATES = '0'
+    </select>
+
+    <!--根据PID代码值查找信息-->
+    <select id="findPidByCode"  resultType="com.cn.gazelle.logistics.pojo.T_Sys_Pid">
+        SELECT
+        *
+        FROM
+        T_Sys_Pid
+        WHERE
+        PID_CODE = #{pid_code} AND TRUCK_TYPE = #{truck_type} AND DELETE_STATES = '0'
+    </select>
+
+    <!--查找所有PID信息-->
+    <select id="findAllPid" resultMap="T_Sys_Pid">
+        SELECT
+        *
+        FROM
+        T_Sys_Pid
+        WHERE
+        DELETE_STATES = '0' AND TRUCK_TYPE = #{truck_type}
+        <if test="pid_code !='' ">
+            AND PID_CODE LIKE '%${pid_code}%'
+        </if>
+        limit #{page},#{rows}
+
+    </select>
+
+    <!--查找符合条件的PID总记录数-->
+    <select id="findAllPidSearchCount" parameterType="String" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        T_Sys_Pid
+        WHERE
+        DELETE_STATES = '0' AND TRUCK_TYPE = #{truck_type}
+        <if test="pid_code !='' ">
+            AND PID_CODE LIKE '%${pid_code}%'
+        </if>
+    </select>
+
+    <!--保存PID信息-->
+    <insert id="savePid" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Pid">
+        INSERT INTO
+        T_Sys_Pid (PID_ID,
+        PID_CODE,
+        PID_CONTENT,
+        PID_DATA_TYPE,
+        PID_SIZE,
+        PID_UNIT,
+        TRUCK_TYPE,
+        PID_DATE,
+        DELETE_STATES,
+        PID_REMARK)
+        VALUES (
+        #{pid_id},
+        #{pid_code},
+        #{pid_content},
+        #{pid_data_type},
+        #{pid_size},
+        #{pid_unit},
+        #{truck_type},
+        #{pid_date},
+        '0',
+        #{pid_remark} );
+    </insert>
+
+    <!--更新PID信息-->
+    <update id="updatePid" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Pid">
+        UPDATE
+        T_Sys_Pid
+        SET
+        PID_CODE = #{pid_code},
+        PID_CONTENT = #{pid_content},
+        PID_DATA_TYPE = #{pid_data_type},
+        PID_SIZE = #{pid_size},
+        PID_UNIT = #{pid_unit},
+        TRUCK_TYPE = #{truck_type},
+        PID_DATE = #{pid_date},
+        DELETE_STATES =  '0',
+        PID_REMARK = #{pid_remark}
+        WHERE
+        PID_ID = #{pid_id}
+    </update>
+
+    <!--删除PID信息-->
+    <delete id="delPid" parameterType="String">
+        UPDATE
+        T_Sys_Pid
+        SET
+        DELETE_STATES = '1'
+        WHERE
+        PID_ID = #{pid_id}
+    </delete>
+</mapper>

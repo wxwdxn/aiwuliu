@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckCarriageTypeDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Master_Truck_Carriage_Type" type="com.cn.gazelle.logistics.pojo.T_Master_Truck_Carriage_Type">
+
+        <id column="TRUCK_CARRIAGE_TYPE_ID" property="truck_carriage_type_id"/>
+        <result column="TRUCK_CARRIAGE_TYPE_NAME" property="truck_carriage_type_name"/>
+        <result column="TRUCK_CARRIAGE_TYPE_DESC" property="truck_carriage_type_desc"/>
+        <result column="TRUCK_CARRIAGE_USEABLE" property="truck_carriage_useable"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据ID查找车厢类型信息-->
+    <select id="findTruckCarriageTypeByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Truck_Carriage_Type">
+        SELECT
+            *
+        FROM
+            T_Master_Truck_Carriage_Type
+        WHERE
+            TRUCK_CARRIAGE_TYPE_ID = #{truck_carriage_type_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据车厢类型名查询车辆类型列表-->
+    <select id="findTruckCarriageTypeByName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Truck_Carriage_Type">
+        SELECT
+            *
+        FROM
+            T_Master_Truck_Carriage_Type
+        WHERE
+            TRUCK_CARRIAGE_TYPE_NAME = '${truck_carriage_type_name}' AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的车厢类型列表信息（默认查询所有车厢类型）-->
+    <select id="findAllTruckCarriageType" resultMap="T_Master_Truck_Carriage_Type">
+        SELECT
+            *
+        FROM
+            T_Master_Truck_Carriage_Type
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type != ''">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+
+    <!--查询符合条件的车厢类型总数-->
+    <select id="findAllTruckCarriageTypeRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Master_Truck_Carriage_Type
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--查询所有车厢类型名-->
+    <select id="findAllTruckCarriageTypeName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Truck_Carriage_Type">
+        SELECT
+            TRUCK_CARRIAGE_TYPE_NAME
+        FROM
+            T_Master_Truck_Carriage_Type
+        WHERE
+            TRUCK_CARRIAGE_TYPE_NAME !='none' AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的车厢型号信息-->
+    <select id="findAllTruckCarriageTypeByID"  resultType="com.cn.gazelle.logistics.pojo.T_Master_Truck_Carriage_Type">
+        SELECT
+            *
+        FROM
+            T_Master_Truck_Carriage_Type
+        WHERE
+            TRUCK_CARRIAGE_TYPE_ID LIKE '%${truck_carriage_type_id}%' AND DELETE_FLAG = 0
+    </select>
+
+    <!--保存车厢类型信息-->
+    <insert id="saveTruckCarriageType" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Truck_Carriage_Type">
+          INSERT INTO
+                  T_Master_Truck_Carriage_Type(
+                  TRUCK_CARRIAGE_TYPE_ID,
+                  TRUCK_CARRIAGE_TYPE_NAME,
+                  TRUCK_CARRIAGE_TYPE_DESC,
+                  TRUCK_CARRIAGE_USEABLE,
+                  DELETE_FLAG,
+                  LAST_UPDATE,
+                  LAST_UPDATE_USER_ID)
+              SELECT
+                  #{truck_carriage_type_id},
+                  #{truck_carriage_type_name},
+                  #{truck_carriage_type_desc},
+                  '1',
+                  0,
+                  #{last_update},
+                  #{last_update_user_id}
+          FROM dual WHERE NOT EXISTS(SELECT TRUCK_CARRIAGE_TYPE_NAME FROM T_Master_Truck_Carriage_Type WHERE TRUCK_CARRIAGE_TYPE_NAME = #{truck_carriage_type_name} AND DELETE_FLAG = 0)
+    </insert>
+
+    <!--更新车厢类型信息-->
+    <update id="updateTruckCarriageType" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Truck_Carriage_Type">
+            UPDATE
+                T_Master_Truck_Carriage_Type
+            SET
+                TRUCK_CARRIAGE_TYPE_NAME = #{truck_carriage_type_name},
+                TRUCK_CARRIAGE_TYPE_DESC = #{truck_carriage_type_desc},
+                TRUCK_CARRIAGE_USEABLE = #{truck_carriage_useable},
+                DELETE_FLAG = #{delete_flag},
+                LAST_UPDATE = #{last_update},
+                LAST_UPDATE_USER_ID = #{last_update_user_id}
+            WHERE
+                TRUCK_CARRIAGE_TYPE_ID = #{truck_carriage_type_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--删除车厢类型信息-->
+    <delete id="delTruckCarriageType" parameterType="String">
+        UPDATE
+            T_Master_Truck_Carriage_Type
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            TRUCK_CARRIAGE_TYPE_ID = #{truck_carriage_type_id} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--根据车厢类型名称查询车厢类型ID-->
+    <select id="findTruckTypeIDByName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Truck_Carriage_Type">
+        SELECT
+            TRUCK_CARRIAGE_TYPE_ID
+        FROM
+            T_Master_Truck_Carriage_Type
+        WHERE
+            DELETE_FLAG = 0
+    </select>
+
+    <!--查询所有车厢类型名-->
+    <select id="findAllTruckCarriageTypeIdAndName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Truck_Carriage_Type">
+        SELECT
+            *
+        FROM
+            T_Master_Truck_Carriage_Type
+        WHERE
+            TRUCK_CARRIAGE_TYPE_ID !='none' AND DELETE_FLAG = 0
+    </select>
+</mapper>

@@ -1,0 +1,91 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称: CompanyService.Java
+ * 系统编号：Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：02
+ * 模块名称：公司信息查询接口声明
+ * 设计文件：
+ * 完成日期：2015-12-30
+ * 作    者：YK
+ * 内容摘要：公司信息查询
+ */
+package com.cn.gazelle.logistics.service;
+
+import com.cn.gazelle.logistics.pojo.T_Data_Company;
+import org.apache.ibatis.annotations.Param;
+
+import javax.jws.WebService;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * 类 名 称: MemberService
+ * 内容摘要: 会员信息查询接口
+ * 方法描述：该类有9个方法：
+ *         01 findCompanyByID                 根据企业id查询企业信息
+ *         02 findCompanyByName               根据企业名查询企业信息
+ *         03 findCompanyName                 查询所有的企业名(无参)
+ *         04 findAllCompany                  查询所有企业信息（有参）
+ *         05 findComanyByMemberName          根据会员名查找公司信息
+ *         06 findAllCompanyRowsCount         查询企业总记录数
+ *         07 saveCompany                     保存企业信息
+ *         08 updateCompan                    更新企业信息
+ *         09 delCompany                      删除企业信息
+ * @author YK
+ */
+@WebService
+public interface CompanyService {
+
+    // 根据企业id查询企业信息
+    T_Data_Company findCompanyByID(String company_id);
+
+    // 根据企业名查询企业信息
+    T_Data_Company findCompanyByName(String company_name,String company_type);
+
+    // 查询所有的企业名（无参）
+    String findCompanyName(String company_type);
+
+    // 查询所有企业信息（有参）
+    List<T_Data_Company> findAllCompany(String search_type, String name, Integer page, Integer rows, String company_type);
+
+    // 根据会员名查找公司信息
+    String findComanyByMemberName(String member_name);
+
+    // 查询企业总记录数
+    Integer findAllCompanyRowsCount(String search_type, String name, String company_type);
+
+    // 保存企业信息
+    int saveCompany(T_Data_Company company);
+
+    // 更新企业信息
+    boolean updateCompany(T_Data_Company company);
+
+    // 删除企业信息
+    void delCompany(String company_id);
+
+    // 物流公司列表查询（页面）
+    List<T_Data_Company> queryCompanyList( String company_name, String contact_name,
+                                           String contact_mobile_phone, String business_licence,
+                                           String city_id);
+    // 物流公司详情页回显
+    T_Data_Company findCompanyDetailByID(String company_id);
+
+    // 新增物流公司信息（页面）
+    int saveCompanyInfo(String info,String userName,String licence_path, String store_path);
+
+    // 编辑物流公司信息（页面）
+    int editCompanyInfo(String info,String userName,String licence_path, String store_path);
+
+
+    // 物流公司新增车辆信息（页面）
+    int saveTruckInfo(String truckInfo, String userName, HashMap picPathMap,String company_id);
+
+    // 查询所有企业信息不分页
+    List<T_Data_Company> findCompanyList();
+
+    // 查询所有企业货主信息不分页
+    List<T_Data_Company> findCompanyShipperList();
+
+}
+

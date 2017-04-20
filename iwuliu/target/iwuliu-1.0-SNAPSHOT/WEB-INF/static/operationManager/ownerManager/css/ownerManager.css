@@ -1,0 +1,16 @@
+.fixed-table-body{
+    height:auto;
+}
+/*新增合同页面的下拉*/
+.company .form-group .provinceJson ul,.cityJson ul,.areaJson ul{
+    max-height:180px;
+    max-height:25rem;
+    overflow-y: auto;
+    width:160px;
+}
+
+#myModal label,
+#myModalNewAdd label{
+    min-width: 104px;
+    text-align: right;
+}

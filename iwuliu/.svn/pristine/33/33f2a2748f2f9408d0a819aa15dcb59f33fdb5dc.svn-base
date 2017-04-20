@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.StationDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Master_Service_Station" type="com.cn.gazelle.logistics.pojo.T_Master_Service_Station">
+
+        <id column="STATION_ID" property="station_id"/>
+        <result column="STATION_NAME" property="station_name"/>
+        <result column="STATION_TYPE" property="station_type"/>
+        <result column="PROVINCE_ID" property="province_id"/>
+        <result column="CITY_ID" property="city_id"/>
+        <result column="AREA_ID" property="area_id"/>
+        <result column="TOWN_STREET" property="town_street"/>
+        <result column="LONGITUDE" property="longitude"/>
+        <result column="LATITUDE" property="latitude"/>
+        <result column="WORK_BEGIN_TIME" property="work_begin_time"/>
+        <result column="WORK_END_TIME" property="work_end_time"/>
+        <result column="CONTACT_NAME" property="contact_name"/>
+        <result column="CONTACT_PHONE" property="contact_phone"/>
+        <result column="BANK_ID" property="BANK_ID"/>
+        <result column="BANK_ACCOUNT" property="bank_account"/>
+        <result column="BANK_ACCOUNT_PERSON_NAME" property="bank_account_person_name"/>
+        <result column="BANK_ACCOUNT_PERSON_ID" property="bank_account_person_id"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据ID查找服务站信息-->
+    <select id="findStationByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Service_Station">
+        SELECT
+            *
+        FROM
+            T_Master_Service_Station
+        WHERE
+            STATION_ID=#{station_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据服务站名查询服务站列表-->
+    <select id="findStationByName" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Service_Station">
+        SELECT
+            *
+        FROM
+            T_Master_Service_Station
+        WHERE
+            STATION_NAME = '${station_name}' AND DELETE_FLAG = 0
+    </select>
+
+    <!--保存服务站信息-->
+    <insert id="saveStation" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Service_Station">
+        INSERT INTO
+                T_Master_Service_Station(STATION_ID,
+                STATION_NAME,
+                STATION_TYPE,
+                PROVINCE_ID,
+                CITY_ID,
+                AREA_ID,
+                TOWN_STREET,
+                LONGITUDE,
+                LATITUDE,
+                WORK_BEGIN_TIME,
+                WORK_END_TIME,
+                CONTACT_NAME,
+                CONTACT_PHONE,
+                BANK_ID,
+                BANK_ACCOUNT,
+                BANK_ACCOUNT_PERSON_NAME,
+                BANK_ACCOUNT_PERSON_ID,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{station_id},
+                #{station_name},
+                #{station_type},
+                #{province_id},
+                #{city_id},
+                #{area_id},
+                #{town_street},
+                #{longitude},
+                #{latitude},
+                #{work_begin_time},
+                #{work_end_time},
+                #{contact_name},
+                #{contact_phone},
+                #{bank_id},
+                #{bank_account},
+                #{bank_account_person_name},
+                #{bank_account_person_id},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新服务站信息-->
+    <update id="updateStation" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Service_Station">
+        UPDATE
+            T_Master_Service_Station
+        SET
+            STATION_NAME = #{station_name},
+            STATION_TYPE = #{station_type},
+            PROVINCE_ID = #{province_id},
+            CITY_ID = #{city_id},
+            AREA_ID = #{area_id},
+            TOWN_STREET = #{town_street},
+            LONGITUDE = #{longitude},
+            LATITUDE = #{latitude},
+            WORK_BEGIN_TIME = #{work_begin_time},
+            WORK_END_TIME = #{work_end_time},
+            CONTACT_NAME = #{contact_name},
+            CONTACT_PHONE= #{contact_phone},
+            bank_id = #{bank_id},
+            BANK_ACCOUNT = #{bank_account},
+            BANK_ACCOUNT_PERSON_NAME = #{bank_account_person_name},
+            BANK_ACCOUNT_PERSON_ID = #{bank_account_person_id},
+            DELETE_FLAG = #{delete_flag},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            STATION_ID = #{station_id} AND DELETE_FLAG = 0
+    </update>
+
+    <!--删除服务站信息-->
+    <delete id="delStation" parameterType="String">
+        UPDATE
+        T_Master_Service_Station
+        SET
+        DELETE_FLAG = 1
+        WHERE
+        STATION_ID = #{station_id} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--根据ID、经纬度查找线下加盟服务商信息-->
+    <select id="findStationByIDAndLatitudeAndLongitude" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Service_Station_Position">
+        SELECT
+            s.`STATION_NAME` AS station_name,
+            s.`LATITUDE` AS latitude,
+            s.`LONGITUDE` AS longitude,
+            ROUND(6378.138*2*ASIN(SQRT(POW(SIN( (latitude*PI()/180-#{lat}*PI()/180)/2),2)+COS(latitude*PI()/180)*COS(#{lat}*PI()/180)* POW(SIN( (longitude*PI()/180-#{lng}*PI()/180)/2),2)))*1000)AS juli
+        FROM
+            T_Master_Service_Station s
+        WHERE
+        STATION_ID=#{station_id} AND DELETE_FLAG = 0
+    </select>
+</mapper>

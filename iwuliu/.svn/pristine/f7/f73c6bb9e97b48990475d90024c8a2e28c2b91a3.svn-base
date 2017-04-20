@@ -1,0 +1,364 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：OBDEquipController.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2016-11-17
+ * 作    者: YK
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.controller.operationController;
+
+import com.cn.gazelle.logistics.pojo.*;
+import com.cn.gazelle.logistics.service.OBDEquipmentTruckBindingService;
+import com.cn.gazelle.logistics.service.OBDequipmentService;
+import com.cn.gazelle.logistics.service.TruckService;
+import com.cn.gazelle.logistics.util.DateUtil;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.ResponseUtil;
+import com.cn.gazelle.logistics.util.message.base.LogUtil;
+import com.cn.gazelle.logistics.util.message.base.MessageUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称：OBDEquipController
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ * 01
+ *
+ * @authot YK
+ */
+@Controller
+@RequestMapping(value = "/OBDEquipManager")
+public class OBDEquipController {
+    Logger logger = Logger.getLogger(OBDEquipController.class);
+    @Value("#{setting[baseUrl]}")
+    private String baseUrl;
+    @Resource
+    private OBDEquipmentTruckBindingService obdEquipmentTruckBindingService;
+    @Resource
+    private OBDequipmentService obDequipmentService;
+    @Resource
+    private TruckService truckService;
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    /**
+     * 方法名称：obdManager_home
+     * 内容摘要：OBD设备管理页面。
+     *
+     * @param model model
+     * @return string OBD设备管理页面
+     */
+    @RequestMapping(value = "home")
+    public String obdManager_home(ModelMap model) {
+        return "operationManager/OBDEquipManager/OBDEquipManager";
+    }
+
+    /**
+     * 方法名称：vehicleEquipManagerDetail
+     * 内容摘要：OBD设备详情页面。
+     *
+     * @param model model
+     * @return string OBD设备详情页面
+     */
+    @RequestMapping(value = "vehicleEquipManagerDetail_home")
+    public String vehicleEquipManagerDetail_home(ModelMap model) {
+        return "operationManager/vehicleEquipManagerDetail/vehicleEquipManagerDetail";
+    }
+
+    /**
+     * 方法名称：vehicleEquipManagerNewAdd
+     * 内容摘要：OBD设备新增页面。
+     *
+     * @param model model
+     * @return string OBD设备新增页面
+     */
+    @RequestMapping(value = "vehicleEquipManagerNewAdd_home")
+    public String vehicleEquipManagerNewAdd(ModelMap model) {
+        return "operationManager/vehicleEquipManagerNewAdd/vehicleEquipManagerNewAdd";
+    }
+
+    /**
+     * 方法名称：vehicleEquipManagerList
+     * 内容摘要：OBD设备管理页面列表。
+     *
+     * @param model model
+     * @return string OBD设备管理页面列表
+     */
+    @RequestMapping(value = "vehicleEquipManagerList")
+    public void vehicleEquipManagerList(@RequestParam(required = false, defaultValue = "") String obd_brand,
+                                        @RequestParam(required = false, defaultValue = "") String obd_id,
+                                        @RequestParam(required = false, defaultValue = "") String equipment_phone_number,
+                                        @RequestParam(required = false, defaultValue = "") String plate_number,
+                                        @RequestParam(required = false, defaultValue = "") String equipment_status,
+                                        @RequestParam(required = false, defaultValue = "") String register_time_start,
+                                        @RequestParam(required = false, defaultValue = "") String register_time_end,
+                                        HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+        System.out.println("obd_brand=" + obd_brand);
+        System.out.println("obd_id=" + obd_id);
+        System.out.println("equipment_phone_number=" + equipment_phone_number);
+        System.out.println("plate_number=" + plate_number);
+        System.out.println("equipment_status=" + equipment_status);
+        System.out.println("register_time_start=" + register_time_start);
+        System.out.println("register_time_end=" + register_time_end);
+        List<T_Data_OBD_Truck_Binding_Info> obdTruckBindingInfoList = null;
+        HashMap<String, String> conditions = new HashMap<String, String>();
+        try {
+            conditions.put("obd_brand_value", obd_brand);
+            conditions.put("obd_id", obd_id);
+            conditions.put("equipment_phone_number", equipment_phone_number);
+            conditions.put("plate_number", plate_number);
+            conditions.put("register_time_start", register_time_start);
+            conditions.put("register_time_end", register_time_end);
+            conditions.put("equipment_status", equipment_status);
+            logger.info(JSONUtil.toJSON(conditions));
+            obdTruckBindingInfoList = this.obdEquipmentTruckBindingService.findOBDTruckBindingInfoList(conditions);
+            logger.info("list=" + JSONUtil.toJSONString(obdTruckBindingInfoList));
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(obdTruckBindingInfoList));
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(LogUtil.searchErr + e.getMessage());
+        }
+    }
+
+    /**
+     * 方法名称：saveEquipment
+     * 内容摘要：新增设备
+     *
+     * @param request  request
+     * @param response response
+     * @param model    model
+     */
+    @ResponseBody
+    @RequestMapping(value = "/saveEquipment")
+    public T_Data_JsonResult saveEquipment(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+        T_Data_JsonResult jsonResult = new T_Data_JsonResult();
+        String info = request.getParameter("obdInfo");
+        int flag = 0;
+        try {
+            flag = this.obDequipmentService.saveEquipmentInfo(info, (String) request.getSession().getAttribute("username"));
+            jsonResult.setResult(flag);
+        } catch (Exception e) {
+            logger.info(MessageUtil.saveInfoError + e.getMessage());
+            flag = Integer.parseInt(e.getMessage());
+            jsonResult.setResult(flag);
+        }
+        logger.info("flag=" + flag);
+        return jsonResult;
+    }
+
+    /**
+     * 方法名称：getOBDTruckBindingInfo
+     * 内容摘要：运营页面OBD设备管理点击表格获取详情
+     *
+     * @param request  request
+     * @param response response
+     * @param model    model
+     */
+    @ResponseBody
+    @RequestMapping(value = "/getOBDTruckBindingInfo")
+    public T_Data_OBD_Truck_Binding_Info getOBDTruckBindingInfo(String binding_number, HttpServletRequest request,
+                                                                HttpServletResponse response, ModelMap model) {
+        List<T_Data_OBD_Truck_Binding_Info> obdTruckBindingInfoList = null;
+        T_Data_OBD_Truck_Binding_Info obdTruckBindingInfo = null;
+        HashMap<String, String> conditions = new HashMap<String, String>();
+        conditions.put("binding_number", binding_number);
+        try {
+            obdTruckBindingInfoList = this.obdEquipmentTruckBindingService.findOBDTruckBindingInfoList(conditions);
+            obdTruckBindingInfo = obdTruckBindingInfoList.get(0);
+            logger.info("obdTruckBindingInfo = " + JSONUtil.toJSONString(obdTruckBindingInfo));
+
+        } catch (Exception e) {
+            logger.info(LogUtil.searchErr + e.getMessage());
+        }
+        return obdTruckBindingInfo;
+    }
+
+
+    /**
+     * 方法名称：obdUnbinding
+     * 内容摘要：OBD设备与车辆解除绑定关系
+     *
+     * @param binding_number binding_number
+     * @param request        request
+     * @param response       response
+     * @param model          model
+     */
+    @ResponseBody
+    @RequestMapping(value = "/obdUnbinding")
+    public T_Data_JsonResult obdUnbinding(String binding_number, HttpServletRequest request, HttpServletResponse response,
+                                          ModelMap model) {
+        logger.info("binding_number=" + binding_number);
+        T_Data_JsonResult jsonResult = new T_Data_JsonResult();
+        T_Data_OBD_Equipment_Truck_Binding obdEquipmentTruckBinding = null;
+        int count = 0;
+        try {
+            obdEquipmentTruckBinding = this.obdEquipmentTruckBindingService.findByBindingNumber(binding_number);
+            // 判断车辆是否解除过绑定
+            if (obdEquipmentTruckBinding.getUnbinding_time() != null
+                    && !obdEquipmentTruckBinding.getUnbinding_time().equals("")) {
+                jsonResult.setResult(3); // 该车辆已解除过绑定
+            } else {
+                obdEquipmentTruckBinding.setUnbinding_time(DateUtil.getDate());
+                obdEquipmentTruckBinding.setLast_update(DateUtil.getDate());
+                obdEquipmentTruckBinding.setLast_update_user_id("U:" + request.getSession().getAttribute("username"));
+                boolean b = this.obdEquipmentTruckBindingService.updateOBDTruckBindingInfo(obdEquipmentTruckBinding);
+                if (b) {
+                    jsonResult.setResult(1);
+                } else {
+                    jsonResult.setResult(-1);
+                }
+            }
+        } catch (Exception e) {
+            jsonResult.setResult(-1); // 保存失败
+            logger.error(e.getMessage());
+        }
+        return jsonResult;
+    }
+
+    /**
+     * 方法名称：updateOBDInfo
+     * 内容摘要：编辑OBD设备信息
+     *
+     * @param request  request
+     * @param response response
+     * @param model    model
+     */
+    @ResponseBody
+    @RequestMapping(value = "/updateOBDInfo")
+    public T_Data_JsonResult updateOBDInfo(String binding_number, HttpServletRequest request, HttpServletResponse response,
+                                           ModelMap model) {
+        T_Data_JsonResult jsonResult = new T_Data_JsonResult();
+        int flag = 0;
+        logger.info("binding_number=" + binding_number);
+        String info = request.getParameter("obdEquipmentInfo");
+        try {
+            flag = this.obDequipmentService.editEquipmentInfo(binding_number,info,(String) request.getSession().getAttribute("username"));
+            jsonResult.setResult(flag);
+        } catch (Exception e) {
+            logger.error(MessageUtil.saveInfoError + e.getMessage());
+            flag = Integer.parseInt(e.getMessage());
+            jsonResult.setResult(flag);
+        }
+        return jsonResult;
+    }
+
+    /**
+     * 方法名称：obdManagerDel
+     * 内容摘要：删除OBD设备信息
+     *
+     * @param request  request
+     * @param response response
+     * @param model    model
+     */
+
+    @ResponseBody
+    @RequestMapping(value = "/obdManagerDel")
+
+    public T_Data_JsonResult obdManagerDel(String binding_number, HttpServletRequest request, HttpServletResponse response,
+                                           ModelMap model) {
+        T_Data_JsonResult jsonResult = new T_Data_JsonResult();
+        logger.info("binding_number=" + binding_number);
+        int flag = 0;
+        try {
+            flag = this.obDequipmentService.delEquipmentInfo(binding_number);
+            jsonResult.setResult(flag);
+            logger.info(MessageUtil.delInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.delInfoError);
+            flag = Integer.parseInt(e.getMessage());
+            jsonResult.setResult(flag);
+        }
+        return jsonResult;
+    }
+
+    /**
+     * 方法名称：obdExport
+     * 内容摘要：导出obd设备卡车绑定信息报表到excel
+     *
+     * @param response response
+     * @throws IOException
+     */
+    @RequestMapping(value = "obdExport")
+    public void obdExport(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            String domainPath = request.getSession().getServletContext().getRealPath("/");
+            System.out.println("domainPath=" + domainPath);
+            domainPath = domainPath.substring(0, domainPath.lastIndexOf(File.separator));
+            domainPath = domainPath.substring(0, domainPath.lastIndexOf(File.separator));
+            String baseUrl = domainPath + File.separator + this.baseUrl;
+            String path = baseUrl + "/ExportExcel/obdExport.xls";
+            InputStream in = new FileInputStream(new File(path));
+            SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //为了转时间
+            Workbook work = new HSSFWorkbook(in);
+            List<T_Data_OBD_Truck_Binding_Info> obdTruckBindingInfoList = null;
+            HashMap<String, String> conditions = new HashMap<String, String>();
+            // 得到excel的第0张表
+            Sheet sheet = work.getSheetAt(0);
+            try {
+                // 将数据写入excel
+                obdTruckBindingInfoList = this.obdEquipmentTruckBindingService.findOBDTruckBindingInfoList(conditions);
+                int i = 2;  // 起始行数，0为第一行
+                for (T_Data_OBD_Truck_Binding_Info obdTruckBindingInfo : obdTruckBindingInfoList) {
+                    Row row = sheet.createRow(i);
+                    i++;
+                    row.createCell(0).setCellValue(obdTruckBindingInfo.getObd_brand());
+                    row.createCell(1).setCellValue(obdTruckBindingInfo.getObd_id());
+                    row.createCell(2).setCellValue(obdTruckBindingInfo.getEquipment_phone_number());
+                    row.createCell(3).setCellValue(obdTruckBindingInfo.getRegister_time());
+                    row.createCell(4).setCellValue(obdTruckBindingInfo.getPlate_number());
+                    row.createCell(5).setCellValue(obdTruckBindingInfo.getBinding_time());
+                    row.createCell(6).setCellValue(obdTruckBindingInfo.getTruck_brand());
+                    row.createCell(7).setCellValue(obdTruckBindingInfo.getTruck_model_name());
+                    row.createCell(8).setCellValue(obdTruckBindingInfo.getUnbinding_time());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            String address = simpleFormat.format(new Date());
+            OutputStream os = response.getOutputStream();// 取得输出流
+            response.setContentType("application/vnd.ms-excel");
+            // 传递中文参数编码
+            String codedFileName = java.net.URLEncoder.encode("运营OBD设备管理", "UTF-8");
+            response.setHeader("content-disposition", "attachment;filename=" + codedFileName + address + ".xls");
+            work.write(os);
+            in.close();
+            os.close();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("文件路径错误");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("文件输入流错误");
+            e.printStackTrace();
+        }
+    }
+}

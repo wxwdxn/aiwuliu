@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckObdOriginalDataDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Truck_Obd_Original_Data" type="com.cn.gazelle.logistics.pojo.T_Data_Truck_Obd_Original_Data">
+
+        <id column="DATA_NUMBER" property="data_number"/>
+        <result column="SAVE_DATE_TIME" property="save_date_time"/>
+        <result column="SAVE_CONTENT" property="save_content"/>
+    </resultMap>
+
+    <!--根据数据No查询OBD信息原始数据总表信息-->
+    <select id="findTruckObdOriginalDataByNumber" parameterType="long" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Obd_Original_Data">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Obd_Original_Data
+        WHERE
+            DATA_NUMBER = #{data_number}
+    </select>
+
+    <!--查询符合条件的OBD信息原始数据总表信息（默认查询OBD信息原始数据总表信息）-->
+    <select id="findAllTruckObdOriginalData" resultMap="T_Data_Truck_Obd_Original_Data">
+        SELECT
+            *
+        FROM
+        T_Data_Truck_Obd_Original_Data
+        <if test="search_type !=''and search_type== 'node_name'">
+            WHERE ${search_type} LIKE '%${name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询OBD信息原始数据总表信息总记录数-->
+    <select id="findAllTruckObdOriginalDataRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+        T_Data_Truck_Obd_Original_Data
+        <if test="search_type !='' ">
+            WHERE ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--保存OBD信息原始数据总表信息-->
+    <insert id="saveTruckObdOriginalData" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Obd_Original_Data">
+        INSERT INTO
+                T_Data_Truck_Obd_Original_Data(DATA_NUMBER,
+                SAVE_DATE_TIME,
+                SAVE_CONTENT)
+        VALUES (
+                #{data_number},
+                #{save_date_time},
+                #{save_content})
+    </insert>
+
+    <!--更新OBD信息原始数据总表信息-->
+    <update id="updateTruckObdOriginalData" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Obd_Original_Data">
+        UPDATE
+            T_Data_Truck_Obd_Original_Data
+        SET
+            SAVE_DATE_TIME = #{save_date_time},
+            SAVE_CONTENT = #{save_content}
+        WHERE
+            DATA_NUMBER = #{data_number}
+    </update>
+
+    <!--根据数据No删除OBD信息原始数据总表信息-->
+    <delete id="delTruckObdOriginalData" parameterType="long">
+        DELETE
+            T_Data_Truck_Obd_Original_Data
+        WHERE
+            DATA_NUMBER = #{data_number}
+    </delete>
+
+    <!--查询所有OBD信息原始数据总表不分页-->
+    <select id="findTruckObdOriginalDataList" resultMap="T_Data_Truck_Obd_Original_Data">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Obd_Original_Data
+    </select>
+
+    <!--根据接收内容查询OBD信息原始数据总表信息-->
+    <select id="findTruckObdOriginalDataBySaveContent" parameterType="long" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Obd_Original_Data">
+        SELECT
+        *
+        FROM
+        T_Data_Truck_Obd_Original_Data
+        WHERE
+        SAVE_CONTENT = #{save_content}
+    </select>
+</mapper>

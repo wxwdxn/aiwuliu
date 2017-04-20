@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.StationCostRecordDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Service_Station_Cost_Record" type="com.cn.gazelle.logistics.pojo.T_Data_Service_Station_Cost_Record">
+
+        <id column="RECORD_ID" property="record_id"></id>
+        <result column="SERVICE_STATION_ID" property="service_station_id"></result>
+        <result column="TRUCK_ID" property="truck_id"></result>
+        <result column="COST_ITEM" property="cost_item"></result>
+        <result column="TOTAL" property="total"></result>
+        <result column="UNIT_PRICE" property="unit_price"></result>
+        <result column="COST_TOTAL" property="cost_total"></result>
+        <result column="TYPE" property="type"></result>
+        <result column="PLATFORM_ADVANCED_COST" property="platform_advanced_cost"></result>
+        <result column="COST_TIME" property="cost_time"></result>
+        <result column="REPAY_TIME" property="repay_time"></result>
+        <result column="REPAY_TOTAL" property="repay_total"></result>
+        <result column="LAST_UPDATE" property="last_update"></result>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"></result>
+    </resultMap>
+
+    <!--根据记录id查询消费信息-->
+    <select id="findCostRecordByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Service_Station_Cost_Record">
+        SELECT * FROM T_Data_Service_Station_Cost_Record WHERE RECORD_ID=#{record_id}
+    </select>
+
+    <!--根据车辆id查询消费信息-->
+    <select id="findCostRecordByTruckID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Service_Station_Cost_Record">
+        SELECT * FROM T_Data_Service_Station_Cost_Record WHERE TRUCK_ID = '${truck_id}'
+    </select>
+
+    <!--查询所有消费信息（默认查询所有消费信息）-->
+    <select id="findAllCostRecord" resultMap="T_Data_Service_Station_Cost_Record">
+        SELECT * FROM T_Data_Service_Station_Cost_Record
+        <if test="truck_id != ''">
+            WHERE TRUCK_ID LIKE '%${truck_id}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询消费信息总记录数-->
+    <select id="findAllCostRecordRowsCount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM T_Data_Service_Station_Cost_Record
+        <if test="truck_id !='' ">
+            WHERE TRUCK_ID LIKE '%${truck_id}%'
+        </if>
+    </select>
+
+    <!--保存消费信息-->
+    <insert id="saveCostRecord" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Service_Station_Cost_Record">
+        INSERT INTO T_Data_Service_Station_Cost_Record(
+        RECORD_ID,
+        SERVICE_STATION_ID,
+        TRUCK_ID,
+        COST_ITEM,
+        TOTAL,
+        UNIT_PRICE,
+        COST_TOTAL,
+        TYPE,
+        PLATFORM_ADVANCED_COST,
+        COST_TIME,
+        REPAY_TIME,
+        REPAY_TOTAL,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID
+        ) VALUES (
+        #{record_id},
+        #{service_station_id},
+        #{truck_id},
+        #{cost_item},
+        #{total},
+        #{unit_price},
+        #{cost_total},
+        #{type},
+        #{platform_advanced_cost},
+        #{cost_time},
+        #{repay_time},
+        #{repay_total},
+        #{last_update},
+        #{last_update_user_id}
+        )
+    </insert>
+
+    <!--更新消费信息-->
+    <update id="updateCostRecord" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Service_Station_Cost_Record">
+        UPDATE T_Data_Service_Station_Cost_Record SET SERVICE_STATION_ID = #{service_station_id},
+        TRUCK_ID = #{truck_id} ,
+        COST_ITEM = #{cost_item} ,
+        TOTAL = #{total} ,
+        UNIT_PRICE = #{unit_price} ,
+        COST_TOTAL = #{cost_total} ,
+        TYPE = #{type} ,
+        PLATFORM_ADVANCED_COST = #{platform_advanced_cost} ,
+        COST_TIME = #{cost_time} ,
+        REPAY_TIME = #{repay_time} ,
+        REPAY_TOTAL = #{repay_total} ,
+        LAST_UPDATE = #{last_update} ,
+        LAST_UPDATE_USER_ID = #{last_update_user_id} WHERE RECORD_ID = #{record_id}
+    </update>
+
+    <!--删除消费信息-->
+    <delete id="delCostRecord" parameterType="String">
+        DELETE FROM T_Data_Service_Station_Cost_Record WHERE RECORD_ID = #{record_id}
+    </delete>
+
+</mapper>

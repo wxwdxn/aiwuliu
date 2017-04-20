@@ -1,0 +1,329 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+	<title></title>
+</head>
+<%--Bootstrap-Datetimepicker CSS文件--%>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-datetimepicker.min.css">
+<%--Bootstrap-table CSS文件--%>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-table.min.css">
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/css/common.css"/>
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/operationManager/withdrawalApproval/css/withdrawalApproval.css"/>
+<script src="<%=request.getContextPath()%>/static/common/js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/js/common.js" type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/js/commonNav.js" type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/operationManager/withdrawalApproval/js/withdrawalApproval.js" type="text/javascript" charset="utf-8"></script>
+<%--Bootstrap时间控件  JavaScript 文件以及汉化文件--%>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-datetimepicker.min.js"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<%--Bootstrap-table JavaScript 文件以及汉化文件--%>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table.min.js"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table-zh-CN.js"></script>
+<!--[if lt IE 9]>
+<script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+<script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	<body>
+	<!--*********导航条开始***********-->
+	<nav class="navbar navbar-default" role="navigation">
+	</nav>
+		<!--*********导航条结束***********-->
+		<div class="container-fluid eleHeight">
+			<div class="row eleHeight">
+				<div class="col-md-2 leftMenu eleHeight">
+					<!--<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+					  <div class="panel panel-default">
+					    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" role="tab" id="headingOne">
+					      <h4 class="panel-title">
+					      	<img src="../../../static/common/images/icon_1.png"/>
+					        <a>
+					          	车联服务
+					        </a>
+					      </h4>
+					    </div>
+					    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+					      <ul class="list-group">
+					      		<li class="list-group-item">
+					      			<a href="../vehicleMonitoring/vehicleMonitoring.html">
+					      				车辆监控
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../trackThePlayback/trackThePlayback.html">
+					      				轨迹回放
+					      			</a>
+					      		</li>
+					      	</ul>
+					    </div>
+					  </div>
+					  <div class="panel panel-default">
+					    <div class="panel-heading"  class="collapsed" >
+					      <a href="../reportManager/reportManager.html">
+					      	<h4 class="panel-title">
+						      	<img src="../../../static/common/images/icon_5.png"/>
+						       		报表管理	
+					      	</h4>
+					      </a>
+					    </div>
+					  </div>
+					  <div class="panel panel-default">
+					    <div class="panel-heading"  class="collapsed">
+					      	<a href="../estimatesContractManager/estimatesContractManager.html">
+						      	<h4 class="panel-title">
+						      	<img src="../../../static/common/images/icon_3.png"/>
+						       		合同管理
+						      	</h4>
+					      	</a>
+					    </div>
+					  </div>
+					  <div class="panel panel-default">
+					    <div class="panel-heading"  class="collapsed">
+					      <a href="../estimatesPlanManager/estimatesPlanManager.html">
+					      	<h4 class="panel-title">
+					      	<img src="../../../static/common/images/icon_4.png"/>
+					       		计划管理
+					        
+					      	</h4>
+					      </a>
+					    </div>
+					  </div>
+					  <div class="panel panel-default">
+					    <div class="panel-heading"  class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix" role="tab" id="headingSix">
+					      <h4 class="panel-title">
+					      	<img src="../../../static/common/images/icon_6.png"/>
+					        <a>
+					       		手动派单
+					        </a>
+					      </h4>
+					    </div>
+					    <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+					      <ul class="list-group">
+					      		<li class="list-group-item">
+					      			<a href="../transportPlan/transportPlan.html">
+					      				运输计划
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../vehiclePlan/vehiclePlan.html">
+					      				车辆计划
+					      			</a>
+					      		</li>
+					      	</ul>
+					    </div>
+					  </div>
+					  <div class="panel panel-default">
+					    <div class="panel-heading"  class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven" role="tab" id="headingSeven">
+					      <h4 class="panel-title">
+					      	<img src="../../../static/common/images/icon_7.png"/>
+					        <a>
+					       		财务金融
+					        </a>
+					      </h4>
+					    </div>
+					    <div id="collapseSeven" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingSeven">
+					      <ul class="list-group">
+					      		<li class="list-group-item">
+					      			<a href="../virtualAccount/virtualAccount.html">
+					      				虚拟账目查看
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../transactionRecords/transactionRecords.html">
+					      				交易记录查询
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item menuActive">
+					      			<a href="../withdrawalApproval/withdrawalApproval.html">
+					      				提现审批
+					      			</a>
+					      		</li>
+					      	</ul>
+					    </div>
+					  </div>
+					  <div class="panel panel-default">
+					    <div class="panel-heading"  class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseEight" aria-expanded="false" aria-controls="collapseEight" role="tab" id="headingEight">
+					      <h4 class="panel-title">
+					      	<img src="../../../static/common/images/icon_8.png"/>
+					        <a>
+					       		物流管理
+					        </a>
+					      </h4>
+					    </div>
+					    <div id="collapseEight" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingEight">
+					      <ul class="list-group">
+					      		<li class="list-group-item">
+					      			<a href="../logisticsManager/logisticsManager.html">
+					      				物流公司管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../vehicleManagement/vehicleManagement.html">
+					      				车辆管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../driverManager/driverManager.html">
+					      				司机管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../ownerManager/ownerManager.html">
+					      				货主管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../OBDEquipManager/OBDEquipManager.html">
+					      				设备管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../routerManager/routerManager.html">
+					      				线路管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../goodTypeManager/goodTypeManager.html">
+					      				货物类型管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../carTypeManager/carTypeManager.html">
+					      				车厢类型管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../vehicleModelManager/vehicleModelManager.html">
+					      				车辆型号管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../freightYardManager/freightYardManager.html">
+					      				货场管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../schedulingOrderManager/schedulingOrderManager.html">
+					      				调度单管理
+					      			</a>
+					      		</li>
+					      		<li class="list-group-item">
+					      			<a href="../allianceBusinessManagement/allianceBusinessManagement.html">
+					      				线下加盟商管理	
+					      			</a>
+					      		</li>
+					      	</ul>
+					    </div>
+					  </div>
+					</div>
+					<div isClick=true class="menuNarrow" onclick="menuNarrow(this)">
+						<img src="../../../static/common/images/menuNarrow.png"/>
+					</div>-->
+				</div>
+				
+				<div class="iframeMain">
+					<h4>
+						提现审批
+					</h4>
+					<div class="infoConditions">
+						<form class="form-inline">
+							<div class="form-group">
+								<label>
+									交易流水号：
+								</label>
+								<div class="display_inlineBlcok">
+									<input type="text" class="form-control" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label>
+									订单号码：
+								</label>
+								<div class="display_inlineBlcok">
+									<input type="text" class="form-control" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label>
+									账户名称：
+								</label>
+								<div class="display_inlineBlcok">
+									<input type="text" class="form-control" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label>
+									结算状态：
+								</label>
+								<div class="display_inlineBlcok">
+									<button class="btn form-control btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										<span class="placeHolder">全部</span>
+									    <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+									    <li><a href="javascript:;">集装箱</a></li>
+									    <li><a href="javascript:;">仓栅</a></li>
+									    <li><a href="javascript:;">黄金车</a></li>
+									    <li><a href="javascript:;">自由厢栏</a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>
+									交易人姓名：
+								</label>
+								<div class="display_inlineBlcok">
+									<input type="text" class="form-control" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label>
+									审核状态：
+								</label>
+								<div class="display_inlineBlcok">
+									<button class="btn form-control btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										<span class="placeHolder">全部</span>
+									    <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+									    <li><a href="javascript:;">集装箱</a></li>
+									    <li><a href="javascript:;">仓栅</a></li>
+									    <li><a href="javascript:;">黄金车</a></li>
+									    <li><a href="javascript:;">自由厢栏</a></li>
+									</ul>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>
+									交易时间：
+								</label>
+								<div class="display_inlineBlcok">
+									<input type="text" class="form-control" />至
+									<input type="text" class="form-control" />
+								</div>
+							</div>
+							<div class="QuerytheReset">
+								<label class="sr-only">查询按钮</label>
+								<div class="display_inlineBlcok">
+									<a type="button" class="btn query">查询</a>
+									<a type="button" class="btn reset">重置</a>
+								</div>
+							</div>
+						</form>
+						<div class="buttons">
+							<a type="button" class="btn btn_export">
+								导出
+							</a>
+						</div>
+						<div style="height: 200px;border: 1px solid #000;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

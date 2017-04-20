@@ -1,0 +1,42 @@
+package com.cn.gazelle.logistics.dao;
+
+import com.cn.gazelle.logistics.pojo.T_Data_Member_Bank_Account;
+
+import java.util.List;
+
+/**
+ * 功能描述:会员银行卡信息操作
+ * Created by zf on 2016/12/12.
+ */
+public interface MemberBankAccountDaoMapper {
+
+    //根据银行卡号和预留的手机号查询会员银行卡信息
+    T_Data_Member_Bank_Account findMemberBankAccountByBankAccountAndPhone(String bank_account,String bank_save_mobile_phone);
+
+    //根据银行卡号和会员id查询会员银行卡信息
+    T_Data_Member_Bank_Account findMemberBankAccountByBankAccountAndMemberId(String bank_account,String member_id);
+
+    //根据绑定编号查询会员银行卡信息
+    T_Data_Member_Bank_Account findMemberBankAccountByAccountNo(String account_no);
+
+    //根据会员Id查询会员银行卡信息
+    List<T_Data_Member_Bank_Account> findAll(String member_id);
+
+    //根据会员名查询会员银行卡信息
+    //T_Data_Member_Bank_Account findMemberBankAccountByMemberName(String member_name);
+
+    //保存会员银行卡信息
+    void saveMemberBankAccount(T_Data_Member_Bank_Account memberBankAccount);
+
+    //更新会员银行卡信息
+    void updateMemberBankAccount(T_Data_Member_Bank_Account memberBankAccount);
+
+    //根据会员id更新会员银行卡信息
+    void updateMemberBankAccountByMemberId(T_Data_Member_Bank_Account memberBankAccount);
+
+    //根据绑定编号删除会员银行卡信息
+    void delMemberBankAccount(String account_no);
+
+    //根据绑卡编号删除会员银行卡信息
+    void delMemberBankAccountByBindId(String bind_id);
+}

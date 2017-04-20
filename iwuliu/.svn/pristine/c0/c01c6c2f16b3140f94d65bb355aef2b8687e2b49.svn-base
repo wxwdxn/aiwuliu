@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.PersonDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Person" type="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        <id column="PERSON_ID" property="person_id"/>
+        <result column="PERSON_NAME" property="person_name"/>
+        <result column="PERSON_MOBILE_PHONE" property="person_mobile_phone"/>
+        <result column="ID_CARD_NUMBER" property="id_card_number"/>
+        <result column="PERSON_TYPE" property="person_type"/>
+        <result column="HOLD_ID_CARD_PIC_ID" property="hold_id_card_pic_id"/>
+        <result column="ID_CARD_FRONT_PIC_ID" property="id_card_front_pic_id"/>
+        <result column="ID_CARD_BACK_PIC_ID" property="id_card_back_pic_id"/>
+        <result column="SEX" property="sex"/>
+        <result column="DRIVER_LICENCE_NUMBER" property="driver_licence_number"/>
+        <result column="DRIVER_LICENCE_MAIN_PIC_ID" property="driver_licence_main_pic_id"/>
+        <result column="DRIVER_LICENCE_SUB_PIC_ID" property="driver_licence_sub_pic_id"/>
+        <result column="QUALIFICATION_CERTIFICATE_NUMBER" property="qualification_certificate_number"/>
+        <result column="qualification_certificate_number_pic_id" property="qualification_certificate_number_pic_id"/>
+        <result column="DRIVING_TRUCK_ID" property="driving_truck_id"/>
+        <result column="DRIVING_STATUS" property="driving_status"/>
+        <result column="SUBMIT_RELATE_TIME" property="submit_relate_time"/>
+        <result column="CONFIRM_RELATE_TIME" property="confirm_relate_time"/>
+        <result column="SUBMIT_VERIFY_TIME" property="submit_verify_time"/>
+        <result column="VERIFY_STATUS" property="verify_status"/>
+        <result column="VERIFY_REFUSED_REASON" property="verify_refused_reason"/>
+        <result column="VERIFY_PASSED_TIME" property="verify_passed_time"/>
+        <result column="VERIFY_REFUSED_TIME" property="verify_refused_time"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+    <resultMap id="T_Data_Driver" type="com.cn.gazelle.logistics.pojo.T_Data_Person" extends="T_Data_Person">
+        <association property="member" javaType="com.cn.gazelle.logistics.pojo.T_Data_Member">
+            <id property="member_id" column="MEMBER_ID"/>
+            <result property="member_type" column="MEMBER_TYPE"/>
+        </association>
+    </resultMap>
+
+    <!--关联查询  查询所有司机-->
+    <select id="findAllDrivers" resultMap="T_Data_Driver">
+        SELECT
+        *
+        FROM
+        t_data_member AS m
+        INNER JOIN
+        t_data_person AS p
+        ON
+        m.`RELEVANCE_INFO_ID` = p.`PERSON_ID`
+        WHERE
+        m.MEMBER_TYPE = '1' AND m.DELETE_FLAG='0' AND p.DELETE_FLAG='0' AND p.PERSON_TYPE LIKE '${person_type}'
+        <if test="search_type != ''">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--关联查询 查询所有车队长-->
+    <select id="findAllFleet" resultMap="T_Data_Driver">
+        SELECT
+        *
+        FROM
+        t_data_member AS m
+        INNER JOIN
+        t_data_person AS p
+        ON
+        m.`RELEVANCE_INFO_ID` = p.`PERSON_ID`
+        WHERE
+        m.MEMBER_TYPE = '0' AND m.DELETE_FLAG='0' AND p.DELETE_FLAG='0' AND p.PERSON_TYPE LIKE '${person_type}'
+        <if test="search_type != ''">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--关联查询 查询符合条件司机的个数-->
+    <select id="findAllDriversRowsCount" parameterType="String" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        t_data_member AS m
+        INNER JOIN
+        t_data_person AS p
+        ON
+        m.`RELEVANCE_INFO_ID` = p.`PERSON_ID`
+        WHERE
+        m.MEMBER_TYPE = '1'AND m.DELETE_FLAG='0' AND p.DELETE_FLAG='0' AND p.PERSON_TYPE LIKE '${person_type}'
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--关联查询 查询符合条件车队长的个数-->
+    <select id="findAllFleetRowsCount" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        t_data_member AS m
+        INNER JOIN
+        t_data_person AS p
+        ON
+        m.`RELEVANCE_INFO_ID` = p.`PERSON_ID`
+        WHERE
+        m.MEMBER_TYPE = '0' AND m.DELETE_FLAG='0' AND p.DELETE_FLAG='0' AND p.PERSON_TYPE LIKE '${person_type}'
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--根据ID查找个人信息-->
+    <select id="findPersonByID" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        SELECT
+            *
+        FROM
+            T_Data_Person
+        WHERE
+            PERSON_ID=#{person_id} AND DELETE_FLAG='0'
+    </select>
+
+    <!--根据个人手机号查询个人信息-->
+    <select id="findPersonByPhone" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        SELECT
+            *
+        FROM
+            T_Data_Person
+        WHERE
+            PERSON_MOBILE_PHONE=#{person_mobile_phone} AND PERSON_TYPE=#{person_type} AND DELETE_FLAG='0'
+    </select>
+
+    <!--根据卡车ID查找个人信息-->
+    <select id="findPersonByTruckId" parameterType="String" resultMap="T_Data_Person">
+        SELECT
+            *
+        FROM
+            T_Data_Person
+        WHERE
+            DRIVING_TRUCK_ID=#{driving_truck_id} AND DELETE_FLAG='0'
+    </select>
+
+    <!--根据个人名查询个人列表-->
+    <select id="findPersonByName" resultType="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        SELECT
+            *
+        FROM
+            T_Data_Person
+        WHERE
+            PERSON_NAME = #{person_name} AND ID_CARD_NUMBER = #{id_card_number} AND PERSON_TYPE = #{person_type} AND DELETE_FLAG='0'
+    </select>
+
+    <!--查询符合条件的个人列表信息（默认查询所有个人列表信息）-->
+    <select id="findAllPerson" resultMap="T_Data_Person">
+        SELECT
+        *
+        FROM
+        T_Data_Person
+        WHERE
+        DELETE_FLAG='0' AND PERSON_TYPE LIKE '${person_type}'
+        <if test="search_type != ''">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询符合条件的个人总数-->
+    <select id="findAllPersonRowsCount" parameterType="String" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        T_Data_Person
+        WHERE
+        DELETE_FLAG='0' AND PERSON_TYPE LIKE '${person_type}'
+        <if test="search_type !='' ">
+            AND ${search_type} LIKE '%${name}%'
+        </if>
+    </select>
+
+    <!--保存个人信息-->
+    <insert id="savePerson" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        INSERT INTO
+                T_Data_Person(PERSON_ID,
+                PERSON_NAME,
+                PERSON_MOBILE_PHONE,
+                ID_CARD_NUMBER,
+                PERSON_TYPE,
+                HOLD_ID_CARD_PIC_ID,
+                ID_CARD_FRONT_PIC_ID,
+                ID_CARD_BACK_PIC_ID,
+                SEX,
+                DRIVER_LICENCE_NUMBER,
+                DRIVER_LICENCE_MAIN_PIC_ID,
+                DRIVER_LICENCE_SUB_PIC_ID,
+                QUALIFICATION_CERTIFICATE_NUMBER,
+                QUALIFICATION_CERTIFICATE_NUMBER_PIC_ID,
+                DRIVING_TRUCK_ID,
+                DRIVING_STATUS,
+                SUBMIT_RELATE_TIME,
+                CONFIRM_RELATE_TIME,
+                SUBMIT_VERIFY_TIME,
+                VERIFY_STATUS,
+                VERIFY_REFUSED_REASON,
+                VERIFY_PASSED_TIME,
+                VERIFY_REFUSED_TIME,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{person_id},
+                #{person_name},
+                #{person_mobile_phone},
+                #{id_card_number},
+                #{person_type},
+                #{hold_id_card_pic_id},
+                #{id_card_front_pic_id},
+                #{id_card_back_pic_id},
+                #{sex},
+                #{driver_licence_number},
+                #{driver_licence_main_pic_id},
+                #{driver_licence_sub_pic_id},
+                #{qualification_certificate_number},
+                #{qualification_certificate_number_pic_id},
+                #{driving_truck_id},
+                #{driving_status},
+                #{submit_relate_time},
+                #{confirm_relate_time},
+                #{submit_verify_time},
+                #{verify_status},
+                #{verify_refused_reason},
+                #{verify_passed_time},
+                #{verify_refused_time},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新个人信息-->
+    <update id="updatePerson" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        UPDATE
+            T_Data_Person
+        SET
+            PERSON_NAME = #{person_name},
+            PERSON_MOBILE_PHONE =#{person_mobile_phone},
+            ID_CARD_NUMBER = #{id_card_number} ,
+            PERSON_TYPE = #{person_type},
+            HOLD_ID_CARD_PIC_ID = #{hold_id_card_pic_id} ,
+            ID_CARD_FRONT_PIC_ID = #{id_card_front_pic_id} ,
+            ID_CARD_BACK_PIC_ID = #{id_card_back_pic_id} ,
+            SEX = #{sex} ,
+            DRIVER_LICENCE_NUMBER = #{driver_licence_number} ,
+            DRIVER_LICENCE_MAIN_PIC_ID = #{driver_licence_main_pic_id} ,
+            DRIVER_LICENCE_SUB_PIC_ID = #{driver_licence_sub_pic_id} ,
+            QUALIFICATION_CERTIFICATE_NUMBER = #{qualification_certificate_number} ,
+            QUALIFICATION_CERTIFICATE_NUMBER_PIC_ID = #{qualification_certificate_number_pic_id} ,
+            DRIVING_TRUCK_ID = #{driving_truck_id} ,
+            DRIVING_STATUS = #{driving_status} ,
+            SUBMIT_RELATE_TIME = #{submit_relate_time} ,
+            CONFIRM_RELATE_TIME = #{confirm_relate_time} ,
+            SUBMIT_VERIFY_TIME = #{submit_verify_time} ,
+            VERIFY_STATUS = 2 ,
+            VERIFY_REFUSED_REASON = #{verify_refused_reason} ,
+            VERIFY_PASSED_TIME = #{verify_passed_time} ,
+            VERIFY_REFUSED_TIME = #{verify_refused_time} ,
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            PERSON_ID = #{person_id} AND DELETE_FLAG='0'
+
+    </update>
+
+    <!--审核个人信息-->
+    <update id="examineDriver" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Person">
+        UPDATE
+            T_Data_Person
+        SET
+            PERSON_NAME = #{person_name},
+            VERIFY_REFUSED_REASON = #{verify_refused_reason} ,
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            PERSON_ID = #{person_id} AND DELETE_FLAG='0'
+    </update>
+
+    <!--删除个人信息-->
+    <delete id="delPerson" parameterType="String">
+        UPDATE
+            T_Data_Person
+        SET
+            DELETE_FLAG = '1'
+        WHERE
+            PERSON_ID = #{person_id} AND DELETE_FLAG='0'
+    </delete>
+
+    <!--联合查询会员、个人和车的信息-->
+    <select id="queryDrivingBehaviorInfo" resultType="java.util.HashMap">
+        SELECT
+        MPT.MEMBER_NAME,
+        MPT.PERSON_NAME,
+        MPT.PLATE_NUMBER,
+        MPT.TRUCK_ID
+        FROM
+        (
+        SELECT
+        m.`MEMBER_NAME`,
+        p.`PERSON_NAME`,
+        t.`PLATE_NUMBER`,
+        t.`TRUCK_ID`
+        FROM
+        t_data_truck AS t
+        INNER JOIN t_data_member AS m ON t.`MANAGER_MEMBER_ID` = m.`RELEVANCE_INFO_ID`
+        INNER JOIN t_data_person AS p ON m.`RELEVANCE_INFO_ID` = p.`PERSON_ID`
+        WHERE
+        t.`DELETE_FLAG` = '0'
+        AND t.`VERIFY_STATUS` = '2'
+        AND m.`DELETE_FLAG` = '0'
+        AND m.`ACCOUNT_STATUS` = '0'
+        AND p.`DELETE_FLAG` = '0'
+        AND p.`VERIFY_STATUS` = '2'
+        ) AS MPT
+        <where>
+            <if test="person_name != null and person_name!= ''">
+                MPT.PERSON_NAME LIKE '%${person_name}%'
+            </if>
+            <if test="plate_number != null and plate_number!= ''">
+                AND MPT.PLATE_NUMBER LIKE '%${plate_number}%'
+            </if>
+        </where>
+    </select>
+
+    <!--查询运营司机管理列表-->
+    <select id="findOperationDriversManagerList"
+            resultType="com.cn.gazelle.logistics.pojo.T_Data_Operation_Drivers_Manager">
+        SELECT
+        *
+        FROM
+        (SELECT
+        p2.PERSON_NAME AS CREW_NAME,'物流' AS 'ORGANIZATION_TYPE',cp.COMPANY_NAME,p1.PERSON_NAME AS
+        OWNER_NAME,p1.PERSON_MOBILE_PHONE AS OWNER_PHONE,
+        p2.PERSON_MOBILE_PHONE AS
+        CREW_PHONE,p1.ID_CARD_NUMBER,p1.DRIVER_LICENCE_NUMBER,t1.PLATE_NUMBER,c.TRUCK_CARRIAGE_TYPE_NAME,GetLine(t1.TRUCK_ID)
+        AS LINE,
+        CASE p2.DRIVING_STATUS
+        WHEN '0' THEN '验证中'
+        WHEN '3' THEN '不合格'
+        ELSE '验证通过' END AS DRIVING_STATUS
+        FROM
+        t_data_truck AS t1
+        LEFT JOIN
+        t_data_person AS p1
+        ON
+        t1.MANAGER_MEMBER_ID = p1.PERSON_ID
+        LEFT JOIN
+        t_data_truck AS t2
+        ON
+        t2.TRUCK_ID = p1.DRIVING_TRUCK_ID
+        RIGHT JOIN
+        t_data_person AS p2
+        ON
+        p2.DRIVING_TRUCK_ID = t1.TRUCK_ID AND p2.DRIVING_STATUS !=''
+        LEFT JOIN
+        t_master_truck_carriage_type AS c
+        ON
+        c.TRUCK_CARRIAGE_TYPE_ID = t1.TRUCK_CARRIAGE_TYPE_ID
+        RIGHT JOIN
+        t_data_company cp
+        ON
+        cp.COMPANY_ID = t1.OWNER_MEMBER_ID
+        WHERE
+        t1.DELETE_FLAG= '0' AND p1.DELETE_FLAG = '0' AND t2.DELETE_FLAG= '0' AND p2.DELETE_FLAG='0'
+        UNION ALL
+        SELECT
+        p2.PERSON_NAME AS CREW_NAME,'车主' AS 'ORGANIZATION_TYPE',''AS COMPANY_NAME,p1.PERSON_NAME AS
+        OWNER_NAME,p1.PERSON_MOBILE_PHONE AS OWNER_PHONE,
+        p2.PERSON_MOBILE_PHONE AS CREW_PHONE,p1.ID_CARD_NUMBER,p1.DRIVER_LICENCE_NUMBER,t1.PLATE_NUMBER,
+        c.TRUCK_CARRIAGE_TYPE_NAME,GetLine(t1.TRUCK_ID) AS LINE,
+        CASE p2.DRIVING_STATUS
+        WHEN '0' THEN '验证中'
+        WHEN '3' THEN '不合格'
+        ELSE '验证通过' END AS DRIVING_STATUS
+        FROM
+        t_data_truck AS t1
+        LEFT JOIN
+        t_data_person AS p1
+        ON
+        t1.MANAGER_MEMBER_ID = p1.PERSON_ID
+        LEFT JOIN
+        t_data_truck AS t2
+        ON
+        t2.TRUCK_ID = p1.DRIVING_TRUCK_ID
+        RIGHT JOIN
+        t_data_person AS p2
+        ON
+        p2.DRIVING_TRUCK_ID = t1.TRUCK_ID AND p2.DRIVING_STATUS !=''
+        LEFT JOIN
+        t_master_truck_carriage_type AS c
+        ON
+        c.TRUCK_CARRIAGE_TYPE_ID = t1.TRUCK_CARRIAGE_TYPE_ID
+        WHERE
+        t1.DELETE_FLAG= '0' AND p1.DELETE_FLAG = '0' AND t2.DELETE_FLAG= '0' AND p2.DELETE_FLAG='0'
+        UNION ALL
+        SELECT
+        DISTINCT(P.`PERSON_NAME`)AS CREW_NAME,'车组成员' AS 'ORGANIZATION_TYPE',''AS COMPANY_NAME,''AS OWNER_NAME,''AS
+        OWNER_PHONE,
+        P.`PERSON_MOBILE_PHONE` AS
+        CREW_PHONE,P.`ID_CARD_NUMBER`,P.`DRIVER_LICENCE_NUMBER`,T.`PLATE_NUMBER`,C.`TRUCK_CARRIAGE_TYPE_NAME`,
+        GetLine(P.`DRIVING_TRUCK_ID`)AS LINE,
+        CASE P.`DRIVING_STATUS`
+        WHEN '0' THEN '验证中'
+        WHEN '3' THEN '不合格'
+        ELSE '验证通过' END AS `DRIVING_STATUS`
+        FROM
+        t_data_person AS P
+        LEFT JOIN
+        t_data_truck AS T
+        ON
+        P.`DRIVING_TRUCK_ID` = T.`TRUCK_ID`
+        LEFT JOIN
+        t_master_truck_carriage_type AS C
+        ON
+        C.TRUCK_CARRIAGE_TYPE_ID = T.TRUCK_CARRIAGE_TYPE_ID
+        WHERE
+        P.`PERSON_NAME`!='none' AND P.`DELETE_FLAG`='0' AND P.`DRIVING_TRUCK_ID`!= '' AND P.`DRIVING_STATUS`!= ''
+        AND T.`DELETE_FLAG` = '0' AND C.`DELETE_FLAG` = '0') AS DM
+        <where>
+
+            <if test="organization_type != null and organization_type!= ''">
+                DM.ORGANIZATION_TYPE LIKE '%${organization_type}%'
+            </if>
+            <if test="company_name != null and company_name!= ''">
+                AND DM.COMPANY_NAME LIKE '%${company_name}%'
+            </if>
+            <if test="owner_name!= null and owner_name!= ''">
+                AND DM.OWNER_NAME LIKE '%${owner_name}%'
+            </if>
+            <if test="crew_name != null and crew_name!= ''">
+                AND DM.CREW_NAME LIKE '%${crew_name}%'
+            </if>
+            <if test="id_card_number != null and id_card_number!= ''">
+                AND DM.ID_CARD_NUMBER LIKE '%${id_card_number}%'
+            </if>
+            <if test="driver_licence_number != null and driver_licence_number!= ''">
+                AND DM.DRIVER_LICENCE_NUMBER LIKE '%${driver_licence_number}%'
+            </if>
+            <if test="plate_number!= null and plate_number!= ''">
+                AND DM.PLATE_NUMBER LIKE '%${plate_number}%'
+            </if>
+            <if test="driving_status != null and driving_status!= ''">
+                AND DM.DRIVING_STATUS LIKE '%${driving_status}%'
+            </if>
+        </where>
+    </select>
+
+    <!--根据卡车id和驾驶状态查找个人信息-->
+    <select id="findPersonByIDAndType" resultMap="T_Data_Person">
+        SELECT
+        *
+        FROM
+        T_Data_Person
+        WHERE
+        DRIVING_TRUCK_ID = #{driving_truck_id} AND DRIVING_STATUS = #{driving_status} AND PERSON_TYPE = 1
+
+    </select>
+
+
+    <!--查询个人货主列表信息不分页-->
+    <select id="findPersonShippers" resultMap="T_Data_Person">
+        SELECT
+        *
+        FROM
+        T_Data_Person
+        Where
+        PERSON_TYPE=2 AND DELETE_FLAG=0 AND VERIFY_STATUS=2
+    </select>
+</mapper>

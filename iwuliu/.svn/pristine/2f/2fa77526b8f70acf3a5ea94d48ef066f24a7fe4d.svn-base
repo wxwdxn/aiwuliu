@@ -1,0 +1,106 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称: PersonDaoMapper.Java
+ * 系统编号：Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：02
+ * 模块名称：个人信息查询接口实现
+ * 设计文件：
+ * 完成日期：2016-02-19
+ * 作    者：YK
+ * 内容摘要：个人公司信息查询
+ */
+package com.cn.gazelle.logistics.dao;
+
+import com.cn.gazelle.logistics.pojo.T_Data_Logistics_Drivers_Manager;
+import com.cn.gazelle.logistics.pojo.T_Data_Operation_Drivers_Manager;
+import com.cn.gazelle.logistics.pojo.T_Data_Person;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称: PersonDaoMapper
+ * 内容摘要:个人信息管理页面
+ * 方法描述：该类有13个方法：
+ * 01 findPersonByTruckId                 根据卡车id查询个人信息
+ * 02 findPersonByID                      根据个人id查询个人信息
+ * 03 findPersonByName                    根据个人名查询个人信息
+ * 04 findAllPerson                       查询所有个人信息
+ * 05 findAllDrivers                      查找所有司机
+ * 06 findAllFleet                        查找所有车队长
+ * 07 findAllPersonRowsCount              查询个人总记录数
+ * 08 findAllDriversRowsCount             查询司机总记录数
+ * 09 findAllFleetRowsCount               查询车队总记录数
+ * 10 savePerson                          保存个人信息
+ * 11 updatePerson                        更新个人信息
+ * 12 examineDriver                       审核司机信息
+ * 13 delPerson                           删除个人信息
+ * 14 savePersonPic                       保存个人图片信息
+ * 15 findAllPersonByTruckIdRowsCount     根据卡车id查询个人总记录数
+ *
+ * @author YK
+ */
+public interface PersonDaoMapper {
+
+    // 根据卡车id查询个人信息
+    List<T_Data_Person> findPersonByTruckId(@Param(value = "driving_truck_id") String driving_truck_id);
+
+    // 根据个人id查询个人信息
+    T_Data_Person findPersonByID(@Param(value = "person_id") String person_id);
+
+    // 根据手机号查询个人信息
+    T_Data_Person findPersonByPhone(@Param(value = "person_mobile_phone") String person_mobile_phone,@Param(value = "person_type") String person_type);
+
+    // 根据个人名查询个人信息
+    T_Data_Person findPersonByName(@Param(value = "person_name") String person_name, @Param(value = "id_card_number") String id_card_number, @Param(value = "person_type") String person_type);
+
+    // 查询所有个人信息
+    List<T_Data_Person> findAllPerson(@Param(value = "search_type") String search_type, @Param(value = "name") String name, @Param("page") Integer page, @Param("rows") Integer rows, @Param("person_type") String person_type);
+
+    // 查找所有司机
+    List<T_Data_Person> findAllDrivers(@Param(value = "search_type") String search_type, @Param(value = "name") String name, @Param("page") Integer page, @Param("rows") Integer rows, @Param("person_type") String person_type);
+
+    // 查找所有车队长
+    List<T_Data_Person> findAllFleet(@Param(value = "search_type") String search_type, @Param(value = "name") String name, @Param("page") Integer page, @Param("rows") Integer rows, @Param("person_type") String person_type);
+
+    // 查询个人总记录数
+    Integer findAllPersonRowsCount(@Param(value = "search_type") String search_type, @Param(value = "name") String name, @Param("person_type") String person_type);
+
+    // 查询司机总记录数
+    Integer findAllDriversRowsCount(@Param(value = "search_type") String search_type, @Param(value = "name") String name, @Param("person_type") String person_type);
+
+    // 查询车队总记录数
+    Integer findAllFleetRowsCount(@Param(value = "search_type") String search_type, @Param(value = "name") String name, @Param("person_type") String person_type);
+
+    // 保存个人信息
+    int savePerson(T_Data_Person person);
+
+    // 更新个人信息
+    void updatePerson(T_Data_Person person);
+
+    // 审核司机信息
+    void examineDriver(T_Data_Person person);
+
+    // 删除个人信息
+    void delPerson(@Param(value = "person_id") String person_id);
+
+    // 联合查询会员、个人和车的信息
+    List<HashMap<String,String>> queryDrivingBehaviorInfo(@Param(value = "person_name") String person_name,
+                                                    @Param(value = "plate_number") String plate_number);
+
+    // 查询运营司机管理列表
+    List<T_Data_Operation_Drivers_Manager> findOperationDriversManagerList(HashMap<String,String> conditions);
+
+    // 根据卡车id和驾驶状态查找个人信息
+    List<T_Data_Person> findPersonByIDAndType(@Param(value = "driving_truck_id") String driving_truck_id,
+                                              @Param(value = "driving_status") String driving_status);
+
+    // 查找所有的个人货主
+    List<T_Data_Person> findPersonShippers();
+
+    // 物流司机管理(web)
+    List<T_Data_Logistics_Drivers_Manager> findDriversList(HashMap<String,String> conditions);
+}

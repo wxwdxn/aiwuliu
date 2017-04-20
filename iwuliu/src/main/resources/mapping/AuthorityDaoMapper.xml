@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.AuthorityDaoMapper">
+    <resultMap id="T_Sys_Authority" type="com.cn.gazelle.logistics.pojo.T_Sys_Authority">
+        <id column="AUTHORITY_ID" property="authority_id"/>
+        <result column="AUTHORITY_NAME" property="authority_name"/>
+        <result column="AUTHORITY_URL" property="authority_url"/>
+        <result column="AUTHORITY_DATE" property="authority_date"/>
+        <result column="AUTHORITY_INFO" property="authority_info"/>
+        <result column="DELETE_STATES" property="delete_states"/>
+        <result column="AUTHORITY_REMARK" property="authority_remark"/>
+    </resultMap>
+
+    <!--根据ID查找权限信息-->
+    <select id="findAuthorityByID" parameterType="int" resultType="com.cn.gazelle.logistics.pojo.T_Sys_Authority">
+        SELECT
+            *
+        FROM
+            T_Sys_Authority
+        WHERE
+            AUTHORITY_ID = #{authority_id} AND DELETE_STATES = '0'
+    </select>
+
+    <!--根据权限名查找信息-->
+    <select id="findAuthorityByAuthorityName" parameterType="String"
+            resultType="com.cn.gazelle.logistics.pojo.T_Sys_Authority">
+        SELECT
+            *
+        FROM
+            T_Sys_Authority
+        WHERE
+            AUTHORITY_NAME = #{authority_name} AND DELETE_STATES = '0'
+    </select>
+
+    <!--查询所有权限信息-->
+    <select id="findAllAuthority" resultMap="T_Sys_Authority">
+        SELECT
+        *
+        FROM
+        T_Sys_Authority
+        WHERE
+        DELETE_STATES = '0'
+        <if test="authority_name !='' ">
+            AND AUTHORITY_NAME LIKE '%${authority_name}%'
+        </if>
+        limit #{page},#{rows}
+
+    </select>
+
+    <!--查找权限总记录数-->
+    <select id="findAllAuthorityRowsCount" resultType="int">
+     SELECT
+         COUNT(*)
+     FROM
+         T_Sys_Authority
+     WHERE
+         DELETE_STATES = '0'
+    </select>
+
+    <!--查找符合条件的权限总记录数-->
+    <select id="findAllAuthoritySearchCount" parameterType="String" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Sys_Authority
+        WHERE
+            AUTHORITY_NAME LIKE '%${authority_name}%'AND DELETE_STATES = '0'
+    </select>
+
+    <!--保存权限信息-->
+    <insert id="saveAuthority" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Authority">
+
+        INSERT INTO
+                T_Sys_Authority (AUTHORITY_ID,
+                AUTHORITY_NAME,
+                AUTHORITY_URL,
+                AUTHORITY_DATE,
+                AUTHORITY_INFO,
+                DELETE_STATES,
+                AUTHORITY_REMARK)
+        SELECT
+                #{authority_id},
+                #{authority_name},
+                #{authority_url},
+                #{authority_date},
+                #{authority_info},
+                '0',
+                #{authority_remark}
+                 FROM dual WHERE NOT EXISTS
+                 (SELECT AUTHORITY_NAME FROM T_Sys_Authority WHERE AUTHORITY_NAME = #{authority_name} AND DELETE_STATES = '0')
+
+    </insert>
+
+    <!--更新权限信息-->
+    <update id="updateAuthority" parameterType="com.cn.gazelle.logistics.pojo.T_Sys_Authority">
+        UPDATE
+            T_Sys_Authority
+        SET
+            AUTHORITY_NAME = #{authority_name},
+            AUTHORITY_URL = #{authority_url},
+            AUTHORITY_DATE = #{authority_date},
+            AUTHORITY_INFO = #{authority_info},
+            DELETE_STATES =  '0',
+            AUTHORITY_REMARK = #{authority_remark}
+        WHERE
+            AUTHORITY_ID = #{authority_id} AND DELETE_STATES =  '0'
+    </update>
+
+    <!--删除权限信息-->
+    <delete id="delAuthority" parameterType="String">
+        UPDATE
+            T_Sys_Authority
+        SET
+            DELETE_STATES = '1'
+        WHERE
+            AUTHORITY_ID = #{authority_id} AND DELETE_STATES =  '0'
+    </delete>
+</mapper>

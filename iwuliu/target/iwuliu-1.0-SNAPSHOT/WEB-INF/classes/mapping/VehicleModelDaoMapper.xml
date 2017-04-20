@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.VehicleModelDaoMapper">
+
+    <!--根据条件查询车辆型号列表-->
+    <select id="findVehicleModelManagerList" resultType="com.cn.gazelle.logistics.pojo.T_Data_Vehicle_Model">
+        SELECT
+        *
+        FROM
+        (SELECT
+        t.`TRUCK_MODEL_NO` AS truck_model_no,
+        d.`DICDATA_ID` AS truck_brand_code,
+        d.`DICDATA_NAME` AS truck_brand_name,
+        t.`TRUCK_MODEL_NAME` AS truck_model_name
+        FROM
+        `t_data_truck_model` t
+        LEFT JOIN
+        `t_sys_dicdata` d ON d.`DICTIONARY_ID`='60F8199A3A4D4136AC4B06BE97A1F974' AND d.`DICDATA_ID`=t.`TRUCK_BRAND_ID` AND d.`DELETE_STATES`=0
+        WHERE
+        t.`DELETE_FLAG`=0
+        ORDER BY t.LAST_UPDATE DESC) AS truckModel
+        WHERE
+        truckModel.`truck_model_no` IS NOT NULL
+        <if test="truck_brand_id != null and truck_brand_id != ''">
+            AND truckModel.`truck_brand_code`= #{truck_brand_id}
+        </if>
+    </select>
+
+    <!--根据条件查找车辆详情-->
+    <select id="findVehicleModelByNo" resultType="com.cn.gazelle.logistics.pojo.T_Data_Vehicle_Model">
+        SELECT
+        *
+        FROM
+        (SELECT
+        t.`TRUCK_MODEL_NO` AS truck_model_no,
+        d.`DICDATA_ID` AS truck_brand_code,
+        d.`DICDATA_NAME` AS truck_brand_name,
+        t.`TRUCK_MODEL_NAME` AS truck_model_name
+        FROM
+        `t_data_truck_model` t
+        LEFT JOIN
+        `t_sys_dicdata` d ON d.`DICTIONARY_ID`='60F8199A3A4D4136AC4B06BE97A1F974' AND d.`DICDATA_ID`=t.`TRUCK_BRAND_ID` AND d.`DELETE_STATES`=0
+        WHERE
+        t.`DELETE_FLAG`=0) AS truckModel
+        WHERE
+        truckModel.`truck_model_no` = #{truck_model_no}
+    </select>
+</mapper>

@@ -1,0 +1,55 @@
+package com.cn.gazelle.logistics.dao;
+
+import com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply;
+import com.cn.gazelle.logistics.pojo.T_Data_Withdraw_Apply_Detail;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * 类 名 称: WithdrawApplyDaoMapper
+ * 内容摘要: 提现申请信息管理
+ * 方法描述：该类有8个方法：
+ *         01 findWithdrawApplyById                  根据ID查提现申请信息
+ *         02 saveWithdrawApply                      保存提现申请信息
+ *         03 updateWithdrawApply                    更新提现申请信息
+ *         04 withdrawApplyDel                       删除提现申请信息
+ * @author YK
+ */
+public interface WithdrawApplyDaoMapper {
+
+    // 根据ID查询提现申请信息
+    T_Data_Withdraw_Apply findWithdrawApplyById(@Param(value = "apply_number") String apply_number);
+
+    // 保存提现申请信息
+    int saveWithdrawApply(T_Data_Withdraw_Apply withdrawApply);
+
+    // 更新提现申请信息
+    void updateWithdrawApply(T_Data_Withdraw_Apply withdrawApply);
+
+    // 删除提现申请信息
+    void withdrawApplyDel(@Param(value = "apply_number") String apply_number);
+
+    // 根据银行卡绑定编号和申请状态查询提现申请信息
+    List<T_Data_Withdraw_Apply> findWithdrawApplyByAccountAndStatus(@Param(value = "account_no") String account_no,
+                                                                    @Param(value = "status") String status);
+    // 根据会员支付历史编号查找提现申请信息
+    T_Data_Withdraw_Apply findWithdrawApplyByNumber(@Param(value = "payment_history_number") String payment_history_number);
+
+    // 查询个人账户提现申请信息
+    List<T_Data_Withdraw_Apply_Detail> findWithdrawApplyDetail(@Param(value = "start_time") String start_time,
+                                                               @Param(value = "end_time") String end_time);
+
+    // 查询车辆账户提现申请信息
+    List<T_Data_Withdraw_Apply_Detail> findWithdrawApplyDetailOfTruck(@Param(value = "start_time") String start_time,
+                                                               @Param(value = "end_time") String end_time);
+
+    // 查询个人账户提现申请总额
+    double  findWithdrawApplySumOfMember();
+
+    // 查询车辆账户提现申请总额
+    double findWithdrawApplySumOfTruck();
+
+
+
+}

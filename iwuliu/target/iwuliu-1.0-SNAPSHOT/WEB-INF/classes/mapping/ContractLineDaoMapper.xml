@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.ContractLineDao">
+
+    <!--结果集定义-->
+    <resultMap id="T_Data_Contract_Line_Match" type="com.cn.gazelle.logistics.pojo.T_Data_Contract_Line_Match">
+        <id column="MATCH_ID" property="matchId"></id>
+        <result column="CONTRACT_ID" property="contractId"></result>
+        <result column="LINE_ID" property="lineId"></result>
+        <result column="DELETE_FLAG" property="deleteFlag"></result>
+        <result column="LAST_UPDATE" property="lastUpdate"></result>
+        <result column="LAST_UPDATE_USER_ID" property="lastUpdateUserId"></result>
+    </resultMap>
+
+    <!--根据id查询匹配列表-->
+    <select id="findById" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Contract_Line_Match">
+        SELECT
+            *
+        FROM
+            t_data_contract_line_match
+        WHERE
+            MATCH_ID = #{matchId} AND DELETE_FLAG=0
+    </select>
+
+    <!--查询列表分页-->
+    <select id="findAll" resultType="com.cn.gazelle.logistics.pojo.T_Data_Contract_Line_Match">
+        SELECT
+            MATCH_ID AS matchId,
+            CONTRACT_ID AS contractId,
+            LINE_ID AS lineId,
+            LAST_UPDATE AS lastUpdate,
+            LAST_UPDATE_USER_ID AS lastUpdateUserId
+        FROM
+            t_data_contract_line_match t
+        WHERE DELETE_FLAG=0
+        <if test="searchType !=''and searchType=='contract_id'">
+            AND
+                t.${searchType}
+            IN (
+                SELECT
+                    m.contract_id
+                FROM
+                    (SELECT
+                          contract_id AS contract_id
+                     FROM
+                          `t_data_transportation_contract`
+                     WHERE
+                          CODE LIKE '%${name}%'AND DELETE_FLAG=0
+                    )AS m
+            )
+        </if>
+        <if test="searchType !='' and searchType=='line_id'">
+           AND
+                t.${searchType}
+            IN (
+                SELECT
+                    s.line_id
+                FROM (
+                      SELECT
+                            line_id AS line_id
+                      FROM
+                            `t_master_transportation_line`
+                      WHERE
+                            line_name LIKE '%${name}%' AND DELETE_FLAG=0
+                      )AS s
+                )
+        </if>
+          limit #{page},#{rows}
+    </select>
+
+    <!--查询符合条件的列表总数-->
+    <select id="count" parameterType="String" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            t_data_contract_line_match t
+        WHERE DELETE_FLAG=0
+        <if test="searchType !=''and searchType=='contract_id'">
+            AND
+                t.${searchType}
+            IN (
+                SELECT
+                    m.contract_id
+                FROM(
+                    SELECT
+                          contract_id AS contract_id
+                    FROM
+                          `t_data_transportation_contract`
+                    WHERE
+                          CODE LIKE '%${name}%'AND DELETE_FLAG=0
+                    )AS m
+            )
+        </if>
+        <if test="searchType !='' and searchType=='line_id'">
+            AND
+                t.${searchType}
+            IN (
+                SELECT
+                      s.line_id
+                FROM (
+                      SELECT
+                          line_id AS line_id
+                      FROM
+                          `t_master_transportation_line`
+                      WHERE
+                          line_name LIKE '%${name}%'AND DELETE_FLAG=0
+                      )AS s
+                )
+        </if>
+    </select>
+
+    <!--保存货场信息-->
+    <insert id="saveContractLine" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Contract_Line_Match">
+        INSERT INTO
+            t_data_contract_line_match(MATCH_ID,
+            CONTRACT_ID,
+            LINE_ID,
+            DELETE_FLAG,
+            LAST_UPDATE,
+            LAST_UPDATE_USER_ID)
+        VALUES (
+            #{matchId},
+            #{contractId},
+            #{lineId},
+            0,
+            #{lastUpdate},
+            #{lastUpdateUserId})
+    </insert>
+
+    <!--更新货场信息-->
+    <update id="updateContractLine" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Contract_Line_Match">
+        UPDATE
+              t_data_contract_line_match
+        SET
+              CONTRACT_ID = #{contractId},
+              LINE_ID = #{lineId} ,
+              DELETE_FLAG=0,
+              LAST_UPDATE = #{lastUpdate} ,
+              LAST_UPDATE_USER_ID = #{lastUpdateUserId}
+       WHERE
+              MATCH_ID=#{matchId} AND DELETE_FLAG=0
+    </update>
+
+    <!--删除货场信息-->
+    <delete id="delContractLine" parameterType="String">
+        UPDATE
+              t_data_contract_line_match
+        SET
+            DELETE_FLAG=1
+        WHERE
+              MATCH_ID=#{matchId} AND DELETE_FLAG=0
+    </delete>
+
+    <!--根据id查询匹配列表-->
+    <select id="findLineNameList" resultType="java.util.Map">
+      SELECT
+        m.LINE_NAME as line_name,
+        t.MATCH_ID as matchId,
+        t.LINE_ID as line_Id,
+        t.`LAST_UPDATE`AS lastUpdate,
+        t.`LAST_UPDATE_USER_ID` AS lastUpdateUserId
+      FROM
+        `t_data_contract_line_match` t
+      LEFT JOIN
+        `t_master_transportation_line` m
+      ON
+        t.`LINE_ID`=m.`LINE_ID`
+      WHERE
+        t.`CONTRACT_ID`=#{contractId} AND t.DELETE_FLAG=0
+         limit #{page},#{rows}
+    </select>
+
+    <select id="findLineCount" parameterType="String" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM `t_data_contract_line_match` t
+        LEFT JOIN `t_master_transportation_line` m
+        ON t.`LINE_ID`=m.`LINE_ID`
+        WHERE t.`CONTRACT_ID`=#{contractId}AND t.DELETE_FLAG=0
+    </select>
+
+</mapper>

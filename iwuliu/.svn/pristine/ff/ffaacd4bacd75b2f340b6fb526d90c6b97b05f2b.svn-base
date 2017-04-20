@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TransportationOrderDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Transportation_Plan" type="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        <id column="SCHEDULE_PLAN_NUMBER" property="schedule_plan_number"></id>
+        <result column="CONTRACT_ID" property="contract_id"></result>
+        <result column="OPERATE_MAIN_LINE_ID" property="operate_main_line_id"></result>
+        <result column="BELONG_SCHEDULE_PLAN_NUMBER" property="belong_schedule_plan_number"></result>
+        <result column="LOADING_CARGO_YARD_ID" property="loading_cargo_yard_id"></result>
+        <result column="LOADING_BEGIN_DATE" property="loading_begin_date"></result>
+        <result column="LOADING_CONTACT_NAME" property="loading_contact_name"></result>
+        <result column="LOADING_CONTACT_PHONE" property="loading_contact_phone"></result>
+        <result column="UNLOADING_CARGO_YARD_ID" property="unloading_cargo_yard_id"></result>
+        <result column="UNLOADING_FINISH_DATE" property="unloading_finish_date"></result>
+        <result column="UNLOADING_CONTACT_NAME" property="unloading_contact_name"></result>
+        <result column="UNLOADING_CONTACT_PHONE" property="unloading_contact_phone"></result>
+        <result column="REMARK" property="remark"></result>
+        <result column="CARGO_TOTAL" property="cargo_total"></result>
+        <result column="REDISTRIBUTE_CARGO_TOTAL" property="redistribute_cargo_total"></result>
+        <result column="TRANSPORT_UNIT_PRICE" property="transport_unit_price"></result>
+        <result column="SCHEDULE_CARGO_TOTAL" property="schedule_cargo_total"></result>
+        <result column="TRANSPORTED_CARGO_TOTAL" property="transported_cargo_total"></result>
+        <result column="TRANSPORT_COMPLETED_CARGO_TOTAL" property="transport_completed_cargo_total"></result>
+        <result column="CREATE_TIME" property="create_time"></result>
+        <result column="ACCEPT_TIME" property="accept_time"></result>
+        <result column="REFUSE_TIME" property="refuse_time"></result> <result column="FINISH_TIME" property="finish_time"></result>
+        <result column="START_SCHEDULE_TIME" property="start_schedule_time"></result>
+        <result column="FINISH_TIME" property="finish_time"></result>
+        <result column="PAYED_TIME" property="payed_time"></result>
+        <result column="AVERAGE_TRANSPORTATION_TIME" property="average_transportation_time"></result>
+        <result column="STATUS" property="status"></result>
+        <result column="REFUSED_REASON" property="refused_reason"></result>
+        <result column="DELETE_FLAG" property="deleteFlag"></result>
+        <result column="LAST_UPDATE" property="last_update"></result>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"></result>
+        <result column="CODE" property="code"></result>
+    </resultMap>
+
+    <!--根据ID查询-->
+    <select id="findOrderById"  resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        SELECT
+        SCHEDULE_PLAN_NUMBER as schedule_plan_number,
+        BELONG_SCHEDULE_PLAN_NUMBER as belong_schedule_plan_number,
+        CONTRACT_ID as contract_id,
+        OPERATE_MAIN_LINE_ID as operate_main_line_id,
+        LOADING_CARGO_YARD_ID as loading_cargo_yard_id,
+        LOADING_BEGIN_DATE as loading_begin_date,
+        LOADING_CONTACT_NAME as loading_contact_name,
+        LOADING_CONTACT_PHONE as loading_contact_phone,
+        UNLOADING_CARGO_YARD_ID as unloading_cargo_yard_id,
+        UNLOADING_FINISH_DATE as unloading_finish_date,
+        UNLOADING_CONTACT_NAME as unloading_contact_name,
+        UNLOADING_CONTACT_PHONE as unloading_contact_phone,
+        REMARK as remark,
+        CARGO_TOTAL as cargo_total,
+        REDISTRIBUTE_CARGO_TOTAL AS redistribute_cargo_total,
+        TRANSPORT_UNIT_PRICE AS transport_unit_price,
+        TRANSPORTED_CARGO_TOTAL as transported_cargo_total,
+        TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+        SCHEDULE_CARGO_TOTAL as schedule_cargo_total,
+        CREATE_TIME as create_time,
+        ACCEPT_TIME as accept_time,
+        REFUSE_TIME as refuse_time,
+        START_SCHEDULE_TIME as start_schedule_time,
+        FINISH_TIME as finish_time,
+        PAYED_TIME as payed_time,
+        AVERAGE_TRANSPORTATION_TIME as average_transportation_time,
+        STATUS as status,
+        REFUSED_REASON as refused_reason,
+        DELETE_FLAG as deleteFlag,
+        LAST_UPDATE as last_update,
+        LAST_UPDATE_USER_ID as last_update_user_id,
+        CODE as code
+        FROM
+        T_Data_Transportation_Plan
+        WHERE
+        SCHEDULE_PLAN_NUMBER=#{schedule_plan_number} AND DELETE_FLAG=0 FOR UPDATE
+    </select>
+
+
+
+
+    <!--保存订单信息-->
+    <insert id="saveTransportateOrder" keyProperty="schedule_plan_number" useGeneratedKeys="true" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        INSERT INTO
+        T_Data_Transportation_Plan(
+        CONTRACT_ID,
+        OPERATE_MAIN_LINE_ID,
+        BELONG_SCHEDULE_PLAN_NUMBER,
+        LOADING_CARGO_YARD_ID,
+        LOADING_BEGIN_DATE,
+        LOADING_CONTACT_NAME,
+        LOADING_CONTACT_PHONE,
+        UNLOADING_CARGO_YARD_ID,
+        UNLOADING_FINISH_DATE,
+        UNLOADING_CONTACT_NAME,
+        UNLOADING_CONTACT_PHONE,
+        REMARK,
+        CARGO_TOTAL,
+        TRANSPORT_UNIT_PRICE,
+        TRANSPORTED_CARGO_TOTAL,
+        REDISTRIBUTE_CARGO_TOTAL,
+        TRANSPORT_COMPLETED_CARGO_TOTAL,
+        SCHEDULE_CARGO_TOTAL,
+        CREATE_TIME,
+        ACCEPT_TIME,
+        REFUSE_TIME,
+        START_SCHEDULE_TIME,
+        FINISH_TIME,
+        PAYED_TIME,
+        AVERAGE_TRANSPORTATION_TIME,
+        STATUS,
+        REFUSED_REASON,
+        DELETE_FLAG,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID,
+        CODE)
+        VALUES (
+        #{contract_id},
+        #{operate_main_line_id},
+        #{belong_schedule_plan_number},
+        #{loading_cargo_yard_id},
+        #{loading_begin_date},
+        #{loading_contact_name},
+        #{loading_contact_phone},
+        #{unloading_cargo_yard_id},
+        #{unloading_finish_date},
+        #{unloading_contact_name},
+        #{unloading_contact_phone},
+        #{remark},
+        #{cargo_total},
+        #{transport_unit_price},
+        #{transported_cargo_total},
+        0,
+        0,
+        #{schedule_cargo_total},
+        #{create_time},
+        #{accept_time},
+        #{refuse_time},
+        #{start_schedule_time},
+        #{finish_time},
+        #{payed_time},
+        #{average_transportation_time},
+        #{status},
+        #{refused_reason},
+        0,
+        #{last_update},
+        #{last_update_user_id},
+        #{code} );
+    </insert>
+
+    <!--更新运输订单信息-->
+    <update id="updateTransportateOrder" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        UPDATE
+        T_Data_Transportation_Plan
+        SET
+        CONTRACT_ID = #{contract_id},
+        OPERATE_MAIN_LINE_ID = #{operate_main_line_id} ,
+        LOADING_CARGO_YARD_ID=#{loading_cargo_yard_id},
+        LOADING_BEGIN_DATE = #{loading_begin_date} ,
+        LOADING_CONTACT_NAME = #{loading_contact_name} ,
+        LOADING_CONTACT_PHONE=#{loading_contact_phone},
+        UNLOADING_CARGO_YARD_ID=#{unloading_cargo_yard_id},
+        UNLOADING_FINISH_DATE = #{unloading_finish_date} ,
+        UNLOADING_CONTACT_NAME = #{unloading_contact_name} ,
+        UNLOADING_CONTACT_PHONE = #{unloading_contact_phone} ,
+        REMARK=#{remark},
+        CARGO_TOTAL=#{cargo_total},
+        TRANSPORT_UNIT_PRICE = #{transport_unit_price} ,
+        REDISTRIBUTE_CARGO_TOTAL = #{redistribute_cargo_total} ,
+        TRANSPORTED_CARGO_TOTAL = #{transported_cargo_total} ,
+        TRANSPORT_COMPLETED_CARGO_TOTAL=#{transport_completed_cargo_total},
+        SCHEDULE_CARGO_TOTAL=#{schedule_cargo_total},
+        CREATE_TIME=#{create_time},
+        ACCEPT_TIME=#{accept_time},
+        REFUSE_TIME=#{refuse_time},
+        START_SCHEDULE_TIME=#{start_schedule_time},
+        FINISH_TIME=#{finish_time},
+        PAYED_TIME=#{payed_time},
+        AVERAGE_TRANSPORTATION_TIME=#{average_transportation_time},
+        STATUS = #{status} ,
+        REFUSED_REASON=#{refused_reason},
+        DELETE_FLAG=0,
+        LAST_UPDATE = #{last_update} ,
+        LAST_UPDATE_USER_ID=#{last_update_user_id}
+        WHERE
+        SCHEDULE_PLAN_NUMBER=#{schedule_plan_number} AND DELETE_FLAG=0
+    </update>
+
+    <!--删除订单信息-->
+    <delete id="delTransportateOrderById" parameterType="String">
+        UPDATE
+        T_Data_Transportation_Plan
+        SET
+        DELETE_FLAG=1
+        WHERE
+        SCHEDULE_PLAN_NUMBER=#{schedule_plan_number} AND DELETE_FLAG=0
+    </delete>
+
+    <!--根据干线ID和合同 距离查询 刷单-->
+    <select id="findOrderByLineIdAndConId2"  resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_OrderList">
+        SELECT
+        o.SCHEDULE_PLAN_NUMBER as schedule_plan_number,
+        o.BELONG_SCHEDULE_PLAN_NUMBER as belong_schedule_plan_number,
+        o.CONTRACT_ID AS contract_id,
+        o.OPERATE_MAIN_LINE_ID AS operate_main_line_id,
+        o.LOADING_CARGO_YARD_ID AS loading_cargo_yard_id,
+        LOADING_BEGIN_DATE AS loading_begin_date,
+        LOADING_CONTACT_NAME AS loading_contact_name,
+        LOADING_CONTACT_PHONE AS loading_contact_phone,
+        UNLOADING_CARGO_YARD_ID AS unloading_cargo_yard_id,
+        UNLOADING_FINISH_DATE AS unloading_finish_date,
+        UNLOADING_CONTACT_NAME AS unloading_contact_name,
+        UNLOADING_CONTACT_PHONE AS unloading_contact_phone,
+        REMARK AS remark,
+        o.CARGO_TOTAL AS cargo_total,
+        o.TRANSPORT_UNIT_PRICE AS transport_unit_price,
+        o.TRANSPORTED_CARGO_TOTAL AS transported_cargo_total,
+        o.TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+        o.SCHEDULE_CARGO_TOTAL AS schedule_cargo_total,
+        o.REDISTRIBUTE_CARGO_TOTAL AS redistribute_cargo_total,
+        o.CREATE_TIME AS create_time,
+        o.ACCEPT_TIME AS accept_time,
+        o.REFUSE_TIME AS refuse_time,
+        o.START_SCHEDULE_TIME AS start_schedule_time,
+        o.FINISH_TIME AS finish_time,
+        o.PAYED_TIME AS payed_time,
+        o.STATUS AS STATUS,
+        o.REFUSED_REASON AS refused_reason,
+        o.DELETE_FLAG AS deleteFlag,
+        o.LAST_UPDATE AS last_update,
+        o.LAST_UPDATE_USER_ID AS last_update_user_id,
+        o.CODE AS CODE,
+        t.`LATITUDE`AS latitude,
+        t.`LONGITUDE` AS longitude,
+        ROUND(6378.138*2*ASIN(SQRT(POW(SIN( (latitude*PI()/180-#{lat}*PI()/180)/2),2)+COS(latitude*PI()/180)*COS(#{lat}*PI()/180)* POW(SIN( (longitude*PI()/180-#{lng}*PI()/180)/2),2)))*1000)AS juli
+        FROM
+        T_Data_Transportation_Plan o
+        LEFT JOIN `t_master_cargo_yard` t
+        ON  t.cargo_id=o.LOADING_CARGO_YARD_ID
+        LEFT  JOIN  `t_data_transportation_contract` c
+        ON c.`CONTRACT_ID`=o.`CONTRACT_ID`
+        LEFT  join t_master_operate_main_line l
+        ON l.OPERATE_MAIN_LINE_ID =o.OPERATE_MAIN_LINE_ID
+        WHERE
+        o.OPERATE_MAIN_LINE_ID=#{operate_main_line_id} AND l.delete_flag='0' AND o.CONTRACT_ID=#{contract_id}AND o.DELETE_FLAG=0 AND o.STATUS IN (1,3) AND o.BELONG_SCHEDULE_PLAN_NUMBER is NOT NULL
+        AND o.CARGO_TOTAL> o.SCHEDULE_CARGO_TOTAL +o.REDISTRIBUTE_CARGO_TOTAL AND o.`LOADING_BEGIN_DATE` &lt; ADDDATE(DATE_FORMAT(NOW(),'%Y-%m-%d'), INTERVAL 1 DAY)
+        ORDER BY  o.`LOADING_BEGIN_DATE`  ASC
+    </select>
+
+    <select id="findOrderListByContractIdAndBelongNull" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        SELECT
+        SCHEDULE_PLAN_NUMBER as schedule_plan_number,
+        BELONG_SCHEDULE_PLAN_NUMBER as belong_schedule_plan_number,
+        CONTRACT_ID AS contract_id,
+        OPERATE_MAIN_LINE_ID AS operate_main_line_id,
+        LOADING_CARGO_YARD_ID AS loading_cargo_yard_id,
+        LOADING_BEGIN_DATE AS loading_begin_date,
+        LOADING_CONTACT_NAME AS loading_contact_name,
+        LOADING_CONTACT_PHONE AS loading_contact_phone,
+        UNLOADING_CARGO_YARD_ID AS unloading_cargo_yard_id,
+        UNLOADING_FINISH_DATE AS unloading_finish_date,
+        UNLOADING_CONTACT_NAME AS unloading_contact_name,
+        UNLOADING_CONTACT_PHONE AS unloading_contact_phone,
+        REMARK AS remark,
+        CARGO_TOTAL AS cargo_total,
+        TRANSPORT_UNIT_PRICE AS transport_unit_price,
+        TRANSPORTED_CARGO_TOTAL AS transported_cargo_total,
+        TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+        SCHEDULE_CARGO_TOTAL as schedule_cargo_total,
+        CREATE_TIME AS create_time,
+        ACCEPT_TIME AS accept_time,
+        REFUSE_TIME AS refuse_time,
+        START_SCHEDULE_TIME AS start_schedule_time,
+        FINISH_TIME AS finish_time,
+        PAYED_TIME AS payed_time,
+        AVERAGE_TRANSPORTATION_TIME as average_transportation_time,
+        STATUS AS STATUS,
+        REFUSED_REASON AS refused_reason,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE AS last_update,
+        LAST_UPDATE_USER_ID AS last_update_user_id,
+        CODE AS CODE
+        FROM
+        T_Data_Transportation_Plan
+        WHERE
+        CONTRACT_ID=#{contract_id} AND DELETE_FLAG=0 AND  BELONG_SCHEDULE_PLAN_NUMBER IS  NULL
+    </select>
+    <!--根据所属计划编号查询List -->
+
+    <!--查询所有的从属计划为空计划-->    <select id="findOrderListByBelongCode" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+    SELECT
+    SCHEDULE_PLAN_NUMBER as schedule_plan_number,
+    BELONG_SCHEDULE_PLAN_NUMBER AS belong_schedule_plan_number,
+    CONTRACT_ID AS contract_id,
+    OPERATE_MAIN_LINE_ID AS operate_main_line_id,
+    LOADING_CARGO_YARD_ID AS loading_cargo_yard_id,
+    LOADING_BEGIN_DATE AS loading_begin_date,
+    LOADING_CONTACT_NAME AS loading_contact_name,
+    LOADING_CONTACT_PHONE AS loading_contact_phone,
+    UNLOADING_CARGO_YARD_ID AS unloading_cargo_yard_id,
+    UNLOADING_FINISH_DATE AS unloading_finish_date,
+    UNLOADING_CONTACT_NAME AS unloading_contact_name,
+    UNLOADING_CONTACT_PHONE AS unloading_contact_phone,
+    REMARK AS remark,
+    CARGO_TOTAL AS cargo_total,
+    TRANSPORT_UNIT_PRICE AS transport_unit_price,
+    REDISTRIBUTE_CARGO_TOTAL AS redistribute_cargo_total,
+    TRANSPORTED_CARGO_TOTAL AS transported_cargo_total,
+    TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+    SCHEDULE_CARGO_TOTAL as schedule_cargo_total,
+    CREATE_TIME AS create_time,
+    ACCEPT_TIME AS accept_time,
+    REFUSE_TIME AS refuse_time,
+    START_SCHEDULE_TIME AS start_schedule_time,
+    FINISH_TIME AS finish_time,
+    PAYED_TIME AS payed_time,
+    AVERAGE_TRANSPORTATION_TIME as average_transportation_time,
+    STATUS AS STATUS,
+    REFUSED_REASON AS refused_reason,
+    DELETE_FLAG AS deleteFlag,
+    LAST_UPDATE AS last_update,
+    LAST_UPDATE_USER_ID AS last_update_user_id,
+    CODE AS CODE
+    FROM
+    T_Data_Transportation_Plan
+    WHERE
+    BELONG_SCHEDULE_PLAN_NUMBER=#{belong_schedule_plan_number} AND DELETE_FLAG=0 AND  BELONG_SCHEDULE_PLAN_NUMBER IS NOT NULL
+</select>
+
+    <select id="findOrderListBelongNull" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        SELECT
+        SCHEDULE_PLAN_NUMBER as schedule_plan_number,
+        BELONG_SCHEDULE_PLAN_NUMBER as belong_schedule_plan_number,
+        CONTRACT_ID AS contract_id,
+        OPERATE_MAIN_LINE_ID AS operate_main_line_id,
+        LOADING_CARGO_YARD_ID AS loading_cargo_yard_id,
+        LOADING_BEGIN_DATE AS loading_begin_date,
+        LOADING_CONTACT_NAME AS loading_contact_name,
+        LOADING_CONTACT_PHONE AS loading_contact_phone,
+        UNLOADING_CARGO_YARD_ID AS unloading_cargo_yard_id,
+        UNLOADING_FINISH_DATE AS unloading_finish_date,
+        UNLOADING_CONTACT_NAME AS unloading_contact_name,
+        UNLOADING_CONTACT_PHONE AS unloading_contact_phone,
+        REMARK AS remark,
+        CARGO_TOTAL AS cargo_total,
+        TRANSPORT_UNIT_PRICE AS transport_unit_price,
+        REDISTRIBUTE_CARGO_TOTAL AS redistribute_cargo_total,
+        TRANSPORTED_CARGO_TOTAL AS transported_cargo_total,
+        TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+        SCHEDULE_CARGO_TOTAL as schedule_cargo_total,
+        CREATE_TIME AS create_time,
+        ACCEPT_TIME AS accept_time,
+        REFUSE_TIME AS refuse_time,
+        START_SCHEDULE_TIME AS start_schedule_time,
+        FINISH_TIME AS finish_time,
+        PAYED_TIME AS payed_time,
+        AVERAGE_TRANSPORTATION_TIME as average_transportation_time,
+        STATUS AS STATUS,
+        REFUSED_REASON AS refused_reason,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE AS last_update,
+        LAST_UPDATE_USER_ID AS last_update_user_id,
+        CODE AS CODE
+        FROM
+        T_Data_Transportation_Plan
+        WHERE
+        CARGO_TOTAL> SCHEDULE_CARGO_TOTAL +REDISTRIBUTE_CARGO_TOTAL AND DELETE_FLAG=0 AND  BELONG_SCHEDULE_PLAN_NUMBER IS  NULL
+    </select>
+
+
+    <!--根据所属计划编号查询 -->
+    <select id="findBySchedulePlanNumber" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        SELECT
+        SCHEDULE_PLAN_NUMBER as schedule_plan_number,
+        BELONG_SCHEDULE_PLAN_NUMBER AS belong_schedule_plan_number,
+        CONTRACT_ID AS contract_id,
+        OPERATE_MAIN_LINE_ID AS operate_main_line_id,
+        LOADING_CARGO_YARD_ID AS loading_cargo_yard_id,
+        LOADING_BEGIN_DATE AS loading_begin_date,
+        LOADING_CONTACT_NAME AS loading_contact_name,
+        LOADING_CONTACT_PHONE AS loading_contact_phone,
+        UNLOADING_CARGO_YARD_ID AS unloading_cargo_yard_id,
+        UNLOADING_FINISH_DATE AS unloading_finish_date,
+        UNLOADING_CONTACT_NAME AS unloading_contact_name,
+        UNLOADING_CONTACT_PHONE AS unloading_contact_phone,
+        REMARK AS remark,
+        CARGO_TOTAL AS cargo_total,
+        TRANSPORT_UNIT_PRICE AS transport_unit_price,
+        REDISTRIBUTE_CARGO_TOTAL AS redistribute_cargo_total,
+        TRANSPORTED_CARGO_TOTAL AS transported_cargo_total,
+        TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+        SCHEDULE_CARGO_TOTAL as schedule_cargo_total,
+        CREATE_TIME AS create_time,
+        ACCEPT_TIME AS accept_time,
+        REFUSE_TIME AS refuse_time,
+        START_SCHEDULE_TIME AS start_schedule_time,
+        FINISH_TIME AS finish_time,
+        PAYED_TIME AS payed_time,
+        AVERAGE_TRANSPORTATION_TIME as average_transportation_time,
+        STATUS AS STATUS,
+        REFUSED_REASON AS refused_reason,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE AS last_update,
+        LAST_UPDATE_USER_ID AS last_update_user_id,
+        CODE AS CODE
+        FROM
+        T_Data_Transportation_Plan
+        WHERE
+        SCHEDULE_PLAN_NUMBER=#{schedule_plan_number} AND DELETE_FLAG=0
+    </select>
+
+
+    <!--根据合同 ，计划状态，干线 查询所有的从属计划为空计划-->
+    <select id="findPlanByConditions" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        SELECT
+        SCHEDULE_PLAN_NUMBER as schedule_plan_number,
+        BELONG_SCHEDULE_PLAN_NUMBER as belong_schedule_plan_number,
+        CONTRACT_ID AS contract_id,
+        OPERATE_MAIN_LINE_ID AS operate_main_line_id,
+        LOADING_CARGO_YARD_ID AS loading_cargo_yard_id,
+        LOADING_BEGIN_DATE AS loading_begin_date,
+        LOADING_CONTACT_NAME AS loading_contact_name,
+        LOADING_CONTACT_PHONE AS loading_contact_phone,
+        UNLOADING_CARGO_YARD_ID AS unloading_cargo_yard_id,
+        UNLOADING_FINISH_DATE AS unloading_finish_date,
+        UNLOADING_CONTACT_NAME AS unloading_contact_name,
+        UNLOADING_CONTACT_PHONE AS unloading_contact_phone,
+        REMARK AS remark,
+        CARGO_TOTAL AS cargo_total,
+        TRANSPORT_UNIT_PRICE AS transport_unit_price,
+        REDISTRIBUTE_CARGO_TOTAL AS redistribute_cargo_total,
+        TRANSPORTED_CARGO_TOTAL AS transported_cargo_total,
+        TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+        SCHEDULE_CARGO_TOTAL as schedule_cargo_total,
+        CREATE_TIME AS create_time,
+        ACCEPT_TIME AS accept_time,
+        REFUSE_TIME AS refuse_time,
+        START_SCHEDULE_TIME AS start_schedule_time,
+        FINISH_TIME AS finish_time,
+        PAYED_TIME AS payed_time,
+        AVERAGE_TRANSPORTATION_TIME as average_transportation_time,
+        STATUS AS status,
+        REFUSED_REASON AS refused_reason,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE AS last_update,
+        LAST_UPDATE_USER_ID AS last_update_user_id,
+        CODE AS CODE
+        FROM
+        T_Data_Transportation_Plan
+        WHERE
+        CARGO_TOTAL> SCHEDULE_CARGO_TOTAL +REDISTRIBUTE_CARGO_TOTAL AND DELETE_FLAG=0 AND  BELONG_SCHEDULE_PLAN_NUMBER IS  NULL
+        <if test="contract_id!=''">
+            AND
+            CONTRACT_ID LIKE '%${contract_id}%'
+        </if>
+        <if test="operate_main_line_id!=''">
+            AND
+            OPERATE_MAIN_LINE_ID LIKE '%${operate_main_line_id}%'
+        </if>
+        <if test="status!=''">
+            AND
+            STATUS LIKE '%${status}%'
+        </if>
+    </select>
+
+    <!-- 根据合同Id获取一级运单状态最小值-->
+    <select id="findMinStatusByContractId" resultType="String">
+        SELECT
+        MIN(STATUS)
+        FROM
+        T_Data_Transportation_Plan
+        WHERE
+        CONTRACT_ID=#{contract_id} AND DELETE_FLAG=0 AND BELONG_SCHEDULE_PLAN_NUMBER IS  NULL
+    </select>
+
+    <!--根据从属计划编号获取二级运单状态最小值-->
+    <select id="findMinStatusByBelongSchedulePlanNumber" resultType="String">
+        SELECT
+        MIN(STATUS)
+        FROM
+        T_Data_Transportation_Plan
+        WHERE
+        BELONG_SCHEDULE_PLAN_NUMBER=#{belong_schedule_plan_number} AND DELETE_FLAG=0
+    </select>
+
+    <!--手动派单列表未完成-->
+    <select id="manualOrderList" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        SELECT
+        SCHEDULE_PLAN_NUMBER as schedule_plan_number,
+        BELONG_SCHEDULE_PLAN_NUMBER as belong_schedule_plan_number,
+        CONTRACT_ID AS contract_id,
+        OPERATE_MAIN_LINE_ID AS operate_main_line_id,
+        LOADING_CARGO_YARD_ID AS loading_cargo_yard_id,
+        LOADING_BEGIN_DATE AS loading_begin_date,
+        LOADING_CONTACT_NAME AS loading_contact_name,
+        LOADING_CONTACT_PHONE AS loading_contact_phone,
+        UNLOADING_CARGO_YARD_ID AS unloading_cargo_yard_id,
+        UNLOADING_FINISH_DATE AS unloading_finish_date,
+        UNLOADING_CONTACT_NAME AS unloading_contact_name,
+        UNLOADING_CONTACT_PHONE AS unloading_contact_phone,
+        REMARK AS remark,
+        CARGO_TOTAL AS cargo_total,
+        TRANSPORT_UNIT_PRICE AS transport_unit_price,
+        REDISTRIBUTE_CARGO_TOTAL AS redistribute_cargo_total,
+        TRANSPORTED_CARGO_TOTAL AS transported_cargo_total,
+        TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+        SCHEDULE_CARGO_TOTAL as schedule_cargo_total,
+        CREATE_TIME AS create_time,
+        ACCEPT_TIME AS accept_time,
+        REFUSE_TIME AS refuse_time,
+        START_SCHEDULE_TIME AS start_schedule_time,
+        FINISH_TIME AS finish_time,
+        PAYED_TIME AS payed_time,
+        AVERAGE_TRANSPORTATION_TIME as average_transportation_time,
+        STATUS AS STATUS,
+        REFUSED_REASON AS refused_reason,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE AS last_update,
+        LAST_UPDATE_USER_ID AS last_update_user_id,
+        CODE AS CODE
+        FROM
+        T_Data_Transportation_Plan
+        WHERE
+        CARGO_TOTAL> SCHEDULE_CARGO_TOTAL +REDISTRIBUTE_CARGO_TOTAL AND DELETE_FLAG=0 AND UNLOADING_FINISH_DATE> NOW() AND BELONG_SCHEDULE_PLAN_NUMBER IS NOT NULL
+    </select>
+
+    <!--手动派单列表已完成-->
+    <select id="manualFinishedOrderList" resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_Plan">
+        SELECT
+        SCHEDULE_PLAN_NUMBER as schedule_plan_number,
+        BELONG_SCHEDULE_PLAN_NUMBER as belong_schedule_plan_number,
+        CONTRACT_ID AS contract_id,
+        OPERATE_MAIN_LINE_ID AS operate_main_line_id,
+        LOADING_CARGO_YARD_ID AS loading_cargo_yard_id,
+        LOADING_BEGIN_DATE AS loading_begin_date,
+        LOADING_CONTACT_NAME AS loading_contact_name,
+        LOADING_CONTACT_PHONE AS loading_contact_phone,
+        UNLOADING_CARGO_YARD_ID AS unloading_cargo_yard_id,
+        UNLOADING_FINISH_DATE AS unloading_finish_date,
+        UNLOADING_CONTACT_NAME AS unloading_contact_name,
+        UNLOADING_CONTACT_PHONE AS unloading_contact_phone,
+        REMARK AS remark,
+        CARGO_TOTAL AS cargo_total,
+        TRANSPORT_UNIT_PRICE AS transport_unit_price,
+        REDISTRIBUTE_CARGO_TOTAL AS redistribute_cargo_total,
+        TRANSPORTED_CARGO_TOTAL AS transported_cargo_total,
+        TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+        SCHEDULE_CARGO_TOTAL as schedule_cargo_total,
+        CREATE_TIME AS create_time,
+        ACCEPT_TIME AS accept_time,
+        REFUSE_TIME AS refuse_time,
+        START_SCHEDULE_TIME AS start_schedule_time,
+        FINISH_TIME AS finish_time,
+        PAYED_TIME AS payed_time,
+        AVERAGE_TRANSPORTATION_TIME as average_transportation_time,
+        STATUS AS STATUS,
+        REFUSED_REASON AS refused_reason,
+        DELETE_FLAG AS deleteFlag,
+        LAST_UPDATE AS last_update,
+        LAST_UPDATE_USER_ID AS last_update_user_id,
+        CODE AS CODE
+        FROM
+        T_Data_Transportation_Plan
+        WHERE
+        CARGO_TOTAL &lt;  SCHEDULE_CARGO_TOTAL +REDISTRIBUTE_CARGO_TOTAL AND DELETE_FLAG=0 AND BELONG_SCHEDULE_PLAN_NUMBER IS NOT NULL
+    </select>
+
+    <!--根据手动派单的二级计划编号查询 获取手动派单的信息-->
+    <select id="findOrderByPlanAndConId"  resultType="com.cn.gazelle.logistics.pojo.T_Data_Transportation_OrderList">
+        SELECT
+        o.SCHEDULE_PLAN_NUMBER AS schedule_plan_number,
+        o.BELONG_SCHEDULE_PLAN_NUMBER AS belong_schedule_plan_number,
+        o.CONTRACT_ID AS contract_id,
+        OPERATE_MAIN_LINE_ID AS operate_main_line_id,
+        o.LOADING_CARGO_YARD_ID AS loading_cargo_yard_id,
+        LOADING_BEGIN_DATE AS loading_begin_date,
+        LOADING_CONTACT_NAME AS loading_contact_name,
+        LOADING_CONTACT_PHONE AS loading_contact_phone,
+        UNLOADING_CARGO_YARD_ID AS unloading_cargo_yard_id,
+        UNLOADING_FINISH_DATE AS unloading_finish_date,
+        UNLOADING_CONTACT_NAME AS unloading_contact_name,
+        UNLOADING_CONTACT_PHONE AS unloading_contact_phone,
+        REMARK AS remark,
+        o.CARGO_TOTAL AS cargo_total,
+        o.TRANSPORT_UNIT_PRICE AS transport_unit_price,
+        o.TRANSPORTED_CARGO_TOTAL AS transported_cargo_total,
+        o.TRANSPORT_COMPLETED_CARGO_TOTAL AS transport_completed_cargo_total,
+        o.SCHEDULE_CARGO_TOTAL AS schedule_cargo_total,
+        o.CREATE_TIME AS create_time,
+        o.ACCEPT_TIME AS accept_time,
+        o.REFUSE_TIME AS refuse_time,
+        o.START_SCHEDULE_TIME AS start_schedule_time,
+        o.FINISH_TIME AS finish_time,
+        o.PAYED_TIME AS payed_time,
+        o.STATUS AS STATUS,
+        o.REFUSED_REASON AS refused_reason,
+        o.DELETE_FLAG AS deleteFlag,
+        o.LAST_UPDATE AS last_update,
+        o.LAST_UPDATE_USER_ID AS last_update_user_id,
+        o.CODE AS CODE,
+        t.`LATITUDE`AS latitude,
+        t.`LONGITUDE` AS longitude
+        FROM
+        T_Data_Transportation_Plan o
+        LEFT JOIN `t_master_cargo_yard` t
+        ON  t.cargo_id=o.LOADING_CARGO_YARD_ID
+        LEFT  JOIN  `t_data_transportation_contract` c
+        ON c.`CONTRACT_ID`=o.`CONTRACT_ID`
+        WHERE
+        o.`SCHEDULE_PLAN_NUMBER`=#{schedule_plan_number}  AND o.CONTRACT_ID=#{contract_id}AND o.DELETE_FLAG=0  AND o.BELONG_SCHEDULE_PLAN_NUMBER IS NOT NULL
+    </select>
+
+</mapper>

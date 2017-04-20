@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.TruckImmediateDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Truck_Immediate" type="com.cn.gazelle.logistics.pojo.T_Data_Truck_Immediate">
+
+        <id column="PLATE_NUMBER" property="plate_number"/>
+        <result column="TRUCK_BRAND_NAME" property="truck_brand_name"/>
+        <result column="TRUCK_MODEL_NAME" property="truck_model_name"/>
+        <result column="TRUCK_CARRIAGE_TYPE_NAME" property="truck_carriage_type_name"/>
+        <result column="DRIVING_DRIVER" property="driving_driver"/>
+        <result column="CONTACT_PHONE" property="contact_phone"/>
+        <result column="SPEED" property="speed"/>
+        <result column="DIRECTION" property="direction"/>
+        <result column="LONGITUDE" property="longitude"/>
+        <result column="LATITUDE" property="latitude"/>
+        <result column="FUEL_CONSUMPTION_STATISTICS" property="fuel_consumption_statistics"/>
+        <result column="TIRE_PRESSURE" property="tire_pressure"/>
+        <result column="ALARM_TYPE" property="alarm_type"/>
+        <result column="ALARM_INFO" property="alarm_info"/>
+        <result column="ALARM_TIME" property="alarm_time"/>
+        <result column="CARGO_TYPE_NAME" property="cargo_type_name"/>
+        <result column="CARGO_AMOUNT" property="cargo_amount"/>
+        <result column="TRANSPORTATION_PLAN_NO" property="transportation_plan_no"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--通过车牌号查询卡车即时信-->
+    <select id="findTruckImmediateByPlateNumber" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Immediate">
+        SELECT
+            *
+        FROM
+            T_Data_Truck_Immediate
+        WHERE
+            PLATE_NUMBER = #{plate_number}
+    </select>
+
+    <!--保存卡车即时信息-->
+    <insert id="saveTruckImmediate" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Immediate">
+        INSERT INTO
+        T_Data_Truck_Immediate(
+        PLATE_NUMBER,
+        TRUCK_BRAND_NAME,
+        TRUCK_MODEL_NAME,
+        TRUCK_CARRIAGE_TYPE_NAME,
+        DRIVING_DRIVER,
+        CONTACT_PHONE,
+        SPEED,
+        DIRECTION,
+        LONGITUDE,
+        LATITUDE,
+        FUEL_CONSUMPTION_STATISTICS,
+        TIRE_PRESSURE,
+        ALARM_TYPE,
+        ALARM_INFO,
+        ALARM_TIME,
+        CARGO_TYPE_NAME,
+        CARGO_AMOUNT,
+        TRANSPORTATION_PLAN_NO,
+        LAST_UPDATE,
+        LAST_UPDATE_USER_ID)
+        SELECT
+        #{plate_number},
+        #{truck_brand_name},
+        #{truck_model_name},
+        #{truck_carriage_type_name},
+        #{driving_driver},
+        #{contact_phone},
+        #{speed},
+        #{direction},
+        #{longitude},
+        #{latitude},
+        #{fuel_consumption_statistics},
+        #{tire_pressure},
+        #{alarm_type},
+        #{alarm_info},
+        #{alarm_time},
+        #{cargo_type_name},
+        #{cargo_amount},
+        #{transportation_plan_no},
+        #{last_update},
+        #{last_update_user_id}
+    </insert>
+
+    <!--更新卡车即时信息-->
+    <update id="updateTruckImmediate" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Truck_Immediate">
+        UPDATE
+        T_Data_Truck_Immediate
+        SET
+        TRUCK_BRAND_NAME = #{truck_brand_name},
+        TRUCK_MODEL_NAME = #{truck_model_name},
+        TRUCK_CARRIAGE_TYPE_NAME = #{truck_carriage_type_name},
+        DRIVING_DRIVER = #{driving_driver},
+        CONTACT_PHONE = #{contact_phone},
+        SPEED = #{speed},
+        DIRECTION = #{direction},
+        LONGITUDE = #{longitude},
+        LATITUDE = #{latitude},
+        FUEL_CONSUMPTION_STATISTICS = #{fuel_consumption_statistics},
+        TIRE_PRESSURE = #{tire_pressure},
+        ALARM_TYPE = #{alarm_type},
+        ALARM_INFO = #{alarm_info},
+        ALARM_TIME = #{alarm_time},
+        CARGO_TYPE_NAME = #{cargo_type_name},
+        CARGO_AMOUNT = #{cargo_amount},
+        TRANSPORTATION_PLAN_NO = #{transportation_plan_no},
+        LAST_UPDATE = #{last_update},
+        LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+        PLATE_NUMBER = #{plate_number}
+
+    </update>
+
+    <!--删除卡车即时信-->
+    <delete id="delTruckImmediate" parameterType="String">
+    DELETE FROM
+            T_Data_Truck_Immediate
+        WHERE
+            PLATE_NUMBER = #{plate_number}
+    </delete>
+
+    <!--通过obdID查询车牌号-->
+    <select id="findPlateNumberByOBDID" parameterType="String" resultType="String">
+        SELECT
+        t.`PLATE_NUMBER`
+        FROM
+        `t_data_truck` t
+        LEFT JOIN
+        t_data_obd_equipment_truck_binding obdt ON obdt.`TRUCK_ID`=t.`TRUCK_ID` AND obdt.`DELETE_FLAG`=0 AND obdt.`UNBINDING_TIME` IS NULL
+        LEFT JOIN
+        `t_data_obd_equipment` obd ON obd.`EQUIPMENT_ID`=obdt.`EQUIPMENT_ID` AND obd.`DELETE_FLAG`=0
+        WHERE
+        t.`DELETE_FLAG`=0 AND obd.`OBD_ID`=#{obd_id}
+    </select>
+
+    <!--通过车牌号获取车辆品牌名称-->
+    <select id="findTruckBrandNameByPlateNumber" parameterType="String" resultType="String">
+        SELECT
+        d.`DICDATA_NAME`
+        FROM
+        `t_sys_dicdata` d
+        LEFT JOIN
+        `t_data_truck_model` m ON d.`DICDATA_ID`=m.`TRUCK_BRAND_ID`
+        LEFT JOIN
+        `t_data_truck` t ON t.`TRUCK_MODEL_NO`=m.`TRUCK_MODEL_NO`
+        WHERE
+        t.`PLATE_NUMBER`=#{plate_number} AND d.`DELETE_STATES`=0 AND t.`DELETE_FLAG`=0 AND m.`DELETE_FLAG`=0
+    </select>
+
+    <!--通过车牌号获取车辆型号名称-->
+    <select id="findTruckModelNameByPlateNumber" parameterType="String" resultType="String">
+        SELECT
+        m.`TRUCK_MODEL_NAME`
+        FROM
+        `t_data_truck_model` m
+        LEFT JOIN
+        `t_data_truck` t ON t.`TRUCK_MODEL_NO`=m.`TRUCK_MODEL_NO`
+        WHERE
+        t.`PLATE_NUMBER`=#{plate_number} AND m.`DELETE_FLAG`=0 AND t.`DELETE_FLAG`=0
+    </select>
+
+    <!--通过车牌号获取车厢类型名称-->
+    <select id="findTruckCarriageTypeNameByPlateNumber" parameterType="String" resultType="String">
+        SELECT
+        ct.`TRUCK_CARRIAGE_TYPE_NAME`
+        FROM
+        `t_master_truck_carriage_type` ct
+        LEFT JOIN
+        `t_data_truck` t ON ct.`TRUCK_CARRIAGE_TYPE_ID`=t.`TRUCK_CARRIAGE_TYPE_ID`
+        WHERE
+        t.`PLATE_NUMBER`=#{plate_number} AND ct.`DELETE_FLAG`=0 AND t.`DELETE_FLAG`=0
+    </select>
+
+    <!--通过车牌号获取联系方式-->
+    <select id="findTruckContactPhoneByPlateNumber" parameterType="String" resultType="String">
+        SELECT
+        p.`PERSON_MOBILE_PHONE`
+        FROM
+        `t_data_person` p
+        LEFT JOIN
+        `t_data_truck` t ON t.`MANAGER_MEMBER_ID`=p.`PERSON_ID`
+        WHERE
+        t.`PLATE_NUMBER`=#{plate_number} AND p.`DELETE_FLAG`=0 AND t.`DELETE_FLAG`=0
+    </select>
+
+    <!--根据车牌号获取正在驾驶司机列表-->
+    <select id="findDrivingDriverByPlateNumber" resultType="java.util.Map">
+        SELECT
+        p.`PERSON_NAME`
+        FROM
+        `t_data_person` p
+        LEFT JOIN
+        `t_data_truck` t ON t.`TRUCK_ID`=p.`DRIVING_TRUCK_ID`
+        WHERE
+        t.`PLATE_NUMBER`= #{plate_number} AND p.`DRIVING_STATUS`=2 AND p.`DELETE_FLAG`=0 AND PERSON_TYPE = 1
+    </select>
+
+    <!--通过车牌号获取货物类型名称-->
+    <select id="findCargoTypeNameByPlateNumber" parameterType="String" resultType="String">
+    SELECT
+    ct.`CARGO_TYPE_NAME`
+    FROM
+    `t_master_cargo_type` ct
+    LEFT JOIN
+    `t_data_transportation_contract` tc ON ct.`CARGO_TYPE_ID`=tc.`CARGO_TYPE_ID`
+    LEFT JOIN
+    `t_data_transportation_plan` tp ON tc.`CONTRACT_ID`=tp.`CONTRACT_ID`
+    LEFT JOIN
+    `t_data_transportation_schedule_sheet` tss ON tp.`SCHEDULE_PLAN_NUMBER`=tss.`SCHEDULE_PLAN_NUMBER`
+    LEFT JOIN
+    `t_data_truck` t ON tss.`SCHEDULE_TRUCK_ID`=t.`TRUCK_ID`
+    WHERE
+    t.`PLATE_NUMBER`=#{plate_number} AND t.`DELETE_FLAG`=0 AND tss.`DELETE_FLAG`=0 AND tp.`DELETE_FLAG`=0 AND tc.`DELETE_FLAG`=0 AND tss.`STATUS`&lt;5 AND tss.`STATUS`&gt;0
+    </select>
+
+    <!--通过车牌号获取装货数量-->
+    <select id="findLoadingCargoAmountByPlateNumber" parameterType="String" resultType="String">
+        SELECT
+        tss.`LOADING_CARGO_AMOUNT`
+        FROM
+        `t_data_transportation_schedule_sheet` tss
+        LEFT JOIN
+        `t_data_truck` t ON tss.`SCHEDULE_TRUCK_ID`=t.`TRUCK_ID`
+        WHERE
+        t.`PLATE_NUMBER`=#{plate_number} AND t.`DELETE_FLAG`=0 AND tss.`DELETE_FLAG`=0 AND tss.`STATUS`&lt;5 AND tss.`STATUS`&gt;0
+    </select>
+
+    <!--通过车牌号获取运输计划编号-->
+    <select id="findSchedulePlanNumberByPlateNumber" parameterType="String" resultType="String">
+        SELECT
+        tss.`SCHEDULE_PLAN_NUMBER`
+        FROM
+        `t_data_transportation_schedule_sheet` tss
+        LEFT JOIN
+        `t_data_truck` t ON tss.`SCHEDULE_TRUCK_ID`=t.`TRUCK_ID`
+        WHERE
+        t.`PLATE_NUMBER`=#{plate_number} AND t.`DELETE_FLAG`=0 AND tss.`DELETE_FLAG`=0 AND tss.`STATUS`&lt;5 AND tss.`STATUS`&gt;0
+    </select>
+</mapper>

@@ -1,0 +1,43 @@
+.QuerytheReset {
+  border: none;
+  padding: 0;
+}
+.QuerytheReset a {
+  margin: 0;
+  margin-left: 0 15px;
+}
+.glyphicon {
+  cursor: pointer;
+}
+/*货物类型页面下拉*/
+.infoConditions .goodTypeSelect .form-group .goodTypeList ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+.fixed-table-body{
+  height:auto;
+}
+/*新增匹配页面下拉*/
+.addMatch .form-group .CarType ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+.addMatch .form-group .cargoTypeList ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}
+/*
+详情编辑页面的下拉
+*/
+.matchGoodType ul{
+  max-height:180px;
+  max-height:25rem;
+  overflow-y: auto;
+  width:160px;
+}

@@ -1,0 +1,60 @@
+.vehicleMonitoringManagerMap {
+  position: relative;
+  height: 100%;
+  background: #fff;
+}
+.vehicleMonitoringManagerMap .stateOftheVehicle {
+  position: absolute;
+  left: 140px;
+  left: 10rem;
+  top: 9px;
+  top: 0.9rem;
+  background: #fff;
+  box-shadow: 0px 0px 7px #0e0e0e;
+  z-index:999;
+}
+.vehicleMonitoringManagerMap .stateOftheVehicle div {
+  width: 100px;
+  width: 9rem;
+  vertical-align: middle;
+  height: 100%;
+  padding-bottom: 9px;+
+}
+.vehicleMonitoringManagerMap .stateOftheVehicle div span {
+  display: inline-block;
+  font-size: 15px;
+  font-size: 1.5rem;
+}
+.vehicleMonitoringManagerMap .stateOftheVehicle div span img {
+  margin: 6px 0;
+}
+.vehicleMonitoringManagerMap .stateOftheVehicle div .checkbox {
+  cursor: pointer;
+  vertical-align: bottom;
+  font-size: 20px;
+}
+.vehicleMonitoringManagerMap .stateOftheVehicle div .allVehicles {
+  margin-bottom: 0;
+  margin-top: 16px;
+}
+.vehicleMonitoringCarTree {
+  height: 100%;
+  background: #efe;
+}
+.vehicleMonitoringCarTree label {
+  font-weight: 100;
+  font-size: 15px;
+  font-size: 1.5rem;
+}
+.detailClass{
+  color: #5cb85c;
+}
+/*表格显示*/
+.fixed-table-body{
+  height:auto;
+}
+
+#myModal label {
+  min-width: 104px;
+  text-align: right;
+}

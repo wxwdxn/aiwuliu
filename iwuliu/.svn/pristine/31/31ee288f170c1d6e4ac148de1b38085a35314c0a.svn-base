@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.CargoDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Master_Cargo_Yard" type="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Yard">
+        <id column="CARGO_ID" property="cargo_id"></id>
+        <result column="CARGO_NAME" property="cargo_name"></result>
+        <result column="PROVINCE_ID" property="province_id"></result>
+        <result column="CITY_ID" property="city_id"></result>
+        <result column="AREA_ID" property="area_id"></result>
+        <result column="TOWN_STREET" property="town_street"></result>
+        <result column="LOAD_BEGIN_TIME" property="load_begin_time"></result>
+        <result column="LOAD_END_TIME" property="load_end_time"></result>
+        <result column="LOAD_COST" property="load_cost"></result>
+        <result column="LOAD_PUMP_COST" property="load_pump_cost"></result>
+        <result column="AVERAGE_LOAD_TIME" property="average_load_time"></result>
+        <result column="LOAD_TRUCK_NUMBER_PER_DAY" property="load_truck_number_per_day"></result>
+        <result column="UNLOAD_BEGIN_TIME" property="unload_begin_time"></result>
+        <result column="UNLOAD_END_TIME" property="unload_end_time"></result>
+        <result column="UNLOAD_COST" property="unload_cost"></result>
+        <result column="AVERAGE_UNLOAD_TIME" property="average_unload_time"></result>
+        <result column="UNLOAD_PUMP_COST" property="unload_pump_cost"></result>
+        <result column="UNLOAD_TRUCK_NUMBER_PER_DAY" property="unload_truck_number_per_day"></result>
+        <result column="LONGITUDE" property="longitude"></result>
+        <result column="LATITUDE" property="latitude"></result>
+        <result column="DELETE_FLAG" property="deleteFlag"></result>
+        <result column="LAST_UPDATE" property="last_update"></result>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"></result>
+    </resultMap>
+    <!--根据id查询货场列表-->
+    <select id="findById" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Yard">
+        SELECT
+            CARGO_ID as cargo_id,
+            CARGO_NAME as cargo_name,
+            PROVINCE_ID as province_id,
+            CITY_ID as city_id,AREA_ID as area_id,
+            TOWN_STREET as town_street,
+            LOAD_BEGIN_TIME as load_begin_time,
+            LOAD_END_TIME as load_end_time,
+            LOAD_COST as load_cost,
+            LOAD_PUMP_COST as load_pump_cost,
+            LOAD_TRUCK_NUMBER_PER_DAY as load_truck_number_per_day,
+            UNLOAD_BEGIN_TIME as unload_begin_time,
+            UNLOAD_END_TIME as unload_end_time,
+            UNLOAD_COST as unload_cost,
+            UNLOAD_PUMP_COST as unload_pump_cost,
+            UNLOAD_TRUCK_NUMBER_PER_DAY as unload_truck_number_per_day,
+            AVERAGE_LOAD_TIME as average_load_time,
+            AVERAGE_UNLOAD_TIME as average_unload_time,
+            LATITUDE AS latitude,
+            LONGITUDE as longitude,
+            LAST_UPDATE as last_update,
+            LAST_UPDATE_USER_ID as last_update_user_id
+        FROM
+            t_master_cargo_yard
+        WHERE
+            CARGO_ID = #{cargo_id} and DELETE_FLAG=0
+    </select>
+
+    <!--查询符合条件的货场列表信息（不分页）-->
+    <select id="findCargoList" resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Yard">
+        SELECT
+            *
+        FROM
+            t_master_cargo_yard
+        WHERE
+            DELETE_FLAG=0
+    </select>
+
+    <!--查询符合条件的货场列表信息（默认查询所货场列表信息）-->
+    <select id="findAllCargo" resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Yard">
+        SELECT
+            *
+        FROM
+            t_master_cargo_yard
+        WHERE DELETE_FLAG=0
+        <if test="cargo_name !=''">
+        AND
+            CARGO_NAME LIKE '%${cargo_name}%'
+        </if>
+            limit #{page},#{rows}
+
+    </select>
+
+    <!--保存货场信息-->
+    <insert id="saveCargo" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Yard">
+        INSERT INTO
+                t_master_cargo_yard (CARGO_ID,
+                CARGO_NAME,
+                PROVINCE_ID,
+                CITY_ID,
+                AREA_ID,
+                TOWN_STREET,
+                LOAD_BEGIN_TIME,
+                LOAD_END_TIME,
+                LOAD_COST,
+                AVERAGE_LOAD_TIME,
+                AVERAGE_UNLOAD_TIME,
+                LOAD_PUMP_COST,
+                LOAD_TRUCK_NUMBER_PER_DAY,
+                UNLOAD_BEGIN_TIME,
+                UNLOAD_END_TIME,
+                UNLOAD_COST,
+                UNLOAD_PUMP_COST,
+                UNLOAD_TRUCK_NUMBER_PER_DAY,
+                LONGITUDE,
+                LATITUDE,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{cargo_id},
+                #{cargo_name},
+                #{province_id},
+                #{city_id},
+                #{area_id},
+                #{town_street},
+                #{load_begin_time},
+                #{load_end_time},
+                #{load_cost},
+                #{average_load_time},
+                #{average_unload_time},
+                #{load_pump_cost},
+                #{load_truck_number_per_day},
+                #{unload_begin_time},
+                #{unload_end_time},
+                #{unload_cost},
+                #{unload_pump_cost},
+                #{unload_truck_number_per_day},
+                #{longitude},
+                #{latitude},
+                0,
+                #{last_update},
+                #{last_update_user_id});
+    </insert>
+
+    <!--更新货场信息-->
+    <update id="updateCargo" parameterType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Yard">
+        UPDATE
+            t_master_cargo_yard
+        SET
+            CARGO_NAME = #{cargo_name},
+            PROVINCE_ID = #{province_id} ,
+            CITY_ID = #{city_id} ,
+            AREA_ID = #{area_id} ,
+            TOWN_STREET = #{town_street} ,
+            LOAD_BEGIN_TIME = #{load_begin_time} ,
+            LOAD_END_TIME = #{load_end_time} ,
+            LOAD_COST = #{load_cost} ,
+            AVERAGE_LOAD_TIME = #{average_unload_time} ,
+            AVERAGE_UNLOAD_TIME = #{average_unload_time} ,
+            LOAD_PUMP_COST = #{load_pump_cost} ,
+            LOAD_TRUCK_NUMBER_PER_DAY=#{load_truck_number_per_day},
+            UNLOAD_BEGIN_TIME = #{unload_begin_time} ,
+            UNLOAD_END_TIME = #{unload_end_time} ,
+            UNLOAD_COST = #{unload_cost} ,
+            UNLOAD_PUMP_COST = #{unload_pump_cost} ,
+            UNLOAD_TRUCK_NUMBER_PER_DAY= #{unload_truck_number_per_day},
+            LONGITUDE = #{longitude} ,
+            LATITUDE = #{latitude} ,
+            DELETE_FLAG=0 ,
+            LAST_UPDATE = #{last_update} ,
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            CARGO_ID=#{cargo_id} AND DELETE_FLAG=0
+    </update>
+
+    <!--删除货场信息-->
+    <delete id="cargoDel" parameterType="String">
+        UPDATE
+            t_master_cargo_yard
+        SET
+            DELETE_FLAG=1
+        WHERE
+            CARGO_ID = #{cargo_id} AND DELETE_FLAG=0
+    </delete>
+
+    <!--手机定位和装货货场的距离-->
+    <select id="findDistance" resultType="String">
+        SELECT  ROUND(6378.138*2*ASIN(SQRT(POW(SIN( (#{lat1}*PI()/180-#{lat2}*PI()/180)/2),2)+COS(#{lat1}*PI()/180)*COS(#{lat2}*PI()/180)
+        * POW(SIN( (#{lng1}*PI()/180-#{lng2}*PI()/180)/2),2)))*1000)AS juli  FROM DUAL
+    </select>
+
+    <!--根据省市县查询货场信息-->
+    <select id="getFrightYardByPosition" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Master_Cargo_Yard">
+        SELECT
+        *
+        FROM `t_master_cargo_yard`
+        WHERE DELETE_FLAG='0'
+        <if test="province_id!=''">
+            AND
+            PROVINCE_ID LIKE '%${province_id}%'
+        </if>
+        <if test="city_id!=''">
+            AND
+            CITY_ID LIKE '%${city_id}%'
+        </if>
+        <if test="area_id!=''">
+            AND
+            AREA_ID LIKE '%${area_id}%'
+        </if>
+        <if test="town_street!=''">
+            AND
+            TOWN_STREET LIKE '%${town_street}%'
+        </if>
+    </select>
+
+</mapper>

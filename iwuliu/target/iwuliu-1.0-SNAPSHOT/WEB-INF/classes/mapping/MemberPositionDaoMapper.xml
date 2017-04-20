@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.MemberPositionDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Member_Position" type="com.cn.gazelle.logistics.pojo.T_Data_Member_Position">
+
+        <id column="POSITION_NUMBER" property="position_number"/>
+        <result column="MEMBER_ID" property="member_id"/>
+        <result column="CLIENT_ACQUISITION_TIME" property="client_acquisition_time"/>
+        <result column="SERVER_ACQUISITION_TIME" property="server_acquisition_time"/>
+        <result column="LONGITUDE" property="longitude"/>
+        <result column="LATITUDE" property="latitude"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据位置No查询会员定位信息-->
+    <select id="findMemberPositionByPositionNumber" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Position">
+        SELECT
+            *
+        FROM
+            T_Data_Member_Position
+        WHERE
+            POSITION_NUMBER = #{position_number} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据会员ID查询会员定位信息-->
+    <select id="findMemberPositionByMemberId" resultMap="T_Data_Member_Position">
+        SELECT
+            *
+        FROM
+            T_Data_Member_Position
+        WHERE
+            MEMBER_ID = #{member_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的会员定位列表信息（默认查询所有会员定位列表信息）-->
+    <select id="findAllMemberPosition" resultMap="T_Data_Member_Position">
+        SELECT
+            *
+        FROM
+            T_Data_Member_Position t
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'member_id'">
+            AND t.${search_type} IN (
+            SELECT m.member_id FROM (SELECT relevance_info_id AS member_id FROM `t_data_member` WHERE member_name LIKE '%${name}%')AS m
+            )
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询会员定位信息总记录数-->
+    <select id="findAllMemberPositionRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Data_Member_Position t
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'member_id'">
+            AND t.${search_type} IN (
+            SELECT m.member_id FROM (SELECT relevance_info_id AS member_id FROM `t_data_member` WHERE member_name LIKE '%${name}%')AS m
+            )
+        </if>
+    </select>
+
+    <!--保存会员定位基础信息-->
+    <insert id="saveMemberPosition" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Position">
+        INSERT INTO
+                T_Data_Member_Position(POSITION_NUMBER,
+                MEMBER_ID,
+                CLIENT_ACQUISITION_TIME,
+                SERVER_ACQUISITION_TIME,
+                LONGITUDE,
+                LATITUDE,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{position_number},
+                #{member_id},
+                #{client_acquisition_time},
+                #{server_acquisition_time},
+                #{longitude},
+                #{latitude},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新会员定位基础信息-->
+    <update id="updateMemberPosition" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Position">
+        UPDATE
+            T_Data_Member_Position
+        SET
+            MEMBER_ID = #{member_id},
+            CLIENT_ACQUISITION_TIME = #{client_acquisition_time},
+            SERVER_ACQUISITION_TIME = #{server_acquisition_time},
+            LONGITUDE = #{longitude},
+            LATITUDE = #{latitude},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            POSITION_NUMBER = #{position_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据位置No删除会员定位基础信息-->
+    <delete id="delMemberPosition" parameterType="String">
+        UPDATE
+            T_Data_Member_Position
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            POSITION_NUMBER = #{position_number} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--根据会员ID倒叙查询最近10条会员定位信息-->
+    <select id="findLastMemberPositionByMemberId" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Position">
+        SELECT
+        *
+        FROM
+        T_Data_Member_Position
+        WHERE
+        MEMBER_ID = #{member_id} AND DELETE_FLAG = 0
+        ORDER BY CLIENT_ACQUISITION_TIME DESC
+        limit 0,10
+    </select>
+</mapper>

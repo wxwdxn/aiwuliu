@@ -1,0 +1,389 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称：GoodAndCarMatchController.java
+ * 系统编号: Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：
+ * 模块名称：
+ * 设计文件：
+ * 完成日期：2016-11-17
+ * 作    者: WXW
+ * 内容摘要：
+ */
+package com.cn.gazelle.logistics.controller.operationController;
+
+import com.cn.gazelle.logistics.dao.CargoTruckTypeMatchMapper;
+import com.cn.gazelle.logistics.dao.CargoTypeDaoMapper;
+import com.cn.gazelle.logistics.dao.DicdataDaoMapper;
+import com.cn.gazelle.logistics.dao.TruckCarriageTypeDaoMapper;
+import com.cn.gazelle.logistics.pojo.*;
+import com.cn.gazelle.logistics.service.CargoTruckTypeService;
+import com.cn.gazelle.logistics.service.CargoTypeService;
+import com.cn.gazelle.logistics.service.TruckCarriageTypeService;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.ResponseUtil;
+import com.cn.gazelle.logistics.util.message.CargoTruckTypeManager_Message;
+import com.cn.gazelle.logistics.util.message.TruckCarriageTypeManager_Message;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称：GoodAndCarMatchController
+ * 内容描述：
+ * 方法描述：该类有 个方法
+ *          01 
+ *          02
+ *@authot WXW
+ */
+@Controller
+@RequestMapping(value = "/goodAndCarMatchManager")
+public class GoodAndCarMatchController {
+    Logger logger = Logger.getLogger(GoodAndCarMatchController.class);
+    @Resource
+    private CargoTruckTypeService cargoTruckTypeService;
+    @Resource
+    private CargoTruckTypeMatchMapper cargoTruckTypeMatchMapper;
+    @Resource
+    private CargoTypeService cargoTypeService;
+    @Resource
+    private CargoTypeDaoMapper cargoTypeDaoMapper;
+    @Resource
+    private TruckCarriageTypeDaoMapper truckCarriageTypeDaoMapper;
+    @Resource
+    private DicdataDaoMapper dicdataDaoMapper;
+    @Resource
+    private TruckCarriageTypeService truckCarriageTypeService;
+    /**
+     * 方法名 称：saveMatch
+     * 内容描述：保存货物和车厢类型匹配
+     * 方法描述：该类有 个方法
+     *          01
+     *          02
+     *@authot WXW
+     */
+    @ResponseBody
+    @RequestMapping(value = "/saveMatch")
+    public T_Data_JsonResult saveMatch( HttpServletRequest request, HttpServletResponse response, ModelMap model)throws Exception {
+        String parameter = request.getParameter("list");
+        T_Data_JsonResult result = new T_Data_JsonResult();
+        int i=-1;
+        try{
+            i = cargoTruckTypeService.addCargoTruckTypeByCargoType(parameter,"U:"+request.getSession().getAttribute("username"));
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            i = Integer.parseInt(e.getMessage());
+        }
+        if (i == 1) {
+            result.setResult(1);//保存成功
+            logger.info(CargoTruckTypeManager_Message.SaveCargoTruckDone);
+        } else if (i == 0) {
+            result.setResult(0);//保存重复
+            logger.info(CargoTruckTypeManager_Message.SaveCargoTruckError);
+        } else if (i == -1) {
+            result.setResult(2);//保存失败
+            logger.info(CargoTruckTypeManager_Message.SaveCargoTruckError);
+        }
+        return result;
+    }
+    /**
+     * 方法名 称：getTruckTypeBycargoId
+     * 内容描述：根据货物类型查询 匹配详情
+     * 方法描述：该类有 个方法
+     *          01
+     *          02
+     *@authot WXW
+     */
+    @RequestMapping(value = "/getTruckTypeByCargoId")
+    public void getTruckTypeByCargoId(HttpServletRequest request,HttpServletResponse response,String cargoId){
+        List<Map<String,String>> list = new ArrayList<Map<String,String>>();
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        try {
+            T_Master_Cargo_Type cargoType = cargoTypeService.findCargoType(cargoId);
+            String cargoTypeName = cargoType.getCargoTypeName();
+            String cargoTypeUnitE = cargoType.getCargoTypeUnitE();
+            String cargoTypeUnitC = cargoType.getCargoTypeUnitC();
+            String cargoTypeDesc = cargoType.getCargoTypeDesc();
+            hashMap.put("cargoTypeName",cargoTypeName);
+            hashMap.put("cargoTypeUnitE",cargoTypeUnitE);
+            hashMap.put("cargoTypeUnitC",cargoTypeUnitC);
+            hashMap.put("cargoTypeDesc",cargoTypeDesc);
+            List<T_Master_Cargo_Truck_Type_Match> matchList = cargoTruckTypeMatchMapper.findMatchByCargoId(cargoId);
+            for (T_Master_Cargo_Truck_Type_Match match:matchList){
+                HashMap<String, String> map = new HashMap<String, String>();
+                String truckTypeId = match.getTruckTypeId();
+                T_Master_Truck_Carriage_Type carriageType = truckCarriageTypeDaoMapper.findTruckCarriageTypeByID(truckTypeId);
+                String typeName = carriageType.getTruck_carriage_type_name();
+                map.put("truckTypeId",truckTypeId);
+                map.put("typeName",typeName);
+                list.add(map);
+            }
+            hashMap.put("list",list);
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(hashMap));
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 方法名 称：updateMatch
+     * 内容描述：更新货物和车厢类型匹配
+     * 方法描述：该类有 个方法
+     *          01
+     *          02
+     *@authot WXW
+     */
+    @ResponseBody
+    @RequestMapping(value = "/updateMatch")
+    public T_Data_JsonResult updateMatch( HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+        String parameter = request.getParameter("list");
+        T_Data_JsonResult result = new T_Data_JsonResult();
+        int i=-1;
+        try{
+           i = cargoTruckTypeService.addCargoTruckTypeByCargoType(parameter,"U:"+request.getSession().getAttribute("username"));
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            i = Integer.parseInt(e.getMessage());
+        }
+        if (i == 1) {
+            result.setResult(1);//保存成功
+            logger.info(CargoTruckTypeManager_Message.SaveCargoTruckDone);
+        } else if (i == 0) {
+            result.setResult(0);//保存重复
+            logger.info(CargoTruckTypeManager_Message.SaveCargoTruckError);
+        } else if (i == -1) {
+            result.setResult(2);//保存失败
+            logger.info(CargoTruckTypeManager_Message.SaveCargoTruckError);
+        }
+        return result;
+    }
+
+    /**
+     * 方法名 称：getCargoTypeByCarTypeId
+     * 内容描述：根据车厢类型查询 匹配详情
+     * 方法描述：该类有 个方法
+     *          01
+     *          02
+     *@authot WXW
+     */
+    @RequestMapping(value = "/getCargoTypeByCarTypeId")
+    public void getCargoTypeByCarTypeId(HttpServletRequest request,HttpServletResponse response,String carTypeId){
+        List<Map<String,String>> list = new ArrayList<Map<String,String>>();
+        List<T_Sys_Dicdata> dicdataList_useable = null;
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        try {
+            T_Master_Truck_Carriage_Type carriage_type = truckCarriageTypeDaoMapper.findTruckCarriageTypeByID(carTypeId);
+            String typeDesc = carriage_type.getTruck_carriage_type_desc();
+            String type_name = carriage_type.getTruck_carriage_type_name();
+            String useable = carriage_type.getTruck_carriage_useable();
+            dicdataList_useable=  dicdataDaoMapper.findAllDicdataByID("DF338ECE3FC54C9581B52641E2BDD721", useable);
+            hashMap.put("carTypeDesc",typeDesc);
+            hashMap.put("carType",type_name);
+            hashMap.put("userable",dicdataList_useable.get(0).getDicdata_name());
+            List<T_Master_Cargo_Truck_Type_Match> matchList = cargoTruckTypeMatchMapper.findMatchByTruck(carTypeId);
+            for (T_Master_Cargo_Truck_Type_Match match:matchList){
+                HashMap<String, String> map = new HashMap<String, String>();
+                String cargoTypeId = match.getCargoTypeId();
+                T_Master_Cargo_Type cargoType = cargoTypeService.findCargoType(cargoTypeId);
+                String cargoTypeName = cargoType.getCargoTypeName();
+                map.put("cargoTypeId",cargoTypeId);
+                map.put("cargoTypeName",cargoTypeName);
+                list.add(map);
+            }
+            hashMap.put("list",list);
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(hashMap));
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 方法名 称：updateMatchByTruckId
+     * 内容描述：通过车厢类型id更新货物和车厢类型匹配
+     * 方法描述：该类有 个方法
+     *          01
+     *          02
+     *@authot WXW
+     */
+    @ResponseBody
+    @RequestMapping(value = "/updateMatchByTruckId")
+    public T_Data_JsonResult updateMatchByTruckId( HttpServletRequest request, HttpServletResponse response, ModelMap model)throws Exception {
+        String parameter = request.getParameter("list");
+        T_Data_JsonResult result = new T_Data_JsonResult();
+        int i=-1;
+        try{
+            i = cargoTruckTypeService.addCargoTruckTypeByTruckType(parameter,"U:"+request.getSession().getAttribute("username"));
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            i = Integer.parseInt(e.getMessage());
+        }
+        if (i == 1) {
+            result.setResult(1);//保存成功
+            logger.info(CargoTruckTypeManager_Message.SaveCargoTruckDone);
+        } else if (i == 0) {
+            result.setResult(0);//保存重复
+            logger.info(CargoTruckTypeManager_Message.SaveCargoTruckError);
+        } else if (i == -1) {
+            result.setResult(2);//保存失败
+            logger.info(CargoTruckTypeManager_Message.SaveCargoTruckError);
+        }
+        return  result;
+    }
+    /**
+     * 方法名 称：saveCarGoodMatch
+     * 内容描述：保存车厢类型和货物匹配
+     * 方法描述：该类有 个方法
+     *          01
+     *          02
+     *@authot WXW
+     */
+    @ResponseBody
+    @RequestMapping(value = "/saveCarGoodMatch")
+    public T_Data_JsonResult saveCarGoodMatch( HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+        T_Data_JsonResult result = new T_Data_JsonResult();
+        String parameter = request.getParameter("list");
+        try{
+            int i = cargoTruckTypeService.addCargoTruckTypeByTruckType(parameter,"U:"+request.getSession().getAttribute("username"));
+            if (i==1){
+                result.setResult(1);
+                logger.info(TruckCarriageTypeManager_Message.saveDone);
+            }else if (i==0){
+                result.setResult(0);
+                logger.info(TruckCarriageTypeManager_Message.saveDoubleInfoError);
+            }else{
+                result.setResult(2);
+                logger.info(TruckCarriageTypeManager_Message.saveErr);
+            }
+
+        }catch (Exception e){
+            result.setResult(2);
+            logger.info(TruckCarriageTypeManager_Message.saveErr);
+        }
+        return  result;
+    }
+    /**
+     * 方法名称：getCarriageTypeByCargoId
+     * 内容摘要：根据货物类型Id 查询未匹配的车厢类型json文件。
+     * @param request   request
+     * @param response  response
+     * @param model     model
+     */
+    @RequestMapping(value = "getCarriageTypeByCargoId")
+    public String getCarriageTypeByCargoId(HttpServletRequest request, HttpServletResponse response, ModelMap model,String CargoId) {
+        List<T_Master_Truck_Carriage_Type> truckCarriageTypeList = null;
+        List<T_Master_Cargo_Truck_Type_Match> matchByCargoId=null;
+        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+        try {
+            truckCarriageTypeList = this.truckCarriageTypeDaoMapper.findAllTruckCarriageTypeByID("");
+            matchByCargoId= cargoTruckTypeMatchMapper.findMatchByCargoId(CargoId);
+            List<String> truckTypeList=new ArrayList<String>();
+            //获取货物类型匹配的车厢类型
+            for (T_Master_Cargo_Truck_Type_Match match:matchByCargoId){
+                String truckTypeId = match.getTruckTypeId();
+                truckTypeList.add(truckTypeId);
+            }
+            //获取全部的车厢类型Id
+            List<String> carriageTypeList=new ArrayList<String>();
+            for (T_Master_Truck_Carriage_Type truckCarriageType : truckCarriageTypeList) {
+                String carriageTypeId = truckCarriageType.getTruck_carriage_type_id();
+                carriageTypeList.add(carriageTypeId);
+
+            }
+            //获取没有匹配的车厢类型
+            for (String typeId:carriageTypeList){
+                if (!truckTypeList.contains(typeId)){
+                    String typeName = truckCarriageTypeDaoMapper.findTruckCarriageTypeByID(typeId).getTruck_carriage_type_name();
+                    Map<String, String> results = new HashMap<String, String>();
+                    results.put("id",typeId);
+                    results.put("name", typeName);
+                    list.add(results);
+                }
+            }
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(list));
+            logger.info(TruckCarriageTypeManager_Message.searchDone);
+        } catch (Exception e) {
+            logger.error(TruckCarriageTypeManager_Message.searchErr + e.getMessage());
+        }
+        return JSONUtil.toJSONString(list);
+    }
+
+
+    /**
+     * 方法名称：findTruckMatchList
+     * 内容摘要：根据车厢类型查询货物类型。
+     * @param request  request
+     * @param response response
+     * @param truckTypeId 车厢类型Id
+     * @param model
+     */
+    @RequestMapping(value = "MatchList")
+    public void findTruckMatchList(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false,defaultValue = "") String truckTypeId, ModelMap model){
+        Map result=new HashMap();
+        try {
+            List<T_Master_Cargo_Truck_Type_Match> matchList = cargoTruckTypeMatchMapper.findMatchByTruck(truckTypeId);
+            List<Map<String, String>> list=new ArrayList<Map<String, String>>();
+            for (T_Master_Cargo_Truck_Type_Match match:matchList){
+                HashMap<String, String> hashMap = new HashMap<String, String>();
+                String cargoTypeId = match.getCargoTypeId();
+                T_Master_Cargo_Type cargoType = cargoTypeDaoMapper.findCargoType(cargoTypeId);
+                String cargoTypeName = cargoType.getCargoTypeName();
+                String cargoTypeDesc = cargoType.getCargoTypeDesc();
+                String cargoTypeUnitE = cargoType.getCargoTypeUnitE();
+                String cargoTypeUnitC = cargoType.getCargoTypeUnitC();
+                hashMap.put("cargoTypeId",cargoTypeId);
+                hashMap.put("cargoTypeName",cargoTypeName);
+                hashMap.put("cargoTypeDesc",cargoTypeDesc);
+                hashMap.put("cargoTypeUnitE",cargoTypeUnitE);
+                hashMap.put("cargoTypeUnitC",cargoTypeUnitC);
+                list.add(hashMap);
+            }
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(list));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+    /**
+     * 方法名称：findTruckMatchListByCargoType
+     * 内容摘要：根据货物类型查询车厢类型。
+     * @param request  request
+     * @param response response
+     * @param cargoTypeId  货物类型Id
+     * @param model
+     */
+    @RequestMapping(value = "findTruckMatchListByCargoType")
+    public void findTruckMatchListByCargoType( HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false,defaultValue = "") String cargoTypeId, ModelMap model){
+        Map result=new HashMap();
+        List<T_Sys_Dicdata> dicdataList_useable = null;
+        try {
+            List<T_Master_Cargo_Truck_Type_Match> matchList = cargoTruckTypeMatchMapper.findMatchByCargoId(cargoTypeId);
+            List<Map<String, String>> list=new ArrayList<Map<String, String>>();
+            for (T_Master_Cargo_Truck_Type_Match match:matchList){
+                HashMap<String, String> hashMap = new HashMap<String, String>();
+                String truckTypeId = match.getTruckTypeId();
+                T_Master_Truck_Carriage_Type carriageType = truckCarriageTypeService.findTruckCarriageTypeByID(truckTypeId);
+                String name = carriageType.getTruck_carriage_type_name();
+                String typeDesc = carriageType.getTruck_carriage_type_desc();
+                dicdataList_useable=  dicdataDaoMapper.findAllDicdataByID("DF338ECE3FC54C9581B52641E2BDD721", carriageType.getTruck_carriage_useable());
+                hashMap.put("carTypeId",truckTypeId);
+                hashMap.put("carTypeName",name);
+                hashMap.put("carTypeDesc",typeDesc);
+                hashMap.put("carTypeUseable",dicdataList_useable.get(0).getDicdata_name());
+                list.add(hashMap);
+            }
+            ResponseUtil.outWrite(response, JSONUtil.toJSONString(list));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+}

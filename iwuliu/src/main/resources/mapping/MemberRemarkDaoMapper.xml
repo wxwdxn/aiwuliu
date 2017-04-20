@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.gazelle.logistics.dao.MemberRemarkDaoMapper">
+    <!--结果集定义-->
+    <resultMap id="T_Data_Member_Remark" type="com.cn.gazelle.logistics.pojo.T_Data_Member_Remark">
+
+        <id column="REMARK_NUMBER" property="remark_number"/>
+        <result column="MEMBER_ID" property="member_id"/>
+        <result column="REMARK_CONTENT" property="remark_content"/>
+        <result column="ADD_TIME" property="add_time"/>
+        <result column="DELETE_FLAG" property="delete_flag"/>
+        <result column="LAST_UPDATE" property="last_update"/>
+        <result column="LAST_UPDATE_USER_ID" property="last_update_user_id"/>
+    </resultMap>
+
+    <!--根据备注编号查询会员备注信息-->
+    <select id="findMemberRemarkByRemarkNumber" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Remark">
+        SELECT
+            *
+        FROM
+            T_Data_Member_Remark
+        WHERE
+            REMARK_NUMBER = #{remark_number} AND DELETE_FLAG = 0
+    </select>
+
+    <!--根据会员ID查询会员备注信息-->
+    <select id="findMemberRemarkByMemberId" resultMap="T_Data_Member_Remark">
+        SELECT
+            *
+        FROM
+            T_Data_Member_Remark
+        WHERE
+            MEMBER_ID = #{member_id} AND DELETE_FLAG = 0
+    </select>
+
+    <!--查询符合条件的会员备注列表信息（默认查询所有会员备注列表信息）-->
+    <select id="findAllMemberRemark" resultMap="T_Data_Member_Remark">
+        SELECT
+            *
+        FROM
+            T_Data_Member_Remark t
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'member_id'">
+            AND t.${search_type} IN (
+            SELECT m.member_id FROM (SELECT relevance_info_id AS member_id FROM `t_data_member` WHERE member_name LIKE '%${name}%')AS m
+            )
+        </if>
+        limit #{page},#{rows}
+    </select>
+
+    <!--查询会员备注信息总记录数-->
+    <select id="findAllMemberRemarkRowsCount"  resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            T_Data_Member_Remark t
+        WHERE
+            DELETE_FLAG = 0
+        <if test="search_type !=''and search_type== 'member_id'">
+            AND t.${search_type} IN (
+            SELECT m.member_id FROM (SELECT relevance_info_id AS member_id FROM `t_data_member` WHERE member_name LIKE '%${name}%')AS m
+            )
+        </if>
+    </select>
+
+    <!--保存会员备注基础信息-->
+    <insert id="saveMemberRemark" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Remark">
+        INSERT INTO
+                T_Data_Member_Remark(REMARK_NUMBER,
+                MEMBER_ID,
+                REMARK_CONTENT,
+                ADD_TIME,
+                DELETE_FLAG,
+                LAST_UPDATE,
+                LAST_UPDATE_USER_ID)
+        VALUES (
+                #{remark_number},
+                #{member_id},
+                #{remark_content},
+                #{add_time},
+                0,
+                #{last_update},
+                #{last_update_user_id})
+    </insert>
+
+    <!--更新会员备注基础信息-->
+    <update id="updateMemberRemark" parameterType="com.cn.gazelle.logistics.pojo.T_Data_Member_Remark">
+        UPDATE
+            T_Data_Member_Remark
+        SET
+            MEMBER_ID = #{member_id},
+            REMARK_CONTENT = #{remark_content},
+            ADD_TIME = #{add_time},
+            LAST_UPDATE = #{last_update},
+            LAST_UPDATE_USER_ID = #{last_update_user_id}
+        WHERE
+            REMARK_NUMBER = #{remark_number} AND DELETE_FLAG = 0
+    </update>
+
+    <!--根据备注编号删除会员备注基础信息-->
+    <delete id="delMemberRemark" parameterType="String">
+        UPDATE
+            T_Data_Member_Remark
+        SET
+            DELETE_FLAG = 1
+        WHERE
+            REMARK_NUMBER = #{remark_number} AND DELETE_FLAG = 0
+    </delete>
+
+    <!--根据会员ID倒叙查询最近10条会员备注信息-->
+    <select id="findLastMemberRemarkByMemberId" parameterType="String" resultType="com.cn.gazelle.logistics.pojo.T_Data_Member_Remark">
+        SELECT
+        *
+        FROM
+        T_Data_Member_Remark
+        WHERE
+        MEMBER_ID = #{member_id} AND DELETE_FLAG = 0
+        ORDER BY CLIENT_ACQUISITION_TIME DESC
+        limit 0,10
+    </select>
+</mapper>

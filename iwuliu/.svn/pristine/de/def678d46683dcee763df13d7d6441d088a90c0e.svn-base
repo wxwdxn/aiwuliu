@@ -1,0 +1,11 @@
+.QuerytheReset {
+  border: none;
+  padding: 0;
+}
+.QuerytheReset a {
+  margin: 0;
+  margin-left: 0 15px;
+}
+.glyphicon {
+  cursor: pointer;
+}

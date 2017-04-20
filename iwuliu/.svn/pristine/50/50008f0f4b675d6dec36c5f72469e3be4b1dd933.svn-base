@@ -1,0 +1,606 @@
+/**
+ * 版权所有：版权所有(C) 2015
+ * 文件名称: CompanyServiceImpl.Java
+ * 系统编号：Z0001002
+ * 系统名称：物流管理平台
+ * 模块编号：02
+ * 模块名称：公司信息查询接口声明
+ * 设计文件：
+ * 完成日期：2015-02-18
+ * 作    者：YK
+ * 内容摘要：公司信息查询
+ */
+package com.cn.gazelle.logistics.service.impl;
+
+import com.cn.gazelle.logistics.dao.CompanyDaoMapper;
+import com.cn.gazelle.logistics.dao.DicdataDaoMapper;
+import com.cn.gazelle.logistics.dao.MemberDaoMapper;
+import com.cn.gazelle.logistics.dao.TruckDaoMapper;
+import com.cn.gazelle.logistics.pojo.T_Data_Company;
+import com.cn.gazelle.logistics.pojo.T_Data_Member;
+import com.cn.gazelle.logistics.pojo.T_Data_Truck;
+import com.cn.gazelle.logistics.pojo.T_Sys_Dicdata;
+import com.cn.gazelle.logistics.service.CompanyService;
+import com.cn.gazelle.logistics.util.DateUtil;
+import com.cn.gazelle.logistics.util.JSONUtil;
+import com.cn.gazelle.logistics.util.MD5Util;
+import com.cn.gazelle.logistics.util.UUIDUtil;
+import com.cn.gazelle.logistics.util.message.CompanyManager_Message;
+import com.cn.gazelle.logistics.util.message.base.MessageUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.jws.WebService;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 类 名 称: MemberService
+ * 内容摘要: 会员信息查询接口
+ * 方法描述：该类有9个方法：
+ * 01 findCompanyByID                 根据企业id查询企业信息
+ * 02 findCompanyByName               根据企业名查询企业信息
+ * 03 findCompanyName                 查询所有的企业名(无参)
+ * 04 findAllCompany                  查询所有企业信息（有参）
+ * 05 findComanyByMemberName          根据会员名查找公司信息
+ * 06 findAllCompanyRowsCount         查询企业总记录数
+ * 07 saveCompany                     保存企业信息
+ * 08 updateCompan                    更新企业信息
+ * 09 delCompany                      删除企业信息
+ *
+ * @author YK
+ */
+@Service
+@WebService(endpointInterface = "com.cn.gazelle.logistics.service.CompanyService", targetNamespace = "http://service.logistics.gazelle.cn.com/")
+public class CompanyServiceImpl implements CompanyService {
+    // Log初始化
+    Logger logger = Logger.getLogger(CompanyServiceImpl.class);
+
+    @Resource
+    private CompanyDaoMapper companyDaoMapper;                 // 数据访问层
+    @Resource
+    private MemberDaoMapper memberDaoMapper;                   // 数据访问层
+    @Resource
+    private DicdataDaoMapper dicdataDaoMapper;                 // 数据访问层
+    @Resource
+    private TruckDaoMapper truckDaoMapper;                     // 数据访问层
+
+
+    /**
+     * 方法名称：findCompanyByID
+     * 内容摘要：根据企业id查询企业信息。
+     *
+     * @param company_id 企业id
+     * @return String 企业信息json
+     */
+    public T_Data_Company findCompanyByID(String company_id) {
+        T_Data_Company company = null;
+        try {
+            company = this.companyDaoMapper.findCompanyByID(company_id);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError + e.getMessage());
+        }
+        return company;
+    }
+
+    /**
+     * 方法名称：findCompanyByName
+     * 内容摘要：根据企业名查询企业信息
+     *
+     * @param company_name 公司名称
+     * @return T_Data_Company 公司信息
+     */
+    public T_Data_Company findCompanyByName(String company_name, String company_type) {
+        T_Data_Company company = null;
+        try {
+            company = this.companyDaoMapper.findCompanyByName(company_name, company_type);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError + e.getMessage());
+        }
+        return company;
+    }
+
+    /**
+     * 方法名称：findCompanyName
+     * 内容摘要：查询所有的企业名
+     *
+     * @return String  公司名称json
+     */
+    public String findCompanyName(String company_type) {
+        String json = null;
+        Map result = new HashMap();
+        List<T_Data_Company> companyList = null;
+        List compamyNameList = new ArrayList();
+        try {
+            companyList = this.companyDaoMapper.findCompanyName(company_type);
+            for (T_Data_Company company : companyList) {
+                compamyNameList.add(company.getCompany_name());
+            }
+            result.put("compamyNameList", compamyNameList);
+            json = JSONUtil.toJSONString(result);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError + e.getMessage());
+        }
+        return json;
+    }
+
+    /**
+     * 方法名称：findAllCompany
+     * 内容摘要：查询所有企业信息
+     *
+     * @param search_type 搜索类型
+     * @param name        查询类型
+     * @param page        页面页数
+     * @param rows        页面显示条数
+     * @return List<T_Data_Company>  公司信息list
+     */
+    public List<T_Data_Company> findAllCompany(String search_type, String name, Integer page, Integer rows, String company_type) {
+        List<T_Data_Company> companyList = null;
+        try {
+            companyList = this.companyDaoMapper.findAllCompany(search_type, name, page, rows, company_type);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError + e.getMessage());
+        }
+        return companyList;
+    }
+
+    /**
+     * 方法名称：findAllCompanyRowsCount
+     * 内容摘要：查询企业总记录数
+     *
+     * @param search_type 搜索类型
+     * @param name        查询类型
+     * @return Integer  企业信息记录数
+     */
+    public Integer findAllCompanyRowsCount(String search_type, String name, String company_type) {
+        int count = 0;
+        try {
+            count = this.companyDaoMapper.findAllCompanyRowsCount(search_type, name, company_type);
+        } catch (Exception e) {
+            logger.error(CompanyManager_Message.getSelectCompanyCountError + e.getMessage());
+        }
+        return count;
+    }
+
+    /**
+     * 方法名称：saveCompany
+     * 内容摘要：保存企业信息
+     *
+     * @param company 企业名称
+     */
+    public int saveCompany(T_Data_Company company) {
+        int count = 0;
+        T_Data_Member member = new T_Data_Member();
+        try {
+            // 后台添加公司信息，所留联系电话作为会员用户账号
+            member.setMember_id(UUIDUtil.getUUID());
+            member.setMember_type(company.getCompany_type());
+            member.setMember_name(company.getContact_mobile_phone());
+            member.setMember_password(company.getContact_mobile_phone());
+            member.setMobile_phone(company.getContact_mobile_phone());
+            member.setAccount_type("1");
+            member.setRelevance_info_id(company.getCompany_id());
+            member.setMember_belong_code(company.getCompany_id());
+            member.setAccount_status("0");
+            member.setLast_update(DateUtil.getDate());
+            member.setLast_update_user_id(company.getLast_update_user_id());
+            member.setDelete_flag("0");
+            this.memberDaoMapper.saveMember(member);
+            count = this.companyDaoMapper.saveCompany(company);
+            if (count == 1) {
+                logger.info(MessageUtil.saveInfo);
+            } else if (count == 0) {
+                logger.info(MessageUtil.saveDoubleInfoError);
+            }
+        } catch (Exception e) {
+            count = -1;
+            logger.error(MessageUtil.saveInfoError + e.getMessage());
+        }
+        return count;
+    }
+
+    /**
+     * 方法名称：updateCompany
+     * 内容摘要：更新企业信息
+     *
+     * @param company 公司信息
+     */
+    public boolean updateCompany(T_Data_Company company) {
+        boolean b = new Boolean(true);
+        T_Data_Member member = new T_Data_Member();
+        T_Data_Company company_old = null; // 数据库对应的对象
+        try {
+            // 后台添加公司信息，所留联系电话作为会员用户账号
+            company_old = this.companyDaoMapper.findCompanyByID(company.getCompany_id());
+            member = this.memberDaoMapper.findMemberByName(company_old.getContact_mobile_phone());
+            if (member != null) {
+                member.setMember_name(company.getContact_mobile_phone());
+                member.setMember_password(company.getContact_mobile_phone());
+                this.memberDaoMapper.updateMember(member);
+            }
+            this.companyDaoMapper.updateCompany(company);
+        } catch (Exception e) {
+            b = false;
+            logger.error(e.getMessage());
+        }
+        return b;
+    }
+
+    /**
+     * 方法名称：delCompany
+     * 内容摘要：删除企业信息
+     *
+     * @param company_id 会员id
+     */
+    public void delCompany(String company_id) {
+        try {
+            this.companyDaoMapper.delCompany(company_id);
+            logger.info(MessageUtil.delInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.delInfoError + e.getMessage());
+        }
+
+    }
+
+    /**
+     * 方法名称: queryCompanyList
+     * 方法描述： 物流公司列表查询（页面）
+     * @param company_name
+     * @param contact_name
+     * @param contact_mobile_phone
+     * @param business_licence
+     * @return List<T_Data_Company>
+     */
+    public List<T_Data_Company> queryCompanyList(String company_name, String contact_name,
+                                                 String contact_mobile_phone, String business_licence) {
+        List<T_Data_Company> list = null;
+        try {
+            list = this.companyDaoMapper.queryCompanyList(company_name,contact_name,contact_mobile_phone,business_licence);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e){
+            logger.error(e.getMessage() + MessageUtil.seacheInfoError);
+        }
+        return list;
+    }
+
+    /**
+     * 方法名称: findCompanyDetailByID
+     * 方法描述： 物流公司详情页回显（页面）
+     * @param company_id
+     * @return T_Data_Company
+     */
+    public T_Data_Company findCompanyDetailByID(String company_id) {
+        T_Data_Company company = null;
+        try {
+            company = this.companyDaoMapper.findCompanyDetailByID(company_id);
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + MessageUtil.seacheInfoError);
+        }
+
+
+        return company;
+    }
+
+    /**
+     * 方法名称:saveCompanyInfo
+     * 方法描述：保存物流公司信息（web页面）
+     * @param info
+     * @param userName
+     * @return int
+     */
+    @Transactional
+    public int saveCompanyInfo(String info, String userName,String licence_path, String store_path) {
+        Gson gson = new Gson();
+        T_Data_Company company = new T_Data_Company();
+        T_Data_Member member = new T_Data_Member();
+        int flag = 0;
+        try {
+            // 解析info json数据
+            Map<String, String> data = gson.fromJson(info, new TypeToken<Map<String, String>>() {
+            }.getType());
+            logger.info("data=" + JSONUtil.toJSONString(data));
+            String company_name = (String) data.get("add_company_name");
+            String contact_name = (String) data.get("add_contact_name");
+            String contact_mobile_phone = (String) data.get("add_contact_mobile_phone");
+            String business_licence = (String) data.get("add_business_licence");
+            String company_fixed_phone = (String) data.get("add_company_fixed_phone");
+            String contact_sex = (String) data.get("add_contact_sex");
+            String province = (String) data.get("add_province");
+            String city = (String) data.get("add_city");
+            String area = (String) data.get("add_area");
+            String townStreet = (String) data.get("add_townStreet");
+            // 判断所留手机号是否已经注册
+            T_Data_Member memberOfDB = this.memberDaoMapper.findMemberByName(contact_mobile_phone);
+            if (memberOfDB==null) {
+                // 保存公司信息
+                String company_id = UUIDUtil.getUUID();
+                company.setCompany_id(company_id);
+                company.setCompany_name(company_name);
+                company.setBusiness_licence(business_licence);
+                company.setBusiness_licence_pic_id(licence_path);
+                company.setContact_sex(contact_sex);
+                company.setCompany_fixed_phone(company_fixed_phone);
+                company.setContact_name(contact_name);
+                company.setContact_mobile_phone(contact_mobile_phone);
+                company.setCompany_type("0"); // 管车
+                company.setProvince_id(province);
+                company.setCity_id(city);
+                company.setArea_id(area);
+                company.setTown_street(townStreet);
+                company.setStore_pic_id(store_path);
+                company.setRegister_time(DateUtil.getDate());
+                company.setStatus("2"); // 审核默认通过
+                company.setDelete_flag("0");
+                company.setLast_update(DateUtil.getDate());
+                company.setLast_update_user_id(userName);
+                flag = companyDaoMapper.saveCompany(company);
+                // 后台添加公司信息，所留联系电话作为会员用户账号
+                member.setMember_id(UUIDUtil.getUUID());
+                member.setMember_type("0"); // 管车
+                member.setMember_name(contact_mobile_phone);
+                member.setMember_password(MD5Util.md5(contact_mobile_phone));
+                member.setMobile_phone(contact_mobile_phone);
+                member.setAccount_type("1");
+                member.setRelevance_info_id(company_id);
+                member.setMember_belong_code(company_id);
+                member.setAccount_status("0");
+                member.setLast_update(DateUtil.getDate());
+                member.setLast_update_user_id(userName);
+                member.setDelete_flag("0");
+                this.memberDaoMapper.saveMember(member);
+                if (flag == 1) {//保存成功
+                } else if (flag == 0) {//重复
+                    throw new RuntimeException(String.valueOf(flag));
+                } else if (flag == -1) {
+                    throw new RuntimeException(String.valueOf(flag));
+                }
+            } else {
+                flag = 2; // 手机号已经注册
+                throw new RuntimeException(String.valueOf(flag));
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("0")){
+                flag = 0;
+            }else if (e.getMessage().equals("-1")){
+                flag = -1;
+            } else if (e.getMessage().equals("2")){
+                flag = 2;
+            }
+            throw new RuntimeException(flag + "");
+        }
+        return flag;
+    }
+
+    /**
+     * 方法名称：editCompanyInfo
+     * 内容摘要：编辑物流公司信息（页面）
+     */
+    @Transactional
+    public int editCompanyInfo(String info, String userName, String licence_path, String store_path) {
+        Gson gson = new Gson();
+        T_Data_Company company = new T_Data_Company();
+        int flag = 0;
+        int count = 0;
+        try {
+            // 解析info json数据
+            Map<String, String> data = gson.fromJson(info, new TypeToken<Map<String, String>>() {
+            }.getType());
+            logger.info("data=" + JSONUtil.toJSONString(data));
+            String company_id = (String) data.get("company_id");
+            String detail_province = (String) data.get("detail_province");
+            String detail_city = (String) data.get("detail_city");
+            String detail_area = (String) data.get("detail_area");
+            String detail_sex = (String) data.get("detail_sex");
+            String detail_townStreet = (String) data.get("detail_townStreet");
+            String detail_company_name = (String) data.get("detail_company_name");
+            String detail_contact_name = (String) data.get("detail_contact_name");
+            String detail_contact_mobile_phone = (String) data.get("detail_contact_mobile_phone");
+            String detail_business_licence = (String) data.get("detail_business_licence");
+            String detail_company_fixed_phone = (String) data.get("detail_company_fixed_phone");
+            // 获取数据库中的公司信息
+            company = this.companyDaoMapper.findCompanyByID(company_id);
+            // 判断有没有修改手机号
+            if (!detail_contact_mobile_phone.equals(company.getContact_mobile_phone())) {
+                T_Data_Member member_new = this.memberDaoMapper.findMemberByName(detail_contact_mobile_phone);
+                // 判断修改的手机号有没有注册
+                if (member_new!=null){
+                    flag = 2; // 手机号已注册
+                    throw new RuntimeException(String.valueOf(flag));
+                } else {
+                    // 修改手机号，需更新数据库
+                    T_Data_Member member_old = this.memberDaoMapper.findMemberByName(company.getContact_mobile_phone());
+                    member_old.setMember_name(detail_contact_mobile_phone);
+                    member_old.setMember_password(MD5Util.md5(detail_contact_mobile_phone));
+                    member_old.setMobile_phone(detail_contact_mobile_phone);
+                    member_old.setLast_update(DateUtil.getDate());
+                    member_old.setLast_update_user_id(userName);
+                    this.memberDaoMapper.updateMember(member_old);
+                }
+            }
+            // 更新公司信息
+                company.setProvince_id(detail_province);
+                company.setCity_id(detail_city);
+                company.setArea_id(detail_area);
+                company.setContact_sex(detail_sex);
+                company.setTown_street(detail_townStreet);
+                company.setCompany_name(detail_company_name);
+                company.setContact_name(detail_contact_name);
+                company.setContact_mobile_phone(detail_contact_mobile_phone);
+                company.setBusiness_licence(detail_business_licence);
+                company.setCompany_fixed_phone(detail_company_fixed_phone);
+                this.companyDaoMapper.updateCompany(company);
+                flag = 1;
+
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+            if (e.getMessage().equals("2")){
+                flag = 2;
+            } else {
+                flag = -1;
+            }
+            throw new RuntimeException(flag + "");
+        }
+        return flag;
+    }
+
+    /**
+     * 方法名称：saveTruckInfo
+     * 内容摘要：物流公司新增车辆信息（页面）
+     */
+    public int saveTruckInfo(String truckInfo, String userName, HashMap picPathMap,String company_id) {
+        Gson gson = new Gson();
+        int flag = 0;
+        try {
+            T_Data_Truck truck = gson.fromJson(truckInfo, new TypeToken<T_Data_Truck>() {
+            }.getType());
+            truck.setDriving_licence_first_page_save_path((String) picPathMap.get("driving_licence_first_page_save_path"));
+            truck.setDriving_licence_second_page_save_path((String) picPathMap.get("driving_licence_second_page_save_path"));
+            truck.setTruck_first_pic_save_path((String) picPathMap.get("truck_first_pic_save_path"));
+            truck.setTruck_second_pic_save_path((String) picPathMap.get("truck_second_pic_save_path"));
+            truck.setTruck_third_pic_save_path((String) picPathMap.get("truck_third_pic_save_path"));
+            truck.setTruck_id(UUIDUtil.getUUID());              // 绑定车辆ID,司机和车辆id关联
+            truck.setOwner_member_id(company_id);               // 默认为none
+            truck.setOperate_status("0");                       // 车辆运营状态
+            truck.setVerify_status("2");                        // 车辆审核状态
+            truck.setManager_member_id("none");                 // 默认为none
+            truck.setDeposit_member_id(company_id);             // 默认为none
+            truck.setSubmit_verify_time(DateUtil.getDate());    // 新增提交审核时间
+            truck.setDelete_flag(0);                            // 新建删除标识符，0：未删除
+            truck.setLast_update(DateUtil.getDate());           // 新增最终更新日
+            truck.setLast_update_user_id(userName);             // 新增最终更新者
+            flag = this.truckDaoMapper.saveTruck(truck);
+            if (flag == 1) {//保存成功
+            } else if (flag == 0) {//重复
+                throw new RuntimeException(String.valueOf(flag));
+            } else if (flag == -1) {
+                throw new RuntimeException(String.valueOf(flag));
+            }
+        } catch (RuntimeException e) {
+            if (e.getMessage().equals("0")){
+                flag = 0;
+            }else {
+                flag = -1;
+            }
+            throw new RuntimeException(flag + "");
+        }
+        return flag;
+    }
+
+    /**
+     * 方法名称：findCompanyList
+     * 内容摘要：查询所有企业信息不分页
+     */
+    public List<T_Data_Company> findCompanyList() {
+        List<T_Data_Company> companyList = null;
+        try {
+            companyList = this.companyDaoMapper.findCompanyList();
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError + e.getMessage());
+        }
+        return companyList;
+    }
+
+    @Override
+    /**
+     * 方法名称：findCompanyList
+     * 内容摘要：查询所有企业货主不分页
+     */
+    public List<T_Data_Company> findCompanyShipperList() {
+        List<T_Data_Company> companyShippersList = null;
+        try {
+            companyShippersList = this.companyDaoMapper.findCompanyShipperList();
+            logger.info(MessageUtil.seacheInfo);
+        } catch (Exception e) {
+            logger.error(MessageUtil.seacheInfoError + e.getMessage());
+        }
+        return companyShippersList;
+    }
+
+    /**
+     * 方法名称：findComanyByMemberName
+     * 内容摘要：注册会员信息
+     *
+     * @param member_name 会员名称
+     * @return String 返回值json
+     */
+    public String findComanyByMemberName(String member_name) {
+        T_Data_Member member = null;
+        T_Data_Company company = null;
+        String company_id = null;
+        String mobile_phone = null;
+        String user_head_pic_id = null;
+        String json = null;
+        List<T_Sys_Dicdata> dicdataList_province = new ArrayList<T_Sys_Dicdata>();
+        List<T_Sys_Dicdata> dicdataList_city = new ArrayList<T_Sys_Dicdata>();
+        List<T_Sys_Dicdata> dicdataList_area = new ArrayList<T_Sys_Dicdata>();
+        Map result = new HashMap();
+        String ecode = null;
+        try {
+            member = this.memberDaoMapper.findMemberByName(member_name);
+            if (member == null) {
+                ecode = "3005"; // 账号不存在
+                result.put("ecode", ecode);
+                result.put("mobile_phone", "");
+                result.put("user_head_pic_id", "");
+                result.put("companyInfo", "账号不存在，查不到该公司信息！");
+            } else {
+                company_id = member.getRelevance_info_id();
+                mobile_phone = member.getMobile_phone();
+                user_head_pic_id = member.getUser_head_pic_id();
+                company = this.companyDaoMapper.findCompanyByID(company_id);
+                // 省
+                dicdataList_province = this.dicdataDaoMapper.findAllDicdataByID("2EE02FDAE3BE4F06B8CFDF4425BA74BF", company.getProvince_id());
+                if (dicdataList_province != null && dicdataList_province.size() != 0) {
+                    company.setProvince_id(dicdataList_province.get(0).getDicdata_name());
+                }
+                // 市
+                dicdataList_city = this.dicdataDaoMapper.findAllDicdataByID("66029BA5DC964A15B29852FA077327C0", company.getCity_id());
+                if (dicdataList_city != null && dicdataList_city.size() != 0) {
+                    company.setCity_id(dicdataList_city.get(0).getDicdata_name());
+                }
+                // 区
+                dicdataList_area = this.dicdataDaoMapper.findAllDicdataByID("D7FAF287624242ECB3304B6A62414779", company.getArea_id());
+                if (dicdataList_area != null && dicdataList_area.size() != 0) {
+                    company.setArea_id(dicdataList_area.get(0).getDicdata_name());
+                }
+
+                if (company != null) {
+                    ecode = "1000"; // 查到公司信息
+                    result.put("ecode", ecode);
+                    result.put("mobile_phone", mobile_phone);
+                    result.put("user_head_pic_id", user_head_pic_id);
+                    logger.info("user_head_pic_id=" + user_head_pic_id);
+                    result.put("companyInfo", company);
+                } else {
+                    ecode = "3005"; // 公司信息不存在
+                    result.put("ecode", ecode);
+                    result.put("mobile_phone", "");
+                    result.put("user_head_pic_id", "");
+                    result.put("companyInfo", "公司信息不存在!");
+                }
+
+            }
+            logger.info("ecode=" + ecode);
+            logger.info("companyInfo=" + company);
+            logger.info("json=" + JSONUtil.toJSONString(result));
+        } catch (Exception e) {
+            ecode = "2000";
+            result.put("ecode", ecode);
+            logger.error(e.getMessage());
+        }
+        json = JSONUtil.toJSONString(result);
+        return json;
+    }
+}

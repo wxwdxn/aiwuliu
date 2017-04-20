@@ -1,0 +1,514 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% String username = request.getSession().getAttribute("username").toString();%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <title></title>
+</head>
+<link rel="stylesheet" type="text/css"
+      href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap.min.css"/>
+<%--Bootstrap-table CSS文件--%>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-table.min.css">
+<%--Bootstrap-Datetimepicker CSS文件--%>
+<link rel="stylesheet"
+      href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/css/common.css"/>
+<link rel="stylesheet" type="text/css"
+      href="<%=request.getContextPath()%>/static/operationManager/routerManager/css/routerManager.css"/>
+<script src="<%=request.getContextPath()%>/static/common/js/jquery-1.11.0.js" type="text/javascript"
+        charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap.min.js" type="text/javascript"
+        charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/js/common.js" type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/operationManager/routerManager/js/routerManager.js"
+        type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css"
+      href="<%=request.getContextPath()%>/static/operationManager/routerManager/css/routerManager.css"/>
+<script src="<%=request.getContextPath()%>/static/common/js/jquery.form.js" type="text/javascript"
+        charset="utf-8"></script>
+<%--Bootstrap-table JavaScript 文件以及汉化文件--%>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table.min.js"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table-zh-CN.js"></script>
+<%--Bootstrap时间控件  JavaScript 文件以及汉化文件--%>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-datetimepicker.min.js"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<%--高德地图--%>
+<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+<script src="http://webapi.amap.com/maps?v=1.3&key=a0faf6f34da0f9e9fa333547de2a4a9e"></script>
+<!--[if lt IE 9]>
+<script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+<script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<body>
+<!--*********导航条开始***********-->
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="javascript:;">
+                <img src="<%=request.getContextPath()%>/static/common/images/logo.png"/>
+            </a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">系统管理 <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">权限管理</a></li>
+                        <li><a href="#">角色管理</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%=username%><span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="/iwuliu/login/loginOut">退出</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<!--*********导航条结束***********-->
+<div class="container-fluid eleHeight">
+    <div class="row eleHeight">
+        <div class="col-md-2 leftMenu eleHeight"></div>
+
+        <div class="iframeMain">
+            <h4>
+                线路管理
+            </h4>
+
+            <div class="infoConditions">
+                <form id="form-group" class="form-inline">
+                    <div class="form-group">
+                        <label>长跑干线：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" id="routerManager_startCity"/>至
+                            <input type="text" class="form-control" id="routerManager_finishCity"/>
+
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>线路编号：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" id="routerManager_lineNo"/>
+
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>线路：</label>
+
+                        <div class="display_inlineBlcok routerManager_lineId">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">线路备注</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu ulHeight">
+                            </ul>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="QuerytheReset">
+                        <a type="button" class="btn query" onclick="routerManagerQuery();">查询</a>
+                        <a type="button" class="btn reset" onclick="routerManagerQueryReset();">重置</a>
+                    </div>
+                </form>
+                <div class="buttons">
+                    <%--<a type="button" class="btn btn_export">--%>
+                        <%--导出--%>
+                    <%--</a>--%>
+                    <a type="button" class="btn btn_detail" onclick="btn_detail()">
+                        详情/编辑
+                    </a>
+                    <a class="btn btn_newAdd" onclick="btn_newAdd()">
+                        新增线路
+                    </a>
+                </div>
+                <div class="col-md-12">
+                    <table data-toggle="table" class="table table-striped table-bordered table-hover"
+                           id="routerManagerTable"
+                           data-query-params="routerQueryParams"
+                           data-query-params-type="limit"
+                           data-pagination="true"
+                           data-pagination-first-text="首页"
+                           data-pagination-pre-text="上一页"
+                           data-pagination-next-text="下一页"
+                           data-pagination-last-text="末页"
+                           data-row-style="rowStyle"
+                           data-page-list="[10,20,30]"
+                           data-smart-display="false"
+                    >
+                        <thead style="background-color:#dbfff2;">
+                        <tr>
+                            <th data-field="state" data-checkbox="true" data-width="100px"></th>
+                            <th class="hidden" data-field="line_id" data-align="center" data-valign="middle"
+                                width="0">
+                                线路ID
+                            </th>
+                            <th data-field="operate_main_line_name" data-align="center" data-valign="middle">
+                                干线
+                            </th>
+                            <th data-field="line_no" data-align="center" data-valign="middle">路线编号</th>
+                            <th data-field="average_gas_consumption" data-align="center" data-valign="middle">
+                                平均天然气消耗量
+                            </th>
+                            <th data-field="average_diesel_fuel_consumption" data-align="center"
+                                data-valign="middle">平均柴油消耗量
+                            </th>
+                            <th data-field="average_highway_tolls" data-align="center" data-valign="middle">
+                                平均高速过路费
+                            </th>
+                            <th data-field="average_national_road_tolls" data-align="center"
+                                data-valign="middle">平均国道过路费
+                            </th>
+                            <th data-field="average_national_road_fine" data-align="center"
+                                data-valign="middle">平均国道罚款
+                            </th>
+                            <th data-align="center" data-valign="middle" data-formatter="operationFormatter">
+                                详情
+                            </th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="form-inline" align="center" style="margin: -45px auto 17px;">
+                        <input id="router_page" class="form-control" style="width: 60px;" type="number"
+                               value="1" min="1">
+                        <button id="router_goBtn" class="btn btn-success">GO</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 详情-->
+<div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modalDialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close closeLeft" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">详情</h4>
+                <a type="button" isClick=true class="btn edit" onclick="detail_edit(this)">编辑</a>
+            </div>
+            <div class="modal-body">
+                <h4>干线信息</h4>
+                <div class="form-inline padding-left">
+                    <div class="form-group uneditable">
+                        <label>线路：</label>
+                        <div class="display_inlineBlcok start_provice">
+                            <button disabled type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">省份</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                <li value="111"><a href="javascript:;">已绑定</a></li>
+                                <li value="222"><a href="javascript:;">可绑定</a></li>
+                            </ul>
+                        </div>
+                        <div class="display_inlineBlcok start_city">
+                            <button disabled type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">市区</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                <li value="111"><a href="javascript:;">已绑定</a></li>
+                                <li value="222"><a href="javascript:;">可绑定</a></li>
+                            </ul>
+                        </div>至
+                        <div class="display_inlineBlcok end_provice">
+                            <button disabled type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">省份</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                <li value="111"><a href="javascript:;">已绑定</a></li>
+                                <li value="222"><a href="javascript:;">可绑定</a></li>
+                            </ul>
+                        </div>
+                        <div class="display_inlineBlcok end_city">
+                            <button disabled type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">市区</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                <li value="111"><a href="javascript:;">已绑定</a></li>
+                                <li value="222"><a href="javascript:;">可绑定</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <h4>线路详情</h4>
+            </div>
+            <div class="modal-footer modalFooter elementDisplayNone">
+                <a type="button" class="btn hold">保存</a>
+                <a type="button" class="btn cancel" data-dismiss="modal">取消</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal 新增-->
+<div class="modal fade bs-example-modal-lg" id="myModalNewAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modalDialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">新增</h4>
+            </div>
+            <div class="modal-body">
+                <h4>干线信息</h4>
+                <div class="form-inline padding-left routerManagerDetail" id="routerNewAddForm" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>线路：</label>
+                        <div class="display_inlineBlcok add_start_provice">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder startProvince" id="startProvince" addAttr="startProvince">省份</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            </ul>
+                        </div>
+                        <div class="display_inlineBlcok add_start_city">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder startCity" id="startCity" addAttr="startCity">市区</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            </ul>
+                        </div>至
+                        <div class="display_inlineBlcok add_end_provice">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder endProvince" id="endProvince" addAttr="endProvince">省份</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            </ul>
+                        </div>
+                        <div class="display_inlineBlcok add_end_city">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder endCity" id="endCity" addAttr="endCity">市区</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <h4>线路详情</h4>
+                <div class="router_infoDetail">
+                    <div class="form-inline docubleUneditable padding-left">
+                        <div class="form-group margin-right addRouterBtn">
+                            <label class="sr-only">添加线路</label>
+                            <div class="display_inlineBlcok">
+		        				<span class="glyphicon glyphicon-plus addRouterInfoBtn" onclick="addRouterInfo(this)">
+
+				        		</span>
+				        		<span class="glyphicon glyphicon-minus removeRouterInfoBtn" onclick="removeRouterInfo(this)">
+
+				        		</span>
+                            </div>
+                        </div>
+                        <div class="form-group margin-right">
+                            <label>线路：</label>
+                            <div class="display_inlineBlcok">
+                                <span class="form-control nodeStartCity"></span>
+                                <span class="form-control nodeEndCity"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>线路备注：</label>
+                            <div class="display_inlineBlcok">
+                                <input type="text" class="form-control text-center routerNodeName" value=""/>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline routerManagerNewAddNodeInfoDetail">
+                        <div class="form-group docubleUneditable">
+                            <label>节点编号：</label>
+                            <div class="display_inlineBlcok">
+                                <span addAttr="nodeNumber" class="form-control nodeNumber">0</span>
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="form-group docubleUneditable">
+                            <label>节点名称：</label>
+                            <div class="display_inlineBlcok">
+                                <input disabled addAttr="nodeName" type="text" class="form-control text-center nodeName firstStartCity" />
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="form-group docubleUneditable">
+                            <label>节点经度：</label>
+                            <div class="display_inlineBlcok">
+                                <span class="form-control nodeLongitude" addAttr="nodeLongitude"></span>
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="form-group docubleUneditable">
+                            <label>节点纬度：</label>
+                            <div class="display_inlineBlcok">
+                                <span class="form-control nodeLatitude" addAttr="nodeLatitude"></span>
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only">获取经纬度</label>
+                            <div class="display_inlineBlcok">
+                                <span onclick="getMap(this)" class="latitudeAndlongitude margin-right">点击获取经纬度</span>
+		        				<span class="glyphicon glyphicon-plus addNodeBtn" onclick="addNodeBtn(this)">
+
+				        		</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-inline routerManagerNewAddNodeInfoDetail">
+                        <div class="form-group docubleUneditable">
+                            <label>节点编号：</label>
+                            <div class="display_inlineBlcok">
+                                <!--<input disabled type="text" class="form-control" value="1"/>-->
+                                <span addAttr="nodeNumber" class="form-control nodeNumber">1</span>
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="form-group docubleUneditable">
+                            <label>节点名称：</label>
+                            <div class="display_inlineBlcok">
+                                <input disabled addAttr="nodeName" type="text" class="form-control text-center lastEndCity nodeName" />
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="form-group docubleUneditable">
+                            <label>节点经度：</label>
+                            <div class="display_inlineBlcok">
+                                <span class="form-control nodeLongitude" addAttr="nodeLongitude"></span>
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="form-group docubleUneditable">
+                            <label>节点纬度：</label>
+                            <div class="display_inlineBlcok">
+                                <span class="form-control nodeLatitude" addAttr="nodeLatitude"></span>
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only">获取经纬度</label>
+                            <div class="display_inlineBlcok">
+                                <span onclick="getMap(this)" class="latitudeAndlongitude margin-right">点击获取经纬度</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer modalFooter">
+                <a type="button" class="btn hold" id="routerNewAddSaveClick" onclick="routerNewAddSaveClick()">保存</a>
+                <a type="button" class="btn cancel" data-dismiss="modal">取消</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal Map-->
+<div class="modal fade" id="ModalMap" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a type="button" class="close modalImgClose" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></a>
+                <h4 class="modal-title" id="myModalLabel">获取经纬度</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>地址：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control map_address"/>
+                        </div>
+                        <a class="btn btn-primary" onclick="getClick()">点击获取经纬度</a>
+                    </div>
+                </div>
+                <div class="form-control modalMap">
+                    <div id="container"></div>
+                </div>
+            </div>
+            <div class="modal-footer modalFooter form-inline">
+                <div class="form-group">
+                    <label>经度：</label>
+
+                    <div class="display_inlineBlcok margin-right">
+                        <input disabled type="text" class="form-control map_longitude"/>
+                    </div>
+                    <label>纬度：</label>
+
+                    <div class="display_inlineBlcok">
+                        <input disabled type="text" class="form-control map_latitude"/>
+                    </div>
+                    <a type="button" class="btn btn-primary" data-dismiss="modal" onclick="determine()">确定</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%--地图展示--%>
+<div class="modal fade" id="ModalMap1" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modalDialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a type="button" class="close modalImgClose" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></a>
+                <h4 class="modal-title">地图展示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-control modalMap">
+                    <div id="container1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal 小提示框-->
+<div class="modal fade bs-example-modal-sm" id="smallModalInfo" tabindex="-1" role="dialog"
+     aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">提示信息</h4>
+            </div>
+            <div class="modal-body text-center">
+                <h2 class="titleInfo">
+
+                </h2>
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

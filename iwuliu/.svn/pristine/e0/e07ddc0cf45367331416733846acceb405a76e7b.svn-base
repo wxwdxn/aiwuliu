@@ -1,0 +1,500 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <title></title>
+</head>
+<link rel="stylesheet" type="text/css"
+      href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap.min.css"/>
+<%--Bootstrap-table CSS文件--%>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-table.min.css">
+<%--Bootstrap-Datetimepicker CSS文件--%>
+<link rel="stylesheet"
+      href="<%=request.getContextPath()%>/static/common/bootstrap/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/static/common/css/common.css"/>
+<link rel="stylesheet" type="text/css"
+      href="<%=request.getContextPath()%>/static/operationManager/logisticsManager/css/logisticsManager.css"/>
+<script src="<%=request.getContextPath()%>/static/common/js/jquery-1.11.0.js" type="text/javascript"
+        charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap.min.js" type="text/javascript"
+        charset="utf-8"></script>
+<%--Bootstrap-table JavaScript 文件以及汉化文件--%>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table.min.js"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-table-zh-CN.js"></script>
+<%--Bootstrap时间控件  JavaScript 文件以及汉化文件--%>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-datetimepicker.min.js"></script>
+<script src="<%=request.getContextPath()%>/static/common/bootstrap/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="<%=request.getContextPath()%>/static/common/js/commonNav.js" type="text/javascript" charset="utf-8"></script>
+<script src="<%=request.getContextPath()%>/static/operationManager/OBDEquipManager/js/OBDEquipManager.js"
+        type="text/javascript" charset="utf-8"></script>
+<%--common.js的引用放在自己单独引用的js下面--%>
+<script src="<%=request.getContextPath()%>/static/common/js/common.js" type="text/javascript" charset="utf-8"></script>
+<!--[if lt IE 9]>
+<script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+<script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<body>
+<!--*********导航条开始***********-->
+<nav class="navbar navbar-default" role="navigation">
+</nav>
+<!--*********导航条结束***********-->
+<div class="container-fluid eleHeight">
+    <div class="row eleHeight">
+        <div class="col-md-2 leftMenu eleHeight">
+            <div isClick=true class="menuNarrow" onclick="menuNarrow(this)">
+                <img src="<%=request.getContextPath()%>/static/common/images/menuNarrow.png"/>
+            </div>
+        </div>
+        <div class="iframeMain">
+            <h4>
+                设备管理
+            </h4>
+
+            <div class="infoConditions">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label>设备品牌：</label>
+
+                        <div class="display_inlineBlcok obd_brand">
+                            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">请选择</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group nameOfinstitution">
+                        <label>设备编号：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" id="obd_id"/>
+
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group TheOwnerName">
+                        <label>设备手机号：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" id="equipment_phone_number"/>
+
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>绑定车辆牌照：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" id="plate_number"/>
+
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>设备状态：</label>
+
+                        <div class="display_inlineBlcok equipment_status">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">请选择</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li value="1"><a href="javascript:;">已绑定</a></li>
+                                <li value="0"><a href="javascript:;">未绑定</a></li>
+                            </ul>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>采购时间：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input class="form_datetime form-control" readonly="readonly"
+                                   id="register_time_start" type="text" size="16"/>
+                            至
+                            <input class="form_datetime form-control" readonly="readonly"
+                                   id="register_time_end" type="text" size="16"/>
+
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="QuerytheReset">
+                        <a type="button" class="btn query" onclick="obdEquipmentManagerQuery()">查询</a>
+                        <a type="button" class="btn reset" onclick="obdEquipmentManagerQueryReset()">重置</a>
+                    </div>
+                </form>
+                <div class="buttons">
+                    <a class="btn">
+                        车辆批量导入
+                    </a>
+                    <a type="button" class="btn btn_export">
+                        导出
+                    </a>
+                    <a type="button" class="btn btn_detail" onclick="obdEquipmentDetail()">
+                        详情/编辑
+                    </a>
+                    <a class="btn btn_newAdd" onclick="obdEquipmentNewAdd()">
+                        新增设备
+                    </a>
+                    <a class="btn" onclick="obdEquipmentDel()">
+                        删除
+                    </a>
+                </div>
+                <div class="col-md-12">
+                    <%--obd设备管理列表--%>
+                    <table data-toggle="table" class="table table-striped table-bordered table-hover"
+                           id="obdEquipmentManagerTable"
+                           data-query-params="obdEquipmentManagerQueryParams"
+                           data-query-params-type="limit"
+                           data-pagination="true"
+                           data-pagination-first-text="首页"
+                           data-pagination-pre-text="上一页"
+                           data-pagination-next-text="下一页"
+                           data-pagination-last-text="末页"
+                           data-row-style="rowStyle"
+                           data-page-list="[10, 20,30]"
+                           data-smart-display="false"
+                    >
+                        <thead style="background-color:#dbfff2;">
+                        <tr>
+                            <th data-field="state" data-checkbox="true" data-width="100px"></th>
+                            <th data-field="binding_number" data-visible="false" data-align="center" data-valign="middle">
+                                绑定信息编号
+                            </th>
+                            <th data-field="obd_brand" data-align="center" data-valign="middle">设备品牌</th>
+                            <th data-field="obd_id" data-align="center" data-valign="middle">设备编号</th>
+                            <th data-field="equipment_phone_number" data-align="center" data-valign="middle">
+                                设备手机号
+                            </th>
+                            <th data-field="register_time" data-align="center" data-valign="middle">采购时间</th>
+                            <th data-field="plate_number" data-align="center" data-valign="middle">绑定车辆牌照</th>
+                            <th data-field="binding_time" data-align="center" data-valign="middle">绑定车辆时间</th>
+                            <th data-field="truck_brand" data-align="center" data-valign="middle">车辆品牌</th>
+                            <th data-field="truck_model_name" data-align="center" data-valign="middle">车辆型号</th>
+                            <th data-field="unbinding_time" data-align="center" data-valign="middle">解绑时间</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="form-inline" align="center" style="margin: -45px auto 17px;">
+                        <input id="obd_page" class="form-control" style="width: 60px;" type="number" value="1" min="1">
+                        <button id="obd_goBtn" class="btn btn-success">GO</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 详情-->
+<div class="modal fade bs-example-modal-lg" id="myModalDetail" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modalDialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close closeLeft" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">详情</h4>
+                <a type="button" isClick=true class="btn edit" onclick="detail_edit(this)">编辑</a>
+            </div>
+            <div class="modal-body">
+                <h4>车辆信息</h4>
+
+                <form class="form-inline">
+                    <div class="form-group docubleUneditable">
+                        <label>车辆品牌：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input disabled type="text" class="form-control detail_truck_brand_id"/>
+
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                    <div class="form-group docubleUneditable">
+                        <label>车辆型号：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input disabled type="text" class="form-control detail_truck_model_no"/>
+
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                    <div class="form-group docubleUneditable">
+                        <label>车辆牌照：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input disabled type="text" class="form-control detail_plate_number"/>
+
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                </form>
+                <h4>绑定设备</h4>
+
+                <form id="obdEquipEditForm"class="form-inline">
+                    <div class="form-group uneditable">
+                        <label>设备品牌：</label>
+                        <div class="display_inlineBlcok obd_brand_detail">
+                            <button disabled class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder detail_obd_brand"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            </ul>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group uneditable">
+                        <label>设备编号：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input disabled type="text" class="form-control detail_obd_id"
+                                   onkeyup="checkObdId(this)"
+                                   style="text-transform:uppercase;"/>
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                    <div class="form-group uneditable">
+                        <label>设备手机号：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input disabled type="text" class="form-control detail_equipment_phone_number"
+                                   onkeyup="checkPhone(this)"/>
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                    <div class="form-group uneditable">
+                        <label>采购时间：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input disabled type="text" class="form-control detail_register_time" readonly="readonly"/>
+
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                    <div class="form-group docubleUneditable">
+                        <label>可用状态：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input disabled type="text" class="form-control detail_equipment_status"/>
+
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                    <div class="form-group docubleUneditable">
+                        <label>绑定时间：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input disabled type="text" class="form-control detail_binding_time"/>
+
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer modalFooter elementDisplayNone">
+                <a type="button" class="btn hold" onclick="obdEquipmentEditSave()">保存</a>
+                <a type="button" class="btn cancel" data-dismiss="modal">取消</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal 新增-->
+<div class="modal fade bs-example-modal-lg" id="myModalNewAdd" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modalDialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">新增</h4>
+            </div>
+            <div class="modal-body">
+                <h4>
+                    物流公司信息<span class="red">*号为必填项</span>
+                </h4>
+
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label>车辆品牌：</label>
+
+                        <div class="display_inlineBlcok add_truck_brand_id">
+                            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">请选择</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            </ul>
+                            <p></p>
+                        </div>
+						<span class="red">
+							*
+						</span>
+                    </div>
+                    <div class="form-group">
+                        <label>车辆型号：</label>
+
+                        <div class="display_inlineBlcok add_truck_model_no">
+                            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">请选择</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            </ul>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>车辆牌照：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" id="add_plate_number"
+                                   onBlur="checkplate(this)"
+                                   style="text-transform:uppercase;"/>
+
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                </form>
+                <h4>
+                    绑定设备
+                </h4>
+
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label>设备品牌：</label>
+
+                        <div class="display_inlineBlcok add_obd_brand">
+                            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="true">
+                                <span class="placeHolder">请选择</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            </ul>
+                            <p></p>
+                        </div>
+						<span class="red">
+							*
+						</span>
+                    </div>
+                    <div class="form-group">
+                        <label>设备编号：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" id="add_obd_id"
+                                   onkeyup="checkObdId(this)"
+                                   style="text-transform:uppercase;"/>
+
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                    <div class="form-group">
+                        <label>设备手机号：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" id="add_equipment_phone_number"
+                                   onkeyup="checkPhone(this)"/>
+
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>采购时间：</label>
+
+                        <div class="display_inlineBlcok">
+                            <input type="text" class="form-control" id="add_register_time" readonly="readonly"/>
+
+                            <p></p>
+                        </div>
+                        <span class="red">*</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer modalFooter">
+                <a type="button" class="btn hold" onclick="obdEquipmentSave()">保存</a>
+                <a type="button" class="btn cancel" data-dismiss="modal">取消</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal imgBig-->
+<div class="modal fade" id="ModalImg" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">图片信息</h4>
+            </div>
+            <div class="modal-body modalImg">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal 小提示框删除-->
+<div class="modal fade bs-example-modal-sm" id="smallModalInfoDelet" tabindex="-1" role="dialog"
+     aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">提示信息</h4>
+            </div>
+            <div class="modal-body text-center">
+                <h2 class="titleInfoDelet">
+
+                </h2>
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn btn-default confirmDelet" data-dismiss="modal">确定</button>
+                <button type="button" class="btn btn-default cancel" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal 小提示框-->
+<div class="modal fade bs-example-modal-sm" id="smallModalInfo" tabindex="-1" role="dialog"
+     aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">提示信息</h4>
+            </div>
+            <div class="modal-body text-center">
+                <h2 class="titleInfo">
+
+                </h2>
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn btn-default confirm" data-dismiss="modal">确定</button>
+                <button type="button" class="btn btn-default cancel" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

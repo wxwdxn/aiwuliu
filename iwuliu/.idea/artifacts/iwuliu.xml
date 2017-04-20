@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact name="iwuliu">
+    <output-path>$PROJECT_DIR$/classes/artifacts/iwuliu</output-path>
+    <root id="root" />
+  </artifact>
+</component>
